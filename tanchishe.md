@@ -1,6 +1,7 @@
 ---
 layout: default
 title: 🐍 贪吃蛇游戏
+permalink: /tanchishe/
 ---
 
 <div style="max-width: 800px; margin: 0 auto;">
