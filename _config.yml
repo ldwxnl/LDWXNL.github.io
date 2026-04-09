@@ -1,5 +1,13 @@
-title: LDWXNL 的主页       # 网站标题
-description: 我的个人网站和博客 # 网站描述
-baseurl: ""              # 保持为空
-url: "https://ldwxnl.github.io"  # 你的网站地址
-theme: jekyll-theme-cayman  # 使用深蓝色科技感主题
+title: LDWXNL 的主页
+description: 我的个人网站和博客
+baseurl: ""
+url: "https://ldwxnl.github.io"
+theme: jekyll-theme-cayman
+
+# 自定义颜色（可选）
+color:
+  primary: "#2a7ae2"   # 主色调（按钮、链接）
+  secondary: "#6c757d" # 次要颜色
+  background: "#ffffff" # 背景色
+  text: "#333333"      # 文字颜色
+  link: "#007bff"      # 链接颜色
