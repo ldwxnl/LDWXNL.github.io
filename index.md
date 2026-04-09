@@ -16,6 +16,8 @@ title: 首页
     </p>
     <p style="color: #888; font-size: 0.9rem;">
       📧 联系我: qwrrdfrrfgr@qq.com | 🔗 <a href="https://github.com/ldwxnl" style="color: #0366d6;">GitHub</a>
+
+      [查看我的博客](/posts) | [🎮 游戏中心](/games)
     </p>
   </div>
 </div>
