@@ -18,10 +18,8 @@ title: 首页
       📧 联系我: qwrrdfrrfgr@qq.com | 🔗 <a href="https://github.com/ldwxnl" style="color: #0366d6;">GitHub</a>
 
 <div style="margin: 2rem 0; text-align: center;">
-  <a href="/posts" style="margin: 0 1rem; padding: 0.5rem 1rem; background: #0366d6; color: white; text-decoration: none; border-radius: 4px;">查看我的博客</a>
-  <a href="/games" style="margin: 0 1rem; padding: 0.5rem 1rem; background: #28a745; color: white; text-decoration: none; border-radius: 4px;">🎮 游戏中心</a>
+  <a href="/posts" style="margin: 0 1rem; padding: 0.5rem 1rem;  color: white; text-decoration: none; border-radius: 4px;">查看我的博客</a>
+  <a href="/games" style="margin: 0 1rem; padding: 0.5rem 1rem;  color: white; text-decoration: none; border-radius: 4px;">🎮 游戏中心</a>
     </p>
-  </div>
-</div>
     
  
