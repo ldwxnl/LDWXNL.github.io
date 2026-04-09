@@ -25,9 +25,4 @@ style="display: none; margin-top: 1rem; padding: 1rem; background: #f9f9f9; bord
 <p style="margin-top: 1rem;"><strong>联系方式：</strong> <a href="mailto:your@email.com">your@email.com</a>
       
     
-  <p style="margin-top: 1.5rem;"><a href="/posts" class="btn btn-primary">查看我的博客 →</a>
-<hr style="margin: 3rem 0; border: 0; border-top: 1px solid #eee;">
-<div style="background: #f9f9f9; padding: 2rem; border-radius: 8px;">
-  <h3 style="color: #333;">关于我</h3>
  
-  <p style="line-height: 1.6;">你好！我是 LDWXNL/好燃，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。欢迎常来坐坐！
