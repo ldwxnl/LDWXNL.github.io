@@ -42,7 +42,7 @@ title: 首页
   ">查看我的博客</a>
 
   <!-- 游戏中心按钮 -->
-  <a href="/games" style="
+<a href="/games">🎮 游戏中心</a> style="
     padding: 1rem 2.5rem;
     color: #222;
     text-decoration: none;
