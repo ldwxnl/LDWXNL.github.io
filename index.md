@@ -17,9 +17,15 @@ title: 首页
     <p style="color: #888; font-size: 0.9rem;">
       📧 联系我: qwrrdfrrfgr@qq.com | 🔗 <a href="https://github.com/ldwxnl" style="color: #0366d6;">GitHub</a>
 
-<div style="margin: 2rem 0; text-align: center;">
-  <a href="/posts" style="margin: 0 1rem; padding: 0.5rem 1rem;  color: white; text-decoration: none; border-radius: 4px;">查看我的博客</a>
-  <a href="{{ site.baseurl }}/games">🎮 游戏中心</a>
-    </p>
+<div style="margin: 3rem 0; text-align: center;">
+  <a href="/posts" style="margin: 0 1rem; padding: 0.8rem 2rem; color: #222; text-decoration: none; border: 1px solid #ddd; border-radius: 4px; font-weight: 500; background: transparent; transition: all 0.2s;">查看我的博客</a>
+  <a href="/games" style="margin: 0 1rem; padding: 0.8rem 2rem; color: #222; text-decoration: none; border: 1px solid #ddd; border-radius: 4px; font-weight: 500; background: transparent; transition: all 0.2s;">🎮 游戏中心</a>
+<style>
+  /* 方案一、二的悬停效果 */
+  a:hover {
+    background: #222 !important;
+    color: white !important;
+    border-color: #222 !important;
+  }
     
  
