@@ -11,12 +11,12 @@ title: 首页
     
 
  <!-- 头像 + 文字容器 -->
-  <div id="avatar-container" style="margin: 2rem auto; max-width: 300px;">
-  <img id="my-avatar" 
-  src="/assets/images/avatar.jpg" 
-  alt="我的头像" 
-  style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; cursor: pointer; transition: transform 0.2s;"
-  onclick="toggleText()">
+<div id="avatar-container" style="margin: 2rem auto; max-width: 300px;">
+<img id="my-avatar" 
+src="/assets/images/avatar.jpg" 
+alt="我的头像" 
+style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; cursor: pointer; transition: transform 0.2s;"
+onclick="toggleText()">
     
     <div id="avatar-text" 
          style="display: none; margin-top: 1rem; padding: 1rem; background: #f9f9f9; border-radius: 8px; text-align: left; line-height: 1.6;">
