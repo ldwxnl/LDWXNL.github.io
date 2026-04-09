@@ -54,7 +54,7 @@ title: 首页
     text-align: center;
     min-width: 180px;
   ">🎮 游戏中心</a>
-<a href="/tanchishe.html">游戏中心</a>
+
 </div>
 
 <!-- 悬停效果（必须放在这个位置） -->
