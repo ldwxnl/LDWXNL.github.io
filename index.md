@@ -15,3 +15,4 @@ title: 首页
   <h3 style="color: #333;">关于我</h3>
   <p style="line-height: 1.6;">你好！我是 LDWXNL/好燃，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。欢迎常来坐坐！
 </div>
+<img src="/assets/images/avatar.jpg" alt="我的头像" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
