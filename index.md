@@ -7,7 +7,10 @@ title: 首页
   <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">👋 欢迎来到我的网站！</h1>
   <p style="font-size: 1.2rem; color: #555;">我是ldwxnl，你问我是谁，别问，问就是ldwxnl
   
-  
+ 
+ 
+ 
+ 
  <img src="/assets/images/avatar.jpg" alt="我的头像" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"> 
 
  <p style="margin-top: 1.5rem;"><a href="/posts" class="btn btn-primary color: #333;">查看我的博客 →</a>
