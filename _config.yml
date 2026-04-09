@@ -1,0 +1,5 @@
+title: LDWXNL 的主页       # 网站标题
+description: 我的个人网站和博客 # 网站描述
+baseurl: ""              # 保持为空
+url: "https://ldwxnl.github.io"  # 你的网站地址
+theme: jekyll-theme-cayman  # 使用深蓝色科技感主题
