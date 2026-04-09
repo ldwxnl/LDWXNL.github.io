@@ -18,15 +18,15 @@ title: 首页
       📧 联系我: qwrrdfrrfgr@qq.com | 🔗 <a href="https://github.com/ldwxnl" style="color: #0366d6;">GitHub</a>
 
 <div style="margin: 3rem 0; text-align: center;">
-  <a href="/posts" style="margin: 0 1rem; padding: 0.9rem 2.2rem; color: #222; text-decoration: none; border-radius: 6px; font-weight: 500; background: transparent; border: 1px solid #eee; transition: all 0.3s;">查看我的博客</a>
-  <a href="/games" style="margin: 0 1rem; padding: 0.9rem 2.2rem; color: #222; text-decoration: none; border-radius: 6px; font-weight: 500; background: transparent; border: 1px solid #eee; transition: all 0.3s;">🎮 游戏中心</a>
+  <a href="/posts" style="margin: 0 1rem; padding: 0.9rem 2.2rem; color: #222; text-decoration: none; border-radius: 6px; font-weight: 500; background: white; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s;">查看我的博客</a>
+  <a href="/games" style="margin: 0 1rem; padding: 0.9rem 2.2rem; color: #222; text-decoration: none; border-radius: 6px; font-weight: 500; background: white; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s;">🎮 游戏中心</a>
 </div>
 
 <style>
   a:hover {
-    background: #222 !important;
-    color: white !important;
-    border-color: #222 !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    border-color: #ddd;
   }
 </style>
  
