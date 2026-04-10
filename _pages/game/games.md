@@ -1,7 +1,7 @@
 ---
-布局:默认
-title: 我的小游戏
-永久链接:/ /游戏
+layout: default
+title: 🎮 游戏中心
+permalink: /games/ 
 ---
 
 # 🎮 我的游戏集合
