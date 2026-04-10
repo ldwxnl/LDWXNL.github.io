@@ -11,3 +11,6 @@ color:
   background: "#ffffff" # 背景色
   text: "#333333"      # 文字颜色
   link: "#007bff"      # 链接颜色
+  
+include: ["_pages"]  # ✅ 关键：包含 _pages 文件夹
+exclude: []           # 确保这里是空数组
