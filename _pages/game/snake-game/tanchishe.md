@@ -1,48 +1,48 @@
 ---
 布局:默认
 title: 🐍 贪吃蛇游戏
-permalink: /snake-game/
+永久链接:贪吃蛇游戏/
 ---
 
 <!-- 游戏容器 -->
 <div id="game-app">
   <!-- 顶部标题 -->
-  <div class="game-header">
-    <h1>🐍 贪吃蛇游戏</h1>
-    <p class="subtitle">滑动屏幕或使用键盘控制，吃到食物变长</p>
-  </div>
+<div 类="game-header">
+    <h1>🐍 贪吃蛇游戏& lt;h1>
+    <p 类="subtitle">滑动屏幕或使用键盘控制，吃到食物变长& lt;p>
+“divv”。
   
   <!-- 游戏主界面 -->
-  <div class="game-main">
+<div 类="game-main">
     <!-- 左侧控制面板 -->
-    <div class="control-panel">
+<div 类="control-panel">
       <!-- 皮肤选择 -->
-      <div class="panel-section">
-        <h3>🐍 皮肤选择</h3>
-        <div class="skin-selector">
-          <div class="skin-option active" data-skin="classic">
-            <div class="skin-preview classic"></div>
-            <span>经典</span>
-          </div>
-          <div class="skin-option" data-skin="neon">
-            <div class="skin-preview neon"></div>
-            <span>霓虹</span>
-          </div>
-          <div class="skin-option" data-skin="pixel">
-            <div class="skin-preview pixel"></div>
-            <span>像素</span>
-          </div>
-          <div class="skin-option" data-skin="nature">
-            <div class="skin-preview nature"></div>
-            <span>自然</span>
-          </div>
-        </div>
-      </div>
+<div 类="panel-section">
+        <h3>🐍 皮肤选择& lt;h3>
+<div 类="skin-selector">
+<div 类=“skin-option 活跃的" data-skin="classic">
+div 类=皮肤预览经典
+<span>经典& lt;span>
+“divv”。
+<div 类="skin-option" data-skin="neon">
+div 类=皮肤预览neon
+<span>霓虹& lt;span>
+“divv”。
+<div 类="skin-option" data-skin="pixel">
+div 类=皮肤预览像素
+<span>像素& lt;span>
+“divv”。
+<div 类="skin-option" data-skin="nature">
+div 类=“皮肤预览自然”
+<span>自然</span>
+“divv”。
+“divv”。
+“divv”。
       
       <!-- 游戏设置 -->
-      <div class="panel-section">
+    <div 类="panel-section">
         <h3>⚙️ 游戏设置</h3>
-        <div class="setting-item">
+    <div 类="setting-item">
           <label>游戏速度</label>
           <select id="speed-select">
             <option value="200">慢速</option>
@@ -50,8 +50,8 @@ permalink: /snake-game/
             <option value="100">快速</option>
             <option value="70">极速</option>
           </select>
-        </div>
-        <div class="setting-item">
+“divv”。
+<div 类="setting-item">
           <label>网格大小</label>
           <select id="grid-select">
             <option value="15">大网格</option>
