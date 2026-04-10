@@ -1,48 +1,48 @@
 ---
-布局:默认
+layout: default
 title: 🐍 贪吃蛇游戏
-永久链接:贪吃蛇游戏/
+permalink: /snake-game/
 ---
 
 <!-- 游戏容器 -->
 <div id="game-app">
   <!-- 顶部标题 -->
-<div 类="game-header">
-    <h1>🐍 贪吃蛇游戏& lt;h1>
-    <p 类="subtitle">滑动屏幕或使用键盘控制，吃到食物变长& lt;p>
-“divv”。
+  <div class="game-header">
+    <h1>🐍 贪吃蛇游戏</h1>
+    <p class="subtitle">滑动屏幕或使用键盘控制，吃到食物变长</p>
+  </div>
   
   <!-- 游戏主界面 -->
-<div 类="game-main">
+  <div class="game-main">
     <!-- 左侧控制面板 -->
-<div 类="control-panel">
+    <div class="control-panel">
       <!-- 皮肤选择 -->
-<div 类="panel-section">
-        <h3>🐍 皮肤选择& lt;h3>
-<div 类="skin-selector">
-<div 类=“skin-option 活跃的" data-skin="classic">
-div 类=皮肤预览经典
-<span>经典& lt;span>
-“divv”。
-<div 类="skin-option" data-skin="neon">
-div 类=皮肤预览neon
-<span>霓虹& lt;span>
-“divv”。
-<div 类="skin-option" data-skin="pixel">
-div 类=皮肤预览像素
-<span>像素& lt;span>
-“divv”。
-<div 类="skin-option" data-skin="nature">
-div 类=“皮肤预览自然”
-<span>自然</span>
-“divv”。
-“divv”。
-“divv”。
+      <div class="panel-section">
+        <h3>🐍 皮肤选择</h3>
+        <div class="skin-selector">
+          <div class="skin-option active" data-skin="classic">
+            <div class="skin-preview classic"></div>
+            <span>经典</span>
+          </div>
+          <div class="skin-option" data-skin="neon">
+            <div class="skin-preview neon"></div>
+            <span>霓虹</span>
+          </div>
+          <div class="skin-option" data-skin="pixel">
+            <div class="skin-preview pixel"></div>
+            <span>像素</span>
+          </div>
+          <div class="skin-option" data-skin="nature">
+            <div class="skin-preview nature"></div>
+            <span>自然</span>
+          </div>
+        </div>
+      </div>
       
       <!-- 游戏设置 -->
-    <div 类="panel-section">
+      <div class="panel-section">
         <h3>⚙️ 游戏设置</h3>
-    <div 类="setting-item">
+        <div class="setting-item">
           <label>游戏速度</label>
           <select id="speed-select">
             <option value="200">慢速</option>
@@ -50,8 +50,8 @@ div 类=“皮肤预览自然”
             <option value="100">快速</option>
             <option value="70">极速</option>
           </select>
-“divv”。
-<div 类="setting-item">
+        </div>
+        <div class="setting-item">
           <label>网格大小</label>
           <select id="grid-select">
             <option value="15">大网格</option>
@@ -1026,21 +1026,21 @@ function updateSpeedDisplay() {
   dom.currentSpeed.textContent = speedMap[gameState.speed] || '自定义';
 }
 
-showOverlay(title, text) {
-dom.overlayTitle.innerHTML = title；
-dom.overlayText.innerHTML = text；
-Dom.overlay.style.display = 'flex'；
+function showOverlay(title, text) {
+  dom.overlayTitle.innerHTML = title;
+  dom.overlayText.innerHTML = text;
+  dom.overlay.style.display = 'flex';
 }
 
 // ==================== 工具函数 ====================
-函数handleKeyDown(e) {
-如果(gameState。&& ！isGameOver)返回;
+function handleKeyDown(e) {
+  if (gameState.isPaused && !gameState.isGameOver) return;
   
-开关(e。键){
-case 'ArrowUp': case 'w': case 'w'：
-如果(gameState。dy !== 1) {gameState。Dx = 0；gameState。Dy = -1；}打破;
-case 'ArrowDown': case 's': case 's'：
-如果(gameState。dy !== -1) {gameState。Dx = 0；gameState。Dy = 1；}打破;
+  switch(e.key) {
+    case 'ArrowUp': case 'w': case 'W':
+      if (gameState.dy !== 1) { gameState.dx = 0; gameState.dy = -1; } break;
+    case 'ArrowDown': case 's': case 'S':
+      if (gameState.dy !== -1) { gameState.dx = 0; gameState.dy = 1; } break;
     case 'ArrowLeft': case 'a': case 'A':
       if (gameState.dx !== 1) { gameState.dx = -1; gameState.dy = 0; } break;
     case 'ArrowRight': case 'd': case 'D':
@@ -1054,22 +1054,64 @@ case 'ArrowDown': case 's': case 's'：
 
 function formatTime(ms) {
   const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-常量 seconds = totalSeconds % 60；
-返回“$ {minutes.toString()。padStart (2, ' 0 ')}: $ {seconds.toString()。padStart (2, ' 0 ')} ';
+const 分钟 =常量(totalSeconds / 60)；
+常量
+返回“$ {minutes.toString返回)。padStart (2, ' 0 ')}: $ {seconds.toString()。padStart (2, ' 0 ')} ';
 }
 
 // 游戏主循环
-函数 gameLoop() {
+函数 () { gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
 // ==================== 启动游戏 ====================
-如果文档。readyState === “加载”) {
-文档。addEventListener (DOMContentLoaded”内,initGame);
-} else {
+如果
+“DOMContentLoaded”内
+} 其他 {
   initGame();
 }
 < / script>
 
 ---
+
+## 🎯 第二阶段和第三阶段的实现计划
+
+### 第二阶段：AI 对战模式
+- **实现方式**：A* 路径寻找算法
+- **AI难度**：简单/中等/困难
+- **功能**：与AI蛇对战，AI会自动寻找食物并避开障碍
+- **预计时间**：2-3天开发
+
+### 第三阶段：多人广域网对战
+- **实现方式**：WebSocket + Node.- **实现方式**：WebSocket   Node.js 后端 后端
+- **托管需求**：需要单独的服务器（不能只用 GitHub Pages）
+- **功能**：创建房间、加入房间、实时对战
+- **预计时间**：1-2周开发
+
+---
+
+## 📱 当前版本特性总结
+
+你现在拥有的这个版本已经包含：
+
+✅ **完整的单人游戏体验**  
+✅ **4种可切换皮肤**（经典、霓虹、像素、自然）  
+✅ **完美手机适配**（触摸控制 + 响应式布局）  
+✅ **游戏设置**（速度、网格大小可调）  
+✅ **统计系统**（时间、食物计数、最高分）  
+✅ **专业UI设计**（现代化深色主题）
+
+---
+
+## 🔧 部署步骤
+
+1. 在你的 GitHub Pages 仓库中创建文件夹：“贪吃蛇游戏/”
+2. 在该文件夹中创建 `index.md` 文件
+3. 复制上面的完整代码到 `index.md`
+4. 保存并推送到 GitHub
+5. 等待 1-2 分钟部署
+6. 访问：`https://你的域名/snake-game/`
+
+---
+
+这个版本已经是一个**专业级的贪吃蛇游戏**，比之前的基础版强大了很多。先部署这个版本，测试手机适配效果。如果满意，我们再继续开发AI对战功能。
