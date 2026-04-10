@@ -11,7 +11,7 @@ title: 我的小游戏
 [点击试玩](https://play2048.co/)
 
 ## 2. 🐍 贪吃蛇（自制）
-[点击试玩](/page/game/snakegame/tanchishe) - 经典贪吃蛇游戏，用方向键控制
+[点击试玩](/snake-game/) - 经典贪吃蛇游戏，用方向键控制
 
 ## 3. 更多游戏推荐
 - [飞扬的鸟]（https://flappybird.io/）
