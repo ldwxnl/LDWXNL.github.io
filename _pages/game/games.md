@@ -1,5 +1,5 @@
 ---
-layout: default
+布局:默认
 title: 🎮 游戏中心
 permalink: /games/ 
 ---
@@ -14,5 +14,5 @@ permalink: /games/
 [点击试玩](/snake-game/) - 经典贪吃蛇游戏，用方向键控制
 
 ## 3. 更多游戏推荐
-- [飞扬的鸟](https://flappybird.io/）
+- [飞翔的鸟](https://flappybird.io/)
 - [Chrome 小恐龙游戏](chrome: / /恐龙)（需离线时访问）
