@@ -1,8 +1,9 @@
 ---
 layout: default
-title: 🐍 贪吃蛇（自制）
-permalink: /snake-game/
+title: 🐍 贪吃蛇游戏
+permalink: games/snake-game/
 ---
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
