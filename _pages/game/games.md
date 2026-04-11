@@ -1,7 +1,7 @@
 ---
 布局:默认
 title: 🎮 游戏中心
-permalink: /games/ 
+永久链接:/ /游戏
 ---
 
 # 🎮 我的游戏集合
@@ -11,7 +11,7 @@ permalink: /games/
 [点击试玩](https://play2048.co/)
 
 ## 2. 🐍 贪吃蛇（自制）
-[点击试玩](/snake-game/) - 经典贪吃蛇游戏，用方向键控制
+[点击试玩](snake-game/) - 经典贪吃蛇游戏，用方向键控制
 
 ## 3. 更多游戏推荐
 - [飞翔的鸟](https://flappybird.io/)
