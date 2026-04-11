@@ -3,7 +3,6 @@ layout: default
 title: 🐍 贪吃蛇（自制）
 permalink: /games/
 ---
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
