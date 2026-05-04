@@ -27,4 +27,4 @@ permalink: /games/
 
 ## 4. 更多游戏推荐
 - [飞翔的鸟](https://flappybird.io/)
-- [Chrome 小恐龙游戏](chrome: / /恐龙)（需离线时访问）
+- [Chrome 小恐龙游戏](chrome://恐龙)（需离线时访问）
