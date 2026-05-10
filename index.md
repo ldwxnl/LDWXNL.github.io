@@ -16,6 +16,9 @@ title: 首页
     </p>
     <p style="color: #888; font-size: 0.9rem;">
       📧 联系我: qwrrdfrrfgr@qq.com | 🔗 <a href="https://github.com/ldwxnl" style="color: #0366d6;">GitHub</a>
+    </p> <!-- 这里缺少的 </p> 标签我补上了 -->
+  </div>
+</div> <!-- 这里缺少的 </div> 标签我补上了 -->
 
 <!-- 按钮容器 - 用 flex 布局保证完美居中 -->
 <div style="
@@ -41,7 +44,7 @@ title: 首页
     min-width: 180px;
   ">查看我的博客</a>
 
-<!-- 游戏中心按钮 -->
+  <!-- 游戏中心按钮 -->
   <a href="/games" style="
     padding: 1rem 2.5rem;
     color: #222;
@@ -57,7 +60,7 @@ title: 首页
 
 </div>
 
-<!-- 悬停效果（必须放在这个位置） -->
+<!-- 悬停效果 -->
 <style>
   a:hover {
     background: #222;
@@ -79,44 +82,74 @@ title: 首页
   }
 </style>
 
----
-## 🎮 玩家留言板
+<hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
 
-欢迎大家在下方留言交流心得、反馈问题或分享进服体验！
+<!-- 留言板区域 - 独立容器，不影响上面布局 -->
+<div style="
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+">
 
-> **提示**：评论需要 GitHub 账号，数据会保存在你仓库的 Discussions 中。
+  <h2 style="margin-top: 0; color: #333; font-size: 1.8rem;">💬 玩家留言板</h2>
+  
+  <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem;">
+    欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
+  </p>
+  
+  <div style="
+    background: #f8f9fa;
+    border-left: 4px solid #4CAF50;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0 6px 6px 0;
+  ">
+    <p style="margin: 0; color: #555; font-size: 0.95rem;">
+      <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
+    </p>
+  </div>
+  
+  <!-- Giscus 容器 - 限制高度，防止撑开 -->
+  <div id="giscus-container" style="
+    min-height: 300px;
+    max-height: 600px;
+    overflow: visible;
+  ">
+    <!-- Giscus 会在这里加载 -->
+  </div>
+  
+</div>
 
-<!-- Giscus 评论框容器 -->
-<div id="giscus-comments" style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa;"></div>
-
-<!-- 引入 Giscus 的 JS -->
+<!-- Giscus 脚本 -->
 <script src="https://giscus.app/client.js"
         data-repo="LDWXNL/LDWXNL.github.io"
-        data-repo-id="R_kgDOO..."
+        data-repo-id="R_kgDxxxxxxxxx"
         data-category="Announcements"
-        data-category-id="DIC_kwDOO..."
+        data-category-id="DIC_kwDxxxxxxxxx"
         data-mapping="pathname"
         data-strict="0"
         data-reactions-enabled="1"
         data-emit-metadata="0"
         data-input-position="bottom"
-        data-theme="light"
+        data-theme="preferred_color_scheme"
         data-lang="zh-CN"
         crossorigin="anonymous"
         async>
 </script>
 
-<!-- 可选：隐藏 Giscus 的默认表情和登录提示 -->
+<!-- 可选：优化 Giscus 显示 -->
 <style>
-  #giscus-comments .giscus-frame {
-    border: none !important;
+  #giscus-container .giscus-frame {
+    width: 100%;
+    border: none;
   }
-  #giscus-comments .giscus-header {
-    display: none !important; /* 隐藏顶部的“0 个表情”等 */
-  }
-  #giscus-comments .giscus-footer {
-    display: none !important; /* 隐藏底部的“退出登录”等 */
+  
+  /* 隐藏不必要元素 */
+  .giscus-header,
+  .giscus-footer {
+    display: none !important;
   }
 </style>
-        async>
-</script>
