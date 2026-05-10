@@ -89,7 +89,7 @@ title: 首页
 > **提示**：评论需要 GitHub 账号，数据会保存在你仓库的 Discussions 中。
 
 <script src="https://giscus.app/client.js"
-        data-repo="LDWXNL"
+        data-repo="LDWXNL/LDWXNL.github.io"
         data-repo-id="R_kgDxxxxxxxxx"
         data-category="Announcements"
         data-category-id="DIC_kwDxxxxxxxxx"
