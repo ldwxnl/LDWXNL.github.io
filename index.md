@@ -89,7 +89,7 @@ title: 首页
   </div>
   </div>  
   <!-- Giscus 评论区会直接加载在这个容器里 -->
-  <div id="giscus-container"></div>
+  <div class="giscus"></div>
   
 </div>
 
