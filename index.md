@@ -60,57 +60,70 @@ title: 首页
 
 </div>
 
-<!-- 独立的留言板说明区域 -->
+<hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
+
+<!-- 留言板完整区域 - 用一个容器包起来 -->
 <div style="
   max-width: 800px;
-  margin: 3rem auto;
-  padding: 2.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  color: white;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 ">
 
-  <h2 style="margin-top: 0; color: white; font-size: 2rem; margin-bottom: 1rem;">💬 玩家留言板</h2>
-
-  <p style="font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; opacity: 0.95;">
-    欢迎在此交流游戏心得、反馈问题或分享进服体验！<br>
-    <strong>请注意：</strong> 本页面暂未开通实时评论功能。如需联系，请通过上方邮箱或 GitHub 与我交流。
+  <h2 style="margin-top: 0; color: #333; font-size: 1.8rem; text-align: center;">💬 玩家留言板</h2>
+  
+  <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem; text-align: center;">
+    欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
   </p>
-
+  
   <div style="
-    background: rgba(255, 255, 255, 0.15);
-    padding: 1.2rem;
-    border-radius: 10px;
-    border-left: 5px solid #ffdd40;
-    margin-top: 1.5rem;
+    background: #f8f9fa;
+    border-left: 4px solid #4CAF50;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0 6px 6px 0;
   ">
-    <p style="margin: 0; font-size: 0.95rem; line-height: 1.6;">
-      <strong>💡 说明：</strong> 此“留言板”为静态说明页面。<br>
-      所有关于游戏服务器、博客内容的讨论，欢迎通过其他渠道进行。
+    <p style="margin: 0; color: #555; font-size: 0.95rem;">
+      <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
+      闲聊、反馈、求带都可以，但请注意网络礼仪。
     </p>
   </div>
-
+  
+  <!-- Giscus 评论区会直接加载在这个容器里 -->
+  <div id="giscus-container"></div>
+  
 </div>
 
-<!-- 悬停效果（保留） -->
+<!-- Giscus 脚本 -->
+<script src="https://giscus.app/client.js"
+        data-repo="LDWXNL/LDWXNL.github.io"
+        data-repo-id="R_kgDOR96W3Q"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOR96W3c4C8t89"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
+
+<!-- 优化样式 -->
 <style>
-  a:hover {
-    background: #222;
-    color: white;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  /* 确保Giscus框架填满容器 */
+  .giscus, .giscus-frame {
+    width: 100%;
+    border: none;
+    min-height: 300px;
   }
-  /* 手机端优化 */
-  @media (max-width: 768px) {
-    div[style*="display: flex"] {
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-    a[style*="min-width"] {
-      width: 90%;
-      max-width: 300px;
-    }
+  /* 隐藏默认的giscus页眉页脚（可选） */
+  .giscus .giscus-header,
+  .giscus .giscus-footer {
+    display: none;
   }
 </style>
