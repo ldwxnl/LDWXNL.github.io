@@ -126,9 +126,9 @@ title: 首页
 <!-- Giscus 脚本 -->
 <script src="https://giscus.app/client.js"
         data-repo="LDWXNL/LDWXNL.github.io"
-        data-repo-id="R_kgDxxxxxxxxx"
-        data-category="Announcements"
-        data-category-id="DIC_kwDxxxxxxxxx"
+        data-repo-id="R_kgDOR96W3Q"
+        data-category="[在此输入分类名]"
+        data-category-id="[在此输入分类 ID]"
         data-mapping="pathname"
         data-strict="0"
         data-reactions-enabled="1"
@@ -139,7 +139,6 @@ title: 首页
         crossorigin="anonymous"
         async>
 </script>
-
 <!-- 可选：优化 Giscus 显示 -->
 <style>
   #giscus-container .giscus-frame {
