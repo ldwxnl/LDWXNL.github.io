@@ -127,16 +127,16 @@ title: 首页
 <script src="https://giscus.app/client.js"
         data-repo="LDWXNL/LDWXNL.github.io"
         data-repo-id="R_kgDOR96W3Q"
-        data-category="[在此输入分类名]"
-        data-category-id="[在此输入分类 ID]"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOR96W3c4C8t89"
         data-mapping="pathname"
         data-strict="0"
         data-reactions-enabled="1"
         data-emit-metadata="0"
-        data-input-position="bottom"
+        data-input-position="top"
         data-theme="preferred_color_scheme"
         data-lang="zh-CN"
-        crossorigin="General"
+        crossorigin="anonymous"
         async>
 </script>
 <!-- 可选：优化 Giscus 显示 -->
