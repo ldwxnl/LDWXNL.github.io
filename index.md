@@ -79,27 +79,44 @@ title: 首页
   }
 </style>
 
-
 ---
-
-## 💬 玩家留言板
+## 🎮 玩家留言板
 
 欢迎大家在下方留言交流心得、反馈问题或分享进服体验！
 
 > **提示**：评论需要 GitHub 账号，数据会保存在你仓库的 Discussions 中。
 
+<!-- Giscus 评论框容器 -->
+<div id="giscus-comments" style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa;"></div>
+
+<!-- 引入 Giscus 的 JS -->
 <script src="https://giscus.app/client.js"
         data-repo="LDWXNL/LDWXNL.github.io"
-        data-repo-id="R_kgDxxxxxxxxx"
+        data-repo-id="R_kgDOO..."
         data-category="Announcements"
-        data-category-id="DIC_kwDxxxxxxxxx"
+        data-category-id="DIC_kwDOO..."
         data-mapping="pathname"
         data-strict="0"
         data-reactions-enabled="1"
         data-emit-metadata="0"
         data-input-position="bottom"
-        data-theme="preferred_color_scheme"
+        data-theme="light"
         data-lang="zh-CN"
         crossorigin="anonymous"
+        async>
+</script>
+
+<!-- 可选：隐藏 Giscus 的默认表情和登录提示 -->
+<style>
+  #giscus-comments .giscus-frame {
+    border: none !important;
+  }
+  #giscus-comments .giscus-header {
+    display: none !important; /* 隐藏顶部的“0 个表情”等 */
+  }
+  #giscus-comments .giscus-footer {
+    display: none !important; /* 隐藏底部的“退出登录”等 */
+  }
+</style>
         async>
 </script>
