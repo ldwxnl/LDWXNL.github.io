@@ -78,3 +78,28 @@ title: 首页
     }
   }
 </style>
+
+
+---
+
+## 💬 玩家留言板
+
+欢迎大家在下方留言交流心得、反馈问题或分享进服体验！
+
+> **提示**：评论需要 GitHub 账号，数据会保存在你仓库的 Discussions 中。
+
+<script src="https://giscus.app/client.js"
+        data-repo="你的GitHub用户名/你的仓库名"
+        data-repo-id="R_kgDxxxxxxxxx"
+        data-category="Announcements"
+        data-category-id="DIC_kwDxxxxxxxxx"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
