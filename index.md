@@ -84,44 +84,10 @@ title: 首页
 
 <hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
 
-<!-- 留言板区域 - 独立容器，不影响上面布局 -->
-<div style="
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-">
 
-  <h2 style="margin-top: 0; color: #333; font-size: 1.8rem;">💬 玩家留言板</h2>
-  
-  <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem;">
     欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
-  </p>
-  
-  <div style="
-    background: #f8f9fa;
-    border-left: 4px solid #4CAF50;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
-    border-radius: 0 6px 6px 0;
-  ">
-    <p style="margin: 0; color: #555; font-size: 0.95rem;">
+
       <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
-    </p>
-  </div>
-  
-  <!-- Giscus 容器 - 限制高度，防止撑开 -->
-  <div id="giscus-container" style="
-    min-height: 300px;
-    max-height: 600px;
-    overflow: visible;
-  ">
-    <!-- Giscus 会在这里加载 -->
-  </div>
-  
-</div>
 
 <!-- Giscus 脚本 -->
 <script src="https://giscus.app/client.js"
