@@ -21,9 +21,6 @@ title: 首页
         📧 联系我: qwrrdfrrfgr@qq.com | 🔗
         <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
       </p>
-    </div>
-  </div>
-
   <!-- 网站核心功能按钮区域 -->
   <div style="text-align: center;">
     <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
