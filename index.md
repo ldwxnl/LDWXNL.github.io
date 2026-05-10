@@ -87,7 +87,7 @@ title: 首页
       闲聊、反馈、求带都可以，但请注意网络礼仪。
     </p>
   </div>
-  
+  </div>  
   <!-- Giscus 评论区会直接加载在这个容器里 -->
   <div id="giscus-container"></div>
   
