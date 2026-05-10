@@ -136,7 +136,7 @@ title: 首页
         data-input-position="bottom"
         data-theme="preferred_color_scheme"
         data-lang="zh-CN"
-        crossorigin="anonymous"
+        crossorigin="General"
         async>
 </script>
 <!-- 可选：优化 Giscus 显示 -->
