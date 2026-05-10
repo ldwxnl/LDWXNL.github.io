@@ -84,10 +84,11 @@ title: 首页
 
 <hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
 
+    留言板
 
     欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
 
-      <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
+    📌 提示： 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
 
 <!-- Giscus 脚本 -->
 <script src="https://giscus.app/client.js"
