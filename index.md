@@ -3,234 +3,231 @@ layout: default
 title: 首页
 ---
 <style>
-  /* Steam 风格全局样式 */
-  :root {
-    --steam-bg: #1b2838;
-    --steam-card: #2a475e;
-    --steam-accent: #66c0f4;
-    --steam-text: #c7d5e0;
-    --steam-border: #3d5a80;
-  }
-  
+  /* --- 基础设置：深色模式 --- */
   body {
-    background: linear-gradient(135deg, #0c141c 0%, var(--steam-bg) 50%, #0f1b2b 100%);
-    color: var(--steam-text);
-    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-    line-height: 1.6;
+    background: #0f0f14; /* 深邃的暗紫色背景 */
+    color: #e0e0e0;
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    margin: 0;
+    padding: 0;
     min-height: 100vh;
-    padding: 1rem;
   }
-  
-  .steam-container {
-    max-width: 1200px;
+
+  /* --- 主容器：居中布局 --- */
+  .container {
+    max-width: 1100px;
     margin: 0 auto;
+    padding: 40px 20px;
   }
-  
-  /* 毛玻璃卡片 */
-  .steam-card {
-    background: rgba(42, 71, 94, 0.85);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    border: 1px solid var(--steam-border);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s, box-shadow 0.3s;
+
+  /* --- 核心卡片样式：毛玻璃效果 (Glassmorphism) --- */
+  .card {
+    background: rgba(255, 255, 255, 0.05); /* 半透明白色背景 */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* 细微的边框 */
+    border-radius: 16px; /* 大圆角 */
+    backdrop-filter: blur(10px); /* 关键：毛玻璃模糊效果 */
+    -webkit-backdrop-filter: blur(10px); /* 兼容 Safari */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); /* 深沉的阴影 */
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  
-  .steam-card:hover {
-    transform: translateY(-3px);
+
+  .card:hover {
+    transform: translateY(-5px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   }
-  
-  /* 头像区域 */
-  .profile-header {
+
+  /* --- 头部区域：头像与简介 --- */
+  .header {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 25px;
+    margin-bottom: 30px;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    object-fit: cover;
+    box-shadow: 0 0 20px rgba(102, 192, 244, 0.3); /* 头像发光效果 */
+  }
+
+  .intro h1 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .intro p {
+    margin: 0;
+    color: #b0b0b0;
+    font-size: 15px;
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  /* --- 按钮组：科技感按钮 --- */
+  .button-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
     flex-wrap: wrap;
   }
-  
-  .profile-avatar {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    border: 4px solid var(--steam-accent);
-    object-fit: cover;
-    box-shadow: 0 0 20px rgba(102, 192, 244, 0.3);
-  }
-  
-  .profile-info h1 {
+
+  .btn {
+    flex: 1;
+    min-width: 200px;
+    padding: 14px 20px;
+    background: linear-gradient(90deg, #6A11CB 0%, #2575FC 100%); /* 渐变背景 */
+    border: none;
+    border-radius: 8px;
     color: white;
-    font-size: 2.5rem;
-    margin: 0 0 0.5rem 0;
-    font-weight: 300;
-  }
-  
-  .profile-info .subtitle {
-    color: var(--steam-accent);
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .contact-links {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 1rem;
-  }
-  
-  .contact-link {
-    color: var(--steam-text);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
     text-decoration: none;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
+  }
+
+  .btn:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+
+  /* --- 音乐条模拟区域 --- */
+  .music-bar {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(29, 45, 60, 0.7);
-    border-radius: 6px;
-    transition: all 0.3s;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-bottom: 30px;
   }
   
-  .contact-link:hover {
-    background: var(--steam-accent);
-    color: white;
-  }
+  .music-cover {
+    width: 50px; height: 50px; border-radius: 8px; background: #333; }
   
-  /* 功能按钮 */
-  .action-buttons {
+  .music-info { flex: 1; }
+  .music-title { font-weight: bold; margin: 0; color: #fff; }
+  .music-artist { margin: 0; font-size: 12px; color: #aaa; }
+
+  /* --- 网格布局：中间内容区 --- */
+  .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
   }
-  
-  .action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, rgba(29, 45, 60, 0.9) 0%, rgba(42, 71, 94, 0.9) 100%);
-    border: 2px solid var(--steam-border);
-    border-radius: 10px;
-    color: white;
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: 500;
-    transition: all 0.3s;
+
+  .grid-item {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid #66c0f4; /* 左侧高亮边框 */
   }
-  
-  .action-btn:hover {
-    background: linear-gradient(135deg, var(--steam-accent) 0%, #4a9bda 100%);
-    border-color: var(--steam-accent);
-    transform: translateY(-3px);
+
+  .grid-item h3 { margin-top: 0; color: #66c0f4; }
+  .grid-item p { font-size: 14px; color: #ccc; margin-bottom: 0; }
+
+  /* --- 底部时间轴 --- */
+  .footer-time {
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Consolas', monospace;
+    letter-spacing: 1px;
   }
-  
-  .action-btn-icon {
-    font-size: 1.8rem;
-  }
-  
-  /* 留言板 */
-  .comments-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  
-  .comments-header h2 {
-    color: white;
-    font-size: 1.8rem;
-    margin: 0;
-  }
-  
-  .comments-info {
-    background: rgba(102, 192, 244, 0.1);
-    border-left: 4px solid var(--steam-accent);
-    padding: 1rem;
-    border-radius: 0 6px 6px 0;
-    margin-bottom: 1.5rem;
-  }
-  
-  /* 响应式 */
-  @media (max-width: 768px) {
-    .profile-header {
-      flex-direction: column;
-      text-align: center;
-    }
-    
-    .contact-links {
-      justify-content: center;
-    }
-    
-    .action-buttons {
-      grid-template-columns: 1fr;
-    }
+
+  /* --- Cusdis 评论区适配 --- */
+  #cusdis_thread {
+    margin-top: 40px;
   }
 </style>
 
-<div class="steam-container">
-  <!-- 头像和介绍卡片 -->
-  <div class="steam-card">
-    <div class="profile-header">
-      <img src="/assets/images/avatar.jpg" alt="我的头像" class="profile-avatar">
-      <div class="profile-info">
+<div class="container">
+
+  <!-- 1. 顶部个人信息卡片 -->
+  <div class="card">
+    <div class="header">
+      <img src="/assets/images/avatar.jpg" alt="头像" class="avatar">
+      <div class="intro">
         <h1>LDWXNL</h1>
-        <div class="subtitle">玩家 • 开发者 • 探索者</div>
-        <p style="max-width: 600px; margin: 1rem 0; opacity: 0.9;">
-          你好！我是 LDWXNL，热爱技术、游戏与分享。这是我的数字角落，记录学习、项目和奇思妙想。你问我是谁？问就是打游戏的。
-        </p>
-        <div class="contact-links">
-          <a href="mailto:qwrrdfrrfgr@qq.com" class="contact-link">
-            <span>📧</span> 联系我
-          </a>
-          <a href="https://github.com/ldwxnl" target="_blank" class="contact-link">
-            <span>🔗</span> GitHub
-          </a>
-        </div>
+        热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是ldwxnl。
       </div>
     </div>
-  </div>
-  
-  <!-- 功能按钮卡片 -->
-  <div class="steam-card">
-    <h2 style="color: white; margin-top: 0; font-size: 1.8rem; margin-bottom: 1.5rem;">🚀 核心功能</h2>
-    <div class="action-buttons">
-      <a href="/posts" class="action-btn">
-        <span class="action-btn-icon">📖</span>
-        <span>技术博客</span>
-      </a>
-      <a href="/games" class="action-btn">
-        <span class="action-btn-icon">🎮</span>
-        <span>游戏中心</span>
-      </a>
+
+    <div class="button-group">
+      <a href="/posts" class="btn">📖 查看我的博客</a>
+      <a href="/games" class="btn">🎮 游戏中心</a>
     </div>
   </div>
-  
-  <!-- 留言板卡片 -->
-  <div class="steam-card">
-    <div class="comments-header">
-      <h2>💬 玩家留言板</h2>
+
+  <!-- 2. 模拟音乐播放器条 (装饰性) -->
+  <div class="card music-bar">
+    <div class="music-cover"></div>
+    <div class="music-info">
+      <p class="music-title">Neural Network
+      <p class="music-artist">XingHuiSama
     </div>
+    <div style="color: #aaa;">▶️ 正在播放...</div>
+  </div>
+
+  <!-- 3. 中间网格内容 -->
+  <div class="grid">
+    <div class="grid-item card">
+      <h3>💻 最新动态</h3>
+      刚刚更新了个人主页的美化方案，引入了毛玻璃效果和暗色主题，看起来更酷了！
+    </div>
+    <div class="grid-item card">
+      <h3>⭐ 推荐项目</h3>
+      正在研究如何接入 Cusdis 评论系统，虽然中间遇到了点小麻烦，但最终搞定了。
+    </div>
+    <div class="grid-item card">
+      <h3>📚 学习笔记</h3>
+      最近在学习 Docker 部署，感觉比传统的虚拟主机方便很多，特别是配合 GitHub Actions。
+    </div>
+  </div>
+
+  <!-- 4. 底部时间 -->
+  <div class="card footer-time">
+    <span id="current-time">15:32:34</span>
+  </div>
+
+  <!-- 5. 留言板 (Cusdis) -->
+  <div class="card" id="cusdis_thread">
+    <h2 style="text-align: center; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px;">💬 玩家留言板</h2>
+    <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
+      欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
     
-    <div class="comments-info">
-      <p style="margin: 0; color: var(--steam-text);">
-        <strong>欢迎交流！</strong> 在这里分享游戏心得、反馈问题或单纯聊聊天。支持匿名评论，无需登录。
-      </p>
-    </div>
-    
-    <!-- Cusdis 评论区 -->
-    <div id="cusdis_thread"
-         data-host="https://cusdis.com"
-         data-app-id="你的 APP ID" <!-- 记得替换！ -->
-         data-page-id="{{ page.url }}"
-         data-page-url="{{ page.url | absolute_url }}"
-         data-page-title="{{ page.title }}"
-         data-theme="dark"  <!-- 深色主题匹配 Steam 风格 -->
-         style="min-height: 300px; border-radius: 8px; overflow: hidden;">
-    </div>
+    <!-- 这里插入 Cusdis 代码 -->
+    <script async src="https://cusdis.com/client.js"
+      data-app-id="你的APP_ID"
+      data-host="https://cusdis.com"
+      data-page-id="{{ page.url }}"
+      data-page-title="{{ page.title }}"
+      data-theme="dark">
+    </script>
   </div>
+
 </div>
 
-<!-- 引入 Cusdis JS -->
-<script defer src="https://cusdis.com/js/cusdis.es.js"></script>
+<script>
+  // 简单的实时时间脚本
+  function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('zh-CN', { hour12: false });
+    document.getElementById('current-time').innerText = timeString;
+  }
+  setInterval(updateTime, 1000);
+  updateTime();
+</script>
