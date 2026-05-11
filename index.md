@@ -5,7 +5,7 @@ title: 首页
 <style>
   /* --- 基础设置：深色模式 --- */
   body {
-    background: #0f0f14; /* 深邃的暗紫色背景 */
+    background: #0f0f14;
     color: #e0e0e0;
     font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
     margin: 0;
@@ -13,21 +13,20 @@ title: 首页
     min-height: 100vh;
   }
 
-  /* --- 主容器：居中布局 --- */
   .container {
     max-width: 1100px;
     margin: 0 auto;
     padding: 40px 20px;
   }
 
-  /* --- 核心卡片样式：毛玻璃效果 (Glassmorphism) --- */
+  /* --- 核心卡片样式：毛玻璃效果 --- */
   .card {
-    background: rgba(255, 255, 255, 0.05); /* 半透明白色背景 */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* 细微的边框 */
-    border-radius: 16px; /* 大圆角 */
-    backdrop-filter: blur(10px); /* 关键：毛玻璃模糊效果 */
-    -webkit-backdrop-filter: blur(10px); /* 兼容 Safari */
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); /* 深沉的阴影 */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     padding: 25px;
     margin-bottom: 25px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -52,7 +51,7 @@ title: 首页
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.2);
     object-fit: cover;
-    box-shadow: 0 0 20px rgba(102, 192, 244, 0.3); /* 头像发光效果 */
+    box-shadow: 0 0 20px rgba(102, 192, 244, 0.3);
   }
 
   .intro h1 {
@@ -82,7 +81,7 @@ title: 首页
     flex: 1;
     min-width: 200px;
     padding: 14px 20px;
-    background: linear-gradient(90deg, #6A11CB 0%, #2575FC 100%); /* 渐变背景 */
+    background: linear-gradient(90deg, #6A11CB 0%, #2575FC 100%);
     border: none;
     border-radius: 8px;
     color: white;
@@ -130,7 +129,7 @@ title: 首页
     background: rgba(0, 0, 0, 0.2);
     border-radius: 12px;
     padding: 20px;
-    border-left: 4px solid #66c0f4; /* 左侧高亮边框 */
+    border-left: 4px solid #66c0f4;
   }
 
   .grid-item h3 { margin-top: 0; color: #66c0f4; }
@@ -148,9 +147,32 @@ title: 首页
     letter-spacing: 1px;
   }
 
-  /* --- Cusdis 评论区适配 --- */
-  #cusdis_thread {
+  /* --- Giscus 评论区样式 --- */
+  .giscus-section {
     margin-top: 40px;
+  }
+  
+  .giscus-title {
+    text-align: center;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+  }
+  
+  .giscus-info {
+    background: rgba(102, 192, 244, 0.1);
+    border-left: 4px solid #66c0f4;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0 6px 6px 0;
+  }
+  
+  .giscus-info p {
+    margin: 0;
+    color: #b0d7f5;
+    font-size: 0.95rem;
   }
 </style>
 
@@ -203,26 +225,22 @@ title: 首页
     <span id="current-time">15:32:34</span>
   </div>
 
-  <!-- 5. 留言板 (Cusdis) -->
-  <div class="card" id="cusdis_thread">
-    <h2 style="text-align: center; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px;">💬 玩家留言板</h2>
-    <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
-      欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
+  <!-- 5. Giscus 留言板 -->
+  <div class="card giscus-section">
+    <h2 class="giscus-title">💬 玩家留言板</h2>
     
-    <!-- 这里插入 Cusdis 代码 -->
-    <script async src="https://cusdis.com/client.js"
-      data-app-id="你的APP_ID"
-      data-host="https://cusdis.com"
-      data-page-id="{{ page.url }}"
-      data-page-title="{{ page.title }}"
-      data-theme="dark">
-    </script>
+    <div class="giscus-info">
+      <p><strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。闲聊、反馈、求带都可以，但请注意网络礼仪。</p>
+    </div>
+    
+    <!-- Giscus 评论区容器 -->
+    <div class="giscus"></div>
   </div>
 
 </div>
 
+<!-- 实时时间脚本 -->
 <script>
-  // 简单的实时时间脚本
   function updateTime() {
     const now = new Date();
     const timeString = now.toLocaleTimeString('zh-CN', { hour12: false });
@@ -231,3 +249,31 @@ title: 首页
   setInterval(updateTime, 1000);
   updateTime();
 </script>
+
+<!-- Giscus 脚本 -->
+<script src="https://giscus.app/client.js"
+        data-repo="LDWXNL/LDWXNL.github.io"
+        data-repo-id="R_kgDOR96W3Q"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOR96W3c4C8t89"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="dark"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
+
+<!-- Giscus 样式优化 -->
+<style>
+  .giscus, .giscus-frame {
+    width: 100%;
+    border: none;
+  }
+  .giscus-frame {
+    border-radius: 8px;
+  }
+</style>
