@@ -92,17 +92,22 @@ title: 首页
   <!-- Giscus 评论区会直接加载在这个容器里 -->
   <div class="giscus"></div>
   
-</div>
-
-<div id="cusdis_thread"
-  data-host="https://cusdis.com"
-  data-app-id="852dfcc2-5a90-4857-966e-3c71647d8a36"
-  data-page-id="{{ PAGE_ID }}"
-  data-page-url="{{ PAGE_URL }}"
-  data-page-title="{{ PAGE_TITLE }}"
-></div>
-<script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-
+<!-- Giscus 脚本 -->
+<script src="https://giscus.app/client.js"
+        data-repo="LDWXNL/LDWXNL.github.io"
+        data-repo-id="R_kgDOR96W3Q"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOR96W3c4C8t89"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
 <!-- 优化样式 -->
 <style>
   /* 确保Giscus框架填满容器 */
