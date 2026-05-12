@@ -14,3 +14,11 @@ color:
   
 include: ["_pages"]  # ✅ 关键：包含 _pages 文件夹
 exclude: []           # 确保这里是空数组
+
+/* 更通透的玻璃效果 */
+.card {
+  background: rgba(255, 255, 255, 0.08); /* 透明度提高 */
+  backdrop-filter: blur(20px); /* 模糊度加大 */
+  border: 1px solid rgba(255, 255, 255, 0.15); /* 边框更明显 */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* 阴影更柔和 */
+}
