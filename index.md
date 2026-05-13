@@ -122,7 +122,9 @@ title: 首页
     display: none;
   }
 </style>
+</div>
 
+</div>
 <!-- 1. 引入资源 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
 <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
