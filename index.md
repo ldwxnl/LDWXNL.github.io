@@ -2,14 +2,14 @@
 layout: default
 title: 首页
 ---
+
 <!-- 统一的灰色背景容器，包裹整个主内容区域 -->
 <div style="background: #f9f9f9; padding: 3rem 2rem; border-radius: 12px; margin: 2rem 0;">
-
   <!-- 头像和自我介绍区域 -->
   <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap;">
     <!-- 头像 -->
-    <img src="/assets/images/avatar.jpg"
-         alt="我的头像"
+    <img src="/assets/images/avatar.jpg" 
+         alt="我的头像" 
          style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
     <!-- 文字 -->
     <div style="flex: 1; min-width: 250px;">
@@ -21,6 +21,9 @@ title: 首页
         📧 联系我: qwrrdfrrfgr@qq.com | 🔗
         <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
       </p>
+    </div>
+  </div>
+  
   <!-- 网站核心功能按钮区域 -->
   <div style="text-align: center;">
     <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
@@ -53,14 +56,36 @@ title: 首页
         min-width: 180px;
       ">🎮 游戏中心</a>
     </div>
-    </div>  
-</div>
+  </div>
 </div>
 
+<!-- 音乐播放器区域 -->
+<div style="
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+">
+  <h2 style="margin-top: 0; color: #333; font-size: 1.8rem; text-align: center; margin-bottom: 1.5rem;">🎵 音乐播放器</h2>
+  <!-- APlayer 播放器 -->
+  <meting-js
+    server="netease"
+    type="playlist"
+    id="3332771263"
+    fixed="false"
+    loop="all"
+    order="list"
+    list-folded="false"
+    list-max-height="300px"
+    theme="#ff4081">
+  </meting-js>
 </div>
+
 <hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
 
-<!-- 留言板完整区域 - 用一个容器包起来 -->
+<!-- 留言板完整区域 -->
 <div style="
   max-width: 800px;
   margin: 0 auto;
@@ -69,7 +94,6 @@ title: 首页
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 ">
-
   <h2 style="margin-top: 0; color: #333; font-size: 1.8rem; text-align: center;">💬 玩家留言板</h2>
   
   <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem; text-align: center;">
@@ -88,11 +112,17 @@ title: 首页
       闲聊、反馈、求带都可以，但请注意网络礼仪。
     </p>
   </div>
-  </div>  
-  <!-- Giscus 评论区会直接加载在这个容器里 -->
-  <div class="giscus"></div>
   
-<!-- Giscus 脚本 -->
+  <!-- Giscus 评论区 -->
+  <div class="giscus"></div>
+</div>
+
+<!-- 引入 APlayer 和 MetingJS 资源 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
+
+<!-- 引入 Giscus 评论系统 -->
 <script src="https://giscus.app/client.js"
         data-repo="LDWXNL/LDWXNL.github.io"
         data-repo-id="R_kgDOR96W3Q"
@@ -108,6 +138,7 @@ title: 首页
         crossorigin="anonymous"
         async>
 </script>
+
 <!-- 优化样式 -->
 <style>
   /* 确保Giscus框架填满容器 */
@@ -116,29 +147,15 @@ title: 首页
     border: none;
     min-height: 300px;
   }
+  
   /* 隐藏默认的giscus页眉页脚（可选） */
   .giscus .giscus-header,
   .giscus .giscus-footer {
     display: none;
   }
+  
+  /* APlayer 播放器响应式适配 */
+  .aplayer {
+    margin: 0 auto;
+  }
 </style>
-</div>
-
-</div>
-<!-- 1. 引入资源 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
-<script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-
-<!-- 2. 放置播放器 -->
-<meting-js
-  server="netease"        <!-- 平台：netease 网易云 -->
-  type="playlist"         <!-- 类型：歌单（关键！） -->
-  id="3332771263"         <!-- 你的歌单 ID -->
-  fixed="false"           <!-- 是否悬浮：false 为嵌入页面 -->
-  loop="all"              <!-- 循环模式：all 列表循环 -->
-  order="list"            <!-- 顺序：list 顺序播放 -->
-  list-folded="false"     <!-- 列表是否折叠：false 展开 -->
-  list-max-height="300px" <!-- 列表最大高度 -->
-  theme="#ff4081">        <!-- 主题色，可改成你的网站色 -->
-</meting-js>
