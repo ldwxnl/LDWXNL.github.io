@@ -123,4 +123,20 @@ title: 首页
   }
 </style>
 
-<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=3332771263&auto=0&height=66"></iframe>
+<!-- 1. 引入资源 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
+
+<!-- 2. 放置播放器 -->
+<meting-js
+  server="netease"        <!-- 平台：netease 网易云 -->
+  type="playlist"         <!-- 类型：歌单（关键！） -->
+  id="3332771263"         <!-- 你的歌单 ID -->
+  fixed="false"           <!-- 是否悬浮：false 为嵌入页面 -->
+  loop="all"              <!-- 循环模式：all 列表循环 -->
+  order="list"            <!-- 顺序：list 顺序播放 -->
+  list-folded="false"     <!-- 列表是否折叠：false 展开 -->
+  list-max-height="300px" <!-- 列表最大高度 -->
+  theme="#ff4081">        <!-- 主题色，可改成你的网站色 -->
+</meting-js>
