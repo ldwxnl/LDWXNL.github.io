@@ -123,23 +123,3 @@ title: 首页
   }
 </style>
 
-<!DOCTYPE html>
-<html>
-<head>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
-</head>
-<body>
-
-<script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<meting-js
-server="netease"
-type="playlist"
-id="8653606632"
-fixed="false"
-theme="#ff4081">
-</meting-js>
-
-</body>
-</html>
