@@ -1,125 +1,577 @@
----
-layout: default
-title: 首页
----
-<!-- 统一的灰色背景容器，包裹整个主内容区域 -->
-<div style="background: #f9f9f9; padding: 3rem 2rem; border-radius: 12px; margin: 2rem 0;">
-
-  <!-- 头像和自我介绍区域 -->
-  <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap;">
-    <!-- 头像 -->
-    <img src="/assets/images/avatar.jpg"
-         alt="我的头像"
-         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-    <!-- 文字 -->
-    <div style="flex: 1; min-width: 250px;">
-      <h3 style="margin-top: 0; color: #333; font-size: 1.8rem;">关于我</h3>
-      <p style="line-height: 1.8; color: #555; margin-bottom: 0.8rem;">
-        你好！我是 LDWXNL，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是ldwxnl
-      </p>
-      <p style="color: #888; font-size: 0.95rem;">
-        📧 联系我: to@hrn.cc.cd | 🔗
-        <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
-      </p>
-  <!-- 网站核心功能按钮区域 -->
-  <div style="text-align: center;">
-    <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
-    <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
-      <!-- 博客按钮 -->
-      <a href="/posts" style="
-        padding: 1rem 2.5rem;
-        color: #222;
-        text-decoration: none;
-        border: 2px solid #222;
-        border-radius: 8px;
-        font-weight: 600;
-        background: transparent;
-        transition: all 0.3s;
-        text-align: center;
-        min-width: 180px;
-      ">📖 查看我的博客</a>
-
-      <!-- 游戏中心按钮 -->
-      <a href="/games" style="
-        padding: 1rem 2.5rem;
-        color: #222;
-        text-decoration: none;
-        border: 2px solid #222;
-        border-radius: 8px;
-        font-weight: 600;
-        background: transparent;
-        transition: all 0.3s;
-        text-align: center;
-        min-width: 180px;
-      ">🎮 游戏中心</a>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个性化音乐空间</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #0f0f1a;
+            color: #f0f0f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        /* 左侧个人资料区域 */
+        .profile-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin-bottom: 30px;
+        }
+        
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid transparent;
+            background: linear-gradient(45deg, #ff0080, #00ccff, #ff0080) border-box;
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+            animation: avatar-glow 4s infinite alternate;
+        }
+        
+        @keyframes avatar-glow {
+            0% { box-shadow: 0 0 20px rgba(0, 204, 255, 0.5); }
+            100% { box-shadow: 0 0 30px rgba(255, 0, 128, 0.5), 0 0 40px rgba(0, 204, 255, 0.3); }
+        }
+        
+        .profile-info {
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .name {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff0080, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .title {
+            font-size: 1.1rem;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        
+        .bio {
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #ccc;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ccff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background: #00ccff;
+            color: #0f0f1a;
+            transform: translateY(-5px);
+        }
+        
+        /* 右侧音乐播放器区域 */
+        .music-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .player-container {
+            background: rgba(20, 20, 40, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .player-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #00ccff;
+        }
+        
+        .album-art {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin: 0 auto 25px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .album-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .song-info {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .song-title {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .artist {
+            color: #aaa;
+            font-size: 1rem;
+        }
+        
+        .progress-area {
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #ff0080, #00ccff);
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .progress::after {
+            content: '';
+            position: absolute;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #fff;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .control-btn {
+            background: none;
+            border: none;
+            color: #f0f0f0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .play-pause {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff0080, #00ccff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        
+        .control-btn:hover {
+            color: #00ccff;
+            transform: scale(1.1);
+        }
+        
+        .playlist {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .playlist-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+        
+        .playlist-item {
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .playlist-item.active {
+            background: rgba(0, 204, 255, 0.2);
+            color: #00ccff;
+        }
+        
+        .playlist-item i {
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .profile-section, .music-section {
+                padding: 20px;
+            }
+            
+            .avatar-container {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .name {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 动态背景 -->
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <!-- 左侧：个人资料区域 -->
+        <section class="profile-section">
+            <div class="avatar-container">
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="用户头像" class="avatar">
+            </div>
+            
+            <div class="profile-info">
+                <h1 class="name">元宝</h1>
+                <p class="title">音乐爱好者 & 前端开发者</p>
+                <p class="bio">热爱音乐、编程和创造美好的数字体验。这个网站是我个人音乐空间，分享我喜爱的音乐和心情。希望通过音乐连接每一个有趣的灵魂。</p>
+                
+                <div class="social-links">
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-weixin"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-qq"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-spotify"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 右侧：音乐播放器区域 -->
+        <section class="music-section">
+            <div class="player-container">
+                <h2 class="player-title">我的音乐空间</h2>
+                
+                <div class="album-art">
+                    <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面" class="album-cover">
+                </div>
+                
+                <div class="song-info">
+                    <h3 class="song-title">夜空中最亮的星</h3>
+                    <p class="artist">逃跑计划</p>
+                </div>
+                
+                <div class="progress-area">
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <div class="timer">
+                        <span class="current-time" id="current-time">0:00</span>
+                        <span class="duration" id="duration">0:00</span>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="control-btn" id="prev-btn">
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <button class="control-btn" id="play-pause-btn">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="control-btn" id="next-btn">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                </div>
+                
+                <div class="playlist">
+                    <h4 class="playlist-title">播放列表</h4>
+                    <div class="playlist-item active" data-index="0">
+                        <i class="fas fa-music"></i>
+                        <span>夜空中最亮的星 - 逃跑计划</span>
+                    </div>
+                    <div class="playlist-item" data-index="1">
+                        <i class="fas fa-music"></i>
+                        <span>起风了 - 买辣椒也用券</span>
+                    </div>
+                    <div class="playlist-item" data-index="2">
+                        <i class="fas fa-music"></i>
+                        <span>光年之外 - G.E.M. 邓紫棋</span>
+                    </div>
+                    <div class="playlist-item" data-index="3">
+                        <i class="fas fa-music"></i>
+                        <span>平凡之路 - 朴树</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    </div>  
-</div>
-</div>
-
-</div>
-<hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
-
-<!-- 留言板完整区域 - 用一个容器包起来 -->
-<div style="
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-">
-
-  <h2 style="margin-top: 0; color: #333; font-size: 1.8rem; text-align: center;">💬 玩家留言板</h2>
-  
-  <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem; text-align: center;">
-    欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
-  </p>
-  
-  <div style="
-    background: #f8f9fa;
-    border-left: 4px solid #4CAF50;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
-    border-radius: 0 6px 6px 0;
-  ">
-    <p style="margin: 0; color: #555; font-size: 0.95rem;">
-      <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
-      闲聊、反馈、求带都可以，但请注意网络礼仪。
-    </p>
-  </div>
-  </div>  
-  <!-- Giscus 评论区会直接加载在这个容器里 -->
-  <div class="giscus"></div>
-  
-<!-- Giscus 脚本 -->
-<script src="https://giscus.app/client.js"
-        data-repo="LDWXNL/LDWXNL.github.io"
-        data-repo-id="R_kgDOR96W3Q"
-        data-category="Announcements"
-        data-category-id="DIC_kwDOR96W3c4C8t89"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="top"
-        data-theme="preferred_color_scheme"
-        data-lang="zh-CN"
-        crossorigin="anonymous"
-        async>
-</script>
-<!-- 优化样式 -->
-<style>
-  /* 确保Giscus框架填满容器 */
-  .giscus, .giscus-frame {
-    width: 100%;
-    border: none;
-    min-height: 300px;
-  }
-  /* 隐藏默认的giscus页眉页脚（可选） */
-  .giscus .giscus-header,
-  .giscus .giscus-footer {
-    display: none;
-  }
-</style>
-
+    
+    <!-- 引入粒子背景库 -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <script>
+        // 初始化动态粒子背景
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS("particles-js", {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#00ccff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#ff0080",
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: { enable: true, speed: 2 }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" }
+                    }
+                }
+            });
+        });
+        
+        // 音乐播放器功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioPlayer = new Audio();
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const progressBar = document.getElementById('progress');
+            const currentTimeEl = document.getElementById('current-time');
+            const durationEl = document.getElementById('duration');
+            const playlistItems = document.querySelectorAll('.playlist-item');
+            const songTitle = document.querySelector('.song-title');
+            const artist = document.querySelector('.artist');
+            const albumCover = document.querySelector('.album-cover');
+            
+            // 音乐列表
+            const musicList = [
+                {
+                    title: "夜空中最亮的星",
+                    artist: "逃跑计划",
+                    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                    cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                },
+                {
+                    title: "起风了",
+                    artist: "买辣椒也用券",
+                    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                    cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                },
+                {
+                    title: "光年之外",
+                    artist: "G.E.M. 邓紫棋",
+                    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+                    cover: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                },
+                {
+                    title: "平凡之路",
+                    artist: "朴树",
+                    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+                    cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                }
+            ];
+            
+            let currentTrackIndex = 0;
+            
+            // 加载音乐
+            function loadTrack(index) {
+                const track = musicList[index];
+                audioPlayer.src = track.src;
+                songTitle.textContent = track.title;
+                artist.textContent = track.artist;
+                albumCover.src = track.cover;
+                
+                // 更新播放列表高亮
+                playlistItems.forEach(item => item.classList.remove('active'));
+                playlistItems[index].classList.add('active');
+                
+                // 如果音乐正在播放，继续播放
+                if (!audioPlayer.paused) {
+                    audioPlayer.play();
+                }
+            }
+            
+            // 播放/暂停音乐
+            function togglePlayPause() {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    audioPlayer.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            }
+            
+            // 更新进度条
+            function updateProgress(e) {
+                const { currentTime, duration } = e.srcElement;
+                const progressPercent = (currentTime / duration) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+                
+                // 更新时间显示
+                const formatTime = (time) => {
+                    const minutes = Math.floor(time / 60);
+                    const seconds = Math.floor(time % 60);
+                    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                };
+                
+                currentTimeEl.textContent = formatTime(currentTime);
+                
+                if (!isNaN(duration)) {
+                    durationEl.textContent = formatTime(duration);
+                }
+            }
+            
+            // 设置进度
+            function setProgress(e) {
+                const width = this.clientWidth;
+                const clickX = e.offsetX;
+                const duration = audioPlayer.duration;
+                
+                audioPlayer.currentTime = (clickX / width) * duration;
+            }
+            
+            // 下一首
+            function nextTrack() {
+                currentTrackIndex = (currentTrackIndex + 1) % musicList.length;
+                loadTrack(currentTrackIndex);
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                audioPlayer.play();
+            }
+            
+            // 上一首
+            function prevTrack() {
+                currentTrackIndex = (currentTrackIndex - 1 + musicList.length) % musicList.length;
+                loadTrack(currentTrackIndex);
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                audioPlayer.play();
+            }
+            
+            // 事件监听
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            prevBtn.addEventListener('click', prevTrack);
+            nextBtn.addEventListener('click', nextTrack);
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('ended', nextTrack);
+            
+            // 进度条点击事件
+            const progressContainer = document.querySelector('.progress-bar');
+            progressContainer.addEventListener('click', setProgress);
+            
+            // 播放列表点击事件
+            playlistItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    currentTrackIndex = index;
+                    loadTrack(index);
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    audioPlayer.play();
+                });
+            });
+            
+            // 初始化加载第一首音乐
+            loadTrack(0);
+        });
+    </script>
+</body>
+</html>
