@@ -1,133 +1,124 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个性化音乐空间</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- 动态背景 -->
-    <div id="particles-js"></div>
-    
-    <div class="container">
-        <!-- 左侧：个人资料区域 -->
-        <section class="profile-section">
-            <div class="avatar-container">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" 
-                     alt="用户头像" class="avatar" id="user-avatar">
-                <div class="avatar-upload">
-                    <label for="avatar-input" class="upload-btn">
-                        <i class="fas fa-camera"></i>
-                    </label>
-                    <input type="file" id="avatar-input" accept="image/*" style="display: none;">
-                </div>
-            </div>
-            
-            <div class="profile-info">
-                <h1 class="name" id="user-name">元宝</h1>
-                <p class="title" id="user-title">音乐爱好者 & 前端开发者</p>
-                <p class="bio" id="user-bio">热爱音乐、编程和创造美好的数字体验。这个网站是我个人音乐空间，分享我喜爱的音乐和心情。希望通过音乐连接每一个有趣的灵魂。</p>
-                
-                <div class="stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="total-plays">128</span>
-                        <span class="stat-label">播放次数</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="total-songs">24</span>
-                        <span class="stat-label">收藏歌曲</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="total-time">36</span>
-                        <span class="stat-label">收听小时</span>
-                    </div>
-                </div>
-                
-                <div class="social-links">
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-github"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-weixin"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-qq"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-spotify"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 右侧：音乐播放器区域 -->
-        <section class="music-section">
-            <div class="player-container">
-                <h2 class="player-title">我的音乐空间</h2>
-                
-                <div class="album-art">
-                    <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                         alt="专辑封面" class="album-cover" id="album-cover">
-                    <div class="vinyl-effect"></div>
-                </div>
-                
-                <div class="song-info">
-                    <h3 class="song-title" id="song-title">夜空中最亮的星</h3>
-                    <p class="artist" id="song-artist">逃跑计划</p>
-                </div>
-                
-                <div class="progress-area">
-                    <div class="progress-bar" id="progress-bar">
-                        <div class="progress" id="progress"></div>
-                    </div>
-                    <div class="timer">
-                        <span class="current-time" id="current-time">0:00</span>
-                        <span class="duration" id="duration">0:00</span>
-                    </div>
-                </div>
-                
-                <div class="controls">
-                    <button class="control-btn" id="shuffle-btn" title="随机播放">
-                        <i class="fas fa-random"></i>
-                    </button>
-                    <button class="control-btn" id="prev-btn" title="上一首">
-                        <i class="fas fa-step-backward"></i>
-                    </button>
-                    <button class="control-btn play-pause" id="play-pause-btn" title="播放/暂停">
-                        <i class="fas fa-play"></i>
-                    </button>
-                    <button class="control-btn" id="next-btn" title="下一首">
-                        <i class="fas fa-step-forward"></i>
-                    </button>
-                    <button class="control-btn" id="repeat-btn" title="单曲循环">
-                        <i class="fas fa-redo"></i>
-                    </button>
-                </div>
-                
-                <div class="volume-control">
-                    <i class="fas fa-volume-down volume-icon"></i>
-                    <input type="range" min="0" max="100" value="80" class="volume-slider" id="volume-slider">
-                    <i class="fas fa-volume-up volume-icon"></i>
-                </div>
-                
-                <div class="playlist">
-                    <div class="playlist-header">
-                        <h4 class="playlist-title">播放列表</h4>
-                        <span class="playlist-count" id="playlist-count">4 首歌曲</span>
-                    </div>
-                    <div class="playlist-items" id="playlist-items">
-                        <!-- 播放列表将通过JavaScript动态生成 -->
-                    </div>
-                </div>
-            </div>
-        </section>
+---
+layout: default
+title: 首页
+---
+<!-- 统一的灰色背景容器，包裹整个主内容区域 -->
+<div style="background: #f9f9f9; padding: 3rem 2rem; border-radius: 12px; margin: 2rem 0;">
+
+  <!-- 头像和自我介绍区域 -->
+  <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap;">
+    <!-- 头像 -->
+    <img src="/assets/images/avatar.jpg"
+         alt="我的头像"
+         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <!-- 文字 -->
+    <div style="flex: 1; min-width: 250px;">
+      <h3 style="margin-top: 0; color: #333; font-size: 1.8rem;">关于我</h3>
+      <p style="line-height: 1.8; color: #555; margin-bottom: 0.8rem;">
+        你好！我是 LDWXNL，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是ldwxnl
+      </p>
+      <p style="color: #888; font-size: 0.95rem;">
+        📧 联系我: to@hrn.cc.cd | 🔗
+        <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
+      </p>
+  <!-- 网站核心功能按钮区域 -->
+  <div style="text-align: center;">
+    <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
+      <!-- 博客按钮 -->
+      <a href="/posts" style="
+        padding: 1rem 2.5rem;
+        color: #222;
+        text-decoration: none;
+        border: 2px solid #222;
+        border-radius: 8px;
+        font-weight: 600;
+        background: transparent;
+        transition: all 0.3s;
+        text-align: center;
+        min-width: 180px;
+      ">📖 查看我的博客</a>
+
+      <!-- 游戏中心按钮 -->
+      <a href="/games" style="
+        padding: 1rem 2.5rem;
+        color: #222;
+        text-decoration: none;
+        border: 2px solid #222;
+        border-radius: 8px;
+        font-weight: 600;
+        background: transparent;
+        transition: all 0.3s;
+        text-align: center;
+        min-width: 180px;
+      ">🎮 游戏中心</a>
     </div>
-    
-    <!-- 引入粒子背景库 -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <!-- 引入自定义脚本 -->
-    <script src="script.js"></script>
-</body>
-</html>
+    </div>  
+</div>
+</div>
+
+</div>
+<hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
+
+<!-- 留言板完整区域 - 用一个容器包起来 -->
+<div style="
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+">
+
+  <h2 style="margin-top: 0; color: #333; font-size: 1.8rem; text-align: center;">💬 玩家留言板</h2>
+  
+  <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem; text-align: center;">
+    欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
+  </p>
+  
+  <div style="
+    background: #f8f9fa;
+    border-left: 4px solid #4CAF50;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0 6px 6px 0;
+  ">
+    <p style="margin: 0; color: #555; font-size: 0.95rem;">
+      <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
+      闲聊、反馈、求带都可以，但请注意网络礼仪。
+    </p>
+  </div>
+  </div>  
+  <!-- Giscus 评论区会直接加载在这个容器里 -->
+  <div class="giscus"></div>
+  
+<!-- Giscus 脚本 -->
+<script src="https://giscus.app/client.js"
+        data-repo="LDWXNL/LDWXNL.github.io"
+        data-repo-id="R_kgDOR96W3Q"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOR96W3c4C8t89"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
+<!-- 优化样式 -->
+<style>
+  /* 确保Giscus框架填满容器 */
+  .giscus, .giscus-frame {
+    width: 100%;
+    border: none;
+    min-height: 300px;
+  }
+  /* 隐藏默认的giscus页眉页脚（可选） */
+  .giscus .giscus-header,
+  .giscus .giscus-footer {
+    display: none;
+  }
+</style>
