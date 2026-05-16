@@ -18,7 +18,7 @@ title: 首页
         你好！我是 LDWXNL，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是ldwxnl
       </p>
       <p style="color: #888; font-size: 0.95rem;">
-        📧 联系我: qwrrdfrrfgr@qq.com | 🔗
+        📧 联系我: to@hrn.cc.cd | 🔗
         <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
       </p>
   <!-- 网站核心功能按钮区域 -->
