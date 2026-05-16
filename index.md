@@ -131,20 +131,20 @@ title: 首页
 </head>
 <body>
 
-    <!-- 你的网页内容 -->
+<!-- 你的网页内容 -->
 
-    <!-- 2. 在页面底部引入 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
+<!-- 2. 在页面底部引入 JS -->
+<script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
 
-    <!-- 3. 最后放置播放器标签 -->
-    <meting-js
-        server="netease"
-        type="playlist"
-        id="8653606632" <!-- 这里一定要改！ -->
-        fixed="false"
-        theme="#ff4081">
-    </meting-js>
+<!-- 3. 最后放置播放器标签 -->
+<meting-js
+server="netease"
+type="playlist"
+id="8653606632" <!-- 这里一定要改！ -->
+fixed="false"
+theme="#ff4081">
+</meting-js>
 
 </body>
 </html>
