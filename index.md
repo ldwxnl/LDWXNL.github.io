@@ -123,4 +123,28 @@ title: 首页
   }
 </style>
 
-<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=3332771263&auto=1&height=66"></iframe>
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 1. 必须在 head 或 body 开头引入 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
+</head>
+<body>
+
+    <!-- 你的网页内容 -->
+
+    <!-- 2. 在页面底部引入 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
+
+    <!-- 3. 最后放置播放器标签 -->
+    <meting-js
+        server="netease"
+        type="playlist"
+        id="8653606632" <!-- 这里一定要改！ -->
+        fixed="false"
+        theme="#ff4081">
+    </meting-js>
+
+</body>
+</html>
