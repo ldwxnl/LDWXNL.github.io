@@ -126,22 +126,17 @@ title: 首页
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- 1. 必须在 head 或 body 开头引入 CSS -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
 </head>
 <body>
 
-<!-- 你的网页内容 -->
-
-<!-- 2. 在页面底部引入 JS -->
 <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-
-<!-- 3. 最后放置播放器标签 -->
 <meting-js
 server="netease"
 type="playlist"
-id="8653606632" <!-- 这里一定要改！ -->
+id="8653606632"
 fixed="false"
 theme="#ff4081">
 </meting-js>
