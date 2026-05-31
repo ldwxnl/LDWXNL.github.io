@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 🐍 贪吃蛇游戏
-permalink: games/snake-game/
+permalink: game/snake-game/
 ---
 
 <html lang="zh-CN">
