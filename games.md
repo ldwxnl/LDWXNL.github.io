@@ -11,7 +11,7 @@ permalink: /games/
 [点击游玩](https://play2048.co/)
 
 ## 2. 🐍 贪吃蛇（自制）
-[点击游玩](snake-game/) - 经典贪吃蛇游戏，用方向键控制
+[点击游玩](tanchishe/) - 经典贪吃蛇游戏，用方向键控制
 
 ## 3. Minecraft（我的世界）网页版
 [点击游玩:mcjs](https://www.mcjs.cc/) 
