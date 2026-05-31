@@ -2,6 +2,7 @@
 layout: default
 title: 首页
 ---
+
 <!-- 统一的灰色背景容器，包裹整个主内容区域 -->
 <div style="background: #f9f9f9; padding: 3rem 2rem; border-radius: 12px; margin: 2rem 0;">
 
@@ -16,11 +17,14 @@ title: 首页
       <h3 style="margin-top: 0; color: #333; font-size: 1.8rem;">关于我</h3>
       <p style="line-height: 1.8; color: #555; margin-bottom: 0.8rem;">
         你好！我是 LDWXNL，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是ldwxnl
-      </p>
+      
       <p style="color: #888; font-size: 0.95rem;">
         📧 联系我: to@hrn.cc.cd | 🔗
         <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
-      </p>
+      
+    </div> <!-- 这里补上了闭合标签 -->
+  </div> <!-- 这里是外层 flex 容器的闭合标签 -->
+
   <!-- 网站核心功能按钮区域 -->
   <div style="text-align: center;">
     <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
@@ -40,8 +44,7 @@ title: 首页
       ">📖 查看我的博客</a>
 
       <!-- 游戏中心按钮 -->
-      <a href="/games" 
-      style="
+      <a href="/games" style="
         padding: 1rem 2.5rem;
         color: #222;
         text-decoration: none;
@@ -54,11 +57,9 @@ title: 首页
         min-width: 180px;
       ">🎮 游戏中心</a>
     </div>
-    </div>  
-</div>
-</div>
+  </div> <!-- 这里是按钮区域外层 div 的闭合标签 -->
+</div> <!-- 这里是整个灰色背景容器的闭合标签 -->
 
-</div>
 <hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
 
 <!-- 留言板完整区域 - 用一个容器包起来 -->
@@ -75,7 +76,7 @@ title: 首页
   
   <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem; text-align: center;">
     欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
-  </p>
+  
   
   <div style="
     background: #f8f9fa;
@@ -87,7 +88,7 @@ title: 首页
     <p style="margin: 0; color: #555; font-size: 0.95rem;">
       <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
       闲聊、反馈、求带都可以，但请注意网络礼仪。
-    </p>
+    
   </div>
   </div>  
   <!-- Giscus 评论区会直接加载在这个容器里 -->
