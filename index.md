@@ -37,10 +37,9 @@ title: 首页
         transition: all 0.3s;
         text-align: center;
         min-width: 180px;
-      ">📖 查看我的博客</a>
-   
+      ">📖 查看我的博客</a> 
       <!-- 游戏中心按钮 -->
-    <a href="/_pages/game/games.html" style="
+    <a href="/_pages/game/games.md" style="
         padding: 1rem 2.5rem;
         color: #222;
         text-decoration: none;
