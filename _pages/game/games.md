@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 🎮 游戏中心
-permalink: /game/
+permalink: /games/
 ---
 
 # 🎮 我的游戏集合：一些经典的网页小游戏，点击链接跳转到原站体验。
