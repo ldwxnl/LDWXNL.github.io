@@ -155,10 +155,14 @@ async function sendHRSI() {
     const res = await fetch('https://hrsi-api.hrsi.cc.cd/api/generate', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: msg})
+      body: JSON.stringify({
+        model: 'hrsi-model',
+        prompt: `用户问："${msg}"\n\n用 HRSI 的身份（12岁技术建造者，中二自信，好燃 So Intense！）简短回答：`,
+        stream: false
+      })
     })
     const data = await res.json()
-    msgs.innerHTML += `<div style="text-align:left;margin:4px 0;color:#afa;">${data.reply || data.error}</div>`
+    msgs.innerHTML += `<div style="text-align:left;margin:4px 0;color:#afa;">${data.response}</div>`
   } catch(e) {
     msgs.innerHTML += `<div style="text-align:left;margin:4px 0;color:#f88;">HRSI 挖矿去了，稍后再试！</div>`
   }
