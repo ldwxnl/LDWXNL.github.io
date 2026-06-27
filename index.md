@@ -1,26 +1,26 @@
+---
+layout: default
+title: 首页
+---
 <!-- 统一的灰色背景容器，包裹整个主内容区域 -->
 <div style="background: #f9f9f9; padding: 3rem 2rem; border-radius: 12px; margin: 2rem 0;">
 
-  <!-- 头像和自我介绍区域 (修复了布局) -->
+  <!-- 头像和自我介绍区域 -->
   <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap;">
-    <!-- 头像 (移回这里，并加大尺寸) -->
+    <!-- 头像 -->
     <img src="/assets/images/avatar.jpg"
          alt="我的头像"
-         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;">
-    
-    <!-- 文字区域 (修复了标签错乱) -->
-    <div style="flex: 1; min-width: 250px; background: #2c3e50; padding: 2rem; border-radius: 12px; color: white;">
-      <h2 style="margin-top: 0; color: #4caf50; font-size: 2rem;">关于我</h2>
-      <p style="line-height: 1.8; color: #ecf0f1; margin-bottom: 0.8rem;">
+         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <!-- 文字 -->
+    <div style="flex: 1; min-width: 250px;">
+      <h3 style="margin-top: 0; color: #333; font-size: 1.8rem;">关于我</h3>
+      <p style="line-height: 1.8; color: #555; margin-bottom: 0.8rem;">
         你好！我是 LDWXNL，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是hrsi
-      
-      <p style="color: #bdc3c7; font-size: 0.95rem;">
+      </p>
+      <p style="color: #888; font-size: 0.95rem;">
         📧 联系我: to@hrn.cc.cd | 🔗
-        <a href="https://github.com/ldwxnl" style="color: #3498db; text-decoration: none; border-bottom: 1px dashed #3498db;">GitHub</a>
-      
-    </div>
-  </div>
-
+        <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
+      </p>
   <!-- 网站核心功能按钮区域 -->
   <div style="text-align: center;">
     <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
@@ -40,7 +40,7 @@
       ">📖 查看我的博客</a> 
       
       <!-- 游戏中心按钮 -->
-      <a href="/games" style="
+    <a href="/games" style="
         padding: 1rem 2.5rem;
         color: #222;
         text-decoration: none;
@@ -52,45 +52,43 @@
         text-align: center;
         min-width: 180px;
       ">🎮 游戏中心</a>
-    </div>
-  </div>
 
-  <hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
+</div>
+<hr style="margin: 3rem 0; border: none; border-top: 2px solid #eee;">
 
-  <!-- 留言板完整区域 -->
+<!-- 留言板完整区域 - 用一个容器包起来 -->
+<div style="
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+">
+
+  <h2 style="margin-top: 0; color: #333; font-size: 1.8rem; text-align: center;">💬 玩家留言板</h2>
+  
+  <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem; text-align: center;">
+    欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
+  </p>
+  
   <div style="
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    background: #f8f9fa;
+    border-left: 4px solid #4CAF50;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0 6px 6px 0;
   ">
-    <h2 style="margin-top: 0; color: #333; font-size: 1.8rem; text-align: center;">💬 玩家留言板</h2>
-    
-    <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem; text-align: center;">
-      欢迎大家在下方留言交流游戏心得、反馈问题或分享进服体验！
-    
-    
-    <div style="
-      background: #f8f9fa;
-      border-left: 4px solid #4CAF50;
-      padding: 1rem 1.5rem;
-      margin-bottom: 2rem;
-      border-radius: 0 6px 6px 0;
-    ">
-      <p style="margin: 0; color: #555; font-size: 0.95rem;">
-        <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
-        闲聊、反馈、求带都可以，但请注意网络礼仪。
-      
-    </div>
-    
-    <!-- Giscus 评论区会直接加载在这个容器里 -->
-    <div class="giscus"></div>
+    <p style="margin: 0; color: #555; font-size: 0.95rem;">
+      <strong>📌 提示：</strong> 评论需要 GitHub 账号，数据会保存在仓库的 Discussions 中。
+      闲聊、反馈、求带都可以，但请注意网络礼仪。
+    </p>
+  </div>
   </div>  
-</div> <!-- 这里闭合最外层的灰色背景容器 -->
-
-<!-- Giscus 脚本 (保持原样) -->
+  <!-- Giscus 评论区会直接加载在这个容器里 -->
+  <div class="giscus"></div>
+  
+<!-- Giscus 脚本 -->
 <script src="https://giscus.app/client.js"
         data-repo="LDWXNL/LDWXNL.github.io"
         data-repo-id="R_kgDOR96W3Q"
@@ -105,4 +103,69 @@
         data-lang="zh-CN"
         crossorigin="anonymous"
         async>
+</script>
+<!-- 优化样式 -->
+<style>
+  /* 确保Giscus框架填满容器 */
+  .giscus, .giscus-frame {
+    width: 100%;
+    border: none;
+    min-height: 300px;
+  }
+  /* 隐藏默认的giscus页眉页脚（可选） */
+  .giscus .giscus-header,
+  .giscus .giscus-footer {
+    display: none;
+  }
+</style>
+
+<!-- HRSI 聊天按钮 -->
+<button onclick="toggleHRSI()" style="position:fixed;bottom:20px;right:20px;background:#4caf50;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:24px;cursor:pointer;z-index:9998;box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+  💬
+</button>
+
+<!-- HRSI 聊天框 -->
+<div id="hrsi-box" style="display:none;position:fixed;bottom:80px;right:20px;width:320px;height:420px;background:#1a1a2e;border-radius:12px;flex-direction:column;z-index:9999;color:#eee;font-family:sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.5);overflow:hidden;">
+  <div style="background:#4caf50;padding:10px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-weight:bold;">🔥 HRSI AI 助手</span>
+    <button onclick="toggleHRSI()" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;">✕</button>
+  </div>
+  <div id="hrsi-msgs" style="flex:1;overflow-y:auto;padding:10px;font-size:14px;line-height:1.5;"></div>
+  <div style="display:flex;border-top:1px solid #333;padding:8px;">
+    <input id="hrsi-input" placeholder="问 HRSI 点什么…" style="flex:1;padding:8px;border-radius:4px;border:none;background:#16213e;color:#fff;outline:none;">
+    <button onclick="sendHRSI()" style="margin-left:8px;padding:8px 16px;background:#4caf50;border:none;border-radius:4px;color:#fff;cursor:pointer;">发送</button>
+  </div>
+</div>
+
+<script>
+function toggleHRSI() {
+  const box = document.getElementById('hrsi-box')
+  box.style.display = box.style.display === 'flex' ? 'none' : 'flex'
+}
+
+async function sendHRSI() {
+  const input = document.getElementById('hrsi-input')
+  const msg = input.value.trim()
+  if (!msg) return
+  const msgs = document.getElementById('hrsi-msgs')
+  msgs.innerHTML += `<div style="text-align:right;margin:4px 0;color:#8cf;">${msg}</div>`
+  input.value = ''
+
+  try {
+    const res = await fetch('https://hrsi-api.hrsi.cc.cd/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'hrsi-model',
+        prompt: `用户问："${msg}"\n\n用 HRSI 的身份（12岁技术建造者，中二自信，好燃 So Intense！）简短回答：`,
+        stream: false
+      })
+    })
+    const data = await res.json()
+    msgs.innerHTML += `<div style="text-align:left;margin:4px 0;color:#afa;">${data.response}</div>`
+  } catch(e) {
+    msgs.innerHTML += `<div style="text-align:left;margin:4px 0;color:#f88;">HRSI 挖矿去了，稍后再试！</div>`
+  }
+  msgs.scrollTop = msgs.scrollHeight
+}
 </script>
