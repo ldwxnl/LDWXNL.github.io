@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 🐍 贪吃蛇游戏
-permalink: game/tanchishe
+permalink: games：tanchishe
 ---
 
 <html lang="zh-CN">
