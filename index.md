@@ -23,6 +23,7 @@ title: 首页
           <a href="https://evolution-host.com/" style="color: #0366d6; text-decoration: none; font-size: 0.9rem;">🖥️ 本服务器由 Evolution Host 赞助</a>
         
       </div>
+      
   <!-- 网站核心功能按钮区域 -->
   <div style="text-align: center;">
     <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
