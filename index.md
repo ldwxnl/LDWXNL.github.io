@@ -12,15 +12,17 @@ title: 首页
          alt="我的头像"
          style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
     <!-- 文字 -->
-    <div style="flex: 1; min-width: 250px;">
-      <h3 style="margin-top: 0; color: #333; font-size: 1.8rem;">关于我</h3>
-      <p style="line-height: 1.8; color: #555; margin-bottom: 0.8rem;">
-        你好！我是 LDWXNL，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是hrsi
-      </p>
-      <p style="color: #888; font-size: 0.95rem;">
-        📧 联系我: to@hrn.cc.cd | 🔗
-        <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a>
-      </p>
+      <div style="flex: 1; min-width: 250px;">
+        <h3 style="margin-top: 0; color: #333; font-size: 1.8rem;">关于我</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 0.8rem;">
+          你好！我是 LDWXNL，热爱技术、分享与交流。这个网站是我记录学习、项目和生活的空间。你问我是谁，别问，问就是hrsi
+        
+        <p style="color: #888; font-size: 0.95rem;">
+          📧 联系我: to@hrn.cc.cd | 🔗
+          <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a> | 
+          <a href="https://evolution-host.com/" style="color: #0366d6; text-decoration: none; font-size: 0.9rem;">🖥️ 本服务器由 Evolution Host 赞助</a>
+        
+      </div>
   <!-- 网站核心功能按钮区域 -->
   <div style="text-align: center;">
     <h4 style="color: #666; margin-bottom: 1.5rem;">🎯 探索更多</h4>
