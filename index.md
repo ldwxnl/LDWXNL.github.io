@@ -20,9 +20,9 @@ title: 首页
         <p style="color: #888; font-size: 0.95rem;">
           📧 联系我: to@hrn.cc.cd | 🔗
           <a href="https://github.com/ldwxnl" style="color: #0366d6; text-decoration: none; border-bottom: 1px dashed #0366d6;">GitHub</a> | 
-          <a href="https://evolution-host.com/" style="color: #0366d6; text-decoration: none; font-size: 0.9rem;">🖥️ 本服务器由 Evolution Host 赞助</a>
-        
-      </div>
+          <a href="https://evolution-host.com/" style="color: #0366d6; text-decoration: none;">本服务器由 Evolution Host 赞助</a>
+  
+      </p>
       
   <!-- 网站核心功能按钮区域 -->
   <div style="text-align: center;">
