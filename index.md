@@ -908,7 +908,6 @@ title: 首页
       <div class="profile-links">
         <a href="mailto:to@hrn.cc.cd">📧 to@hrn.cc.cd</a>
         <a href="https://github.com/ldwxnl" target="_blank">🐙 GitHub</a>
-        <span class="sponsor">⚡ 本服务器由 <a href="https://evolution-host.com/" target="_blank" style="color:var(--primary);border-bottom:none;">Evolution Host</a> 赞助</span>
       </div>
     </div>
   </div>
