@@ -1483,7 +1483,7 @@ title: 首页
         addMsg(reply, 'bot');
       } catch (e) {
         console.warn('HRSI API 错误:', e);
-        addMsg('😅 HRSI 挖矿去了，稍后再试！或者检查网络～', 'bot');
+        addMsg('😅 HRSI 不在线，稍后再试！或者发邮件给站长/检查网络～', 'bot');
       }
 
       sendBtn.disabled = false;
