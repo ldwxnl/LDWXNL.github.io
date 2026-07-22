@@ -1070,7 +1070,7 @@ title: 首页
 
     function loadPlaylist() {
         try {
-            const saved = localStorage.getItem('music_playlist');
+            const saved = localStorage.getItem('hrsi_playlist_final');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed) && parsed.length > 0) {
@@ -1085,7 +1085,7 @@ title: 首页
 
     function savePlaylist() {
         try {
-            localStorage.setItem('music_playlist', JSON.stringify(playlist));
+            localStorage.setItem('hrsi_playlist_final', JSON.stringify(playlist));
         } catch (_) {}
     }
 
@@ -1144,7 +1144,7 @@ title: 首页
             if (failCount < playlist.length) {
                 playerCover.textContent = '⚠️';
                 playerCover.classList.add('loading');
-                window.retryTimer = setTimeout(() => nextSong(), 2000);
+                window.retryTimer = setTimeout(() => nextSong(), 1550);
             } else {
                 playerCover.textContent = '❌';
                 songTitle.textContent = '所有歌曲都无法播放';
@@ -1156,134 +1156,3 @@ title: 首页
     }
 
     function togglePlay() {
-        if (!playlist.length) {
-            alert('播放列表为空，请先添加歌曲');
-            return;
-        }
-        if (audio.paused) {
-            if (!audio.src) {
-                playSong(currentIndex);
-                return;
-            }
-            audio.play().then(() => {
-                isPlaying = true;
-                playBtn.textContent = '⏸';
-            }).catch(() => {});
-        } else {
-            audio.pause();
-            isPlaying = false;
-            playBtn.textContent = '▶';
-        }
-    }
-
-    function nextSong() {
-        if (!playlist.length) return;
-        const next = (currentIndex + 1) % playlist.length;
-        playSong(next);
-    }
-
-    function prevSong() {
-        if (!playlist.length) return;
-        const prev = (currentIndex - 1 + playlist.length) % playlist.length;
-        playSong(prev);
-    }
-
-    function removeSong(index) {
-        if (index < 0 || index >= playlist.length) return;
-        if (playlist.length <= 1) {
-            alert('至少保留一首歌曲');
-            return;
-        }
-        playlist.splice(index, 1);
-        savePlaylist();
-        if (index === currentIndex) {
-            if (index >= playlist.length) currentIndex = playlist.length - 1;
-            playSong(currentIndex);
-        } else if (index < currentIndex) {
-            currentIndex--;
-        }
-        renderPlaylist();
-    }
-
-    function addSongByURL() {
-        const url = prompt('请输入音乐文件的 URL（mp3 / ogg / wav）：');
-        if (!url) return;
-        const title = prompt('请输入歌曲名称：') || '未命名';
-        const artist = prompt('请输入艺术家名称：') || '未知';
-        playlist.push({ title, artist, url });
-        savePlaylist();
-        renderPlaylist();
-        if (playlist.length === 1) playSong(0);
-    }
-
-    function addNeteaseSong() {
-        const id = prompt('请输入网易云歌曲 ID（例如 186016）：');
-        if (!id) return;
-        const cleanId = id.trim();
-        if (!/^\d+$/.test(cleanId)) {
-            alert('请输入数字ID');
-            return;
-        }
-        const url = 'https://music.163.com/song/media/outer/url?id=' + cleanId + '.mp3';
-        const title = prompt('请输入歌曲名称（可选）：') || ('网易云歌曲 ' + cleanId);
-        const artist = prompt('请输入艺术家名称（可选）：') || '未知';
-        playlist.push({ title, artist, url });
-        savePlaylist();
-        renderPlaylist();
-        if (playlist.length === 1) playSong(0);
-    }
-
-    function seekProgress(val) {
-        if (!audio.duration || isNaN(audio.duration)) return;
-        audio.currentTime = (val / 100) * audio.duration;
-        currentTimeEl.textContent = formatTime(audio.currentTime);
-    }
-
-    function setVolume(val) {
-        audio.volume = parseFloat(val);
-    }
-
-    audio.addEventListener('timeupdate', function() {
-        if (!isDragging && audio.duration) {
-            progressBar.value = (audio.currentTime / audio.duration) * 100;
-            currentTimeEl.textContent = formatTime(audio.currentTime);
-        }
-    });
-    audio.addEventListener('loadedmetadata', function() {
-        totalTimeEl.textContent = formatTime(audio.duration);
-        progressBar.value = 0;
-    });
-    audio.addEventListener('ended', function() { nextSong(); });
-    audio.addEventListener('error', function() {
-        if (failCount < playlist.length) {
-            failCount++;
-            playerCover.textContent = '⚠️';
-            playerCover.classList.add('loading');
-            window.retryTimer = setTimeout(() => nextSong(), 2000);
-        }
-    });
-    audio.addEventListener('canplay', function() {
-        playerCover.classList.remove('loading');
-        playerCover.textContent = '🎵';
-    });
-    progressBar.addEventListener('mousedown', function() { isDragging = true; });
-    progressBar.addEventListener('mouseup', function() { isDragging = false; });
-    progressBar.addEventListener('touchstart', function() { isDragging = true; });
-    progressBar.addEventListener('touchend', function() { isDragging = false; });
-
-    window.playSong = playSong;
-    window.togglePlay = togglePlay;
-    window.nextSong = nextSong;
-    window.prevSong = prevSong;
-    window.removeSong = removeSong;
-    window.addSongByURL = addSongByURL;
-    window.addNeteaseSong = addNeteaseSong;
-    window.seekProgress = seekProgress;
-    window.setVolume = setVolume;
-
-    loadPlaylist();
-    renderPlaylist();
-    if (playlist.length > 0) playSong(0);
-    console.log('播放器已加载，歌单数量:', playlist.length);
-})();
-</script>
