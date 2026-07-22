@@ -3,12 +3,11 @@ layout: default
 title: 首页
 ---
 <!--
-  修复内容：
-  1. 头像路径恢复为 /assets/images/avatar.jpg，若缺失则显示首字母占位。
-  2. 音乐播放器使用 SoundHelix 免费测试曲（无版权，稳定可播），移除所有流行歌曲。
-  3. 聊天室消息添加用户头像（首字母 + 随机颜色）。
-  4. HRSI 助手对话框修复样式，增强错误处理。
-  5. 优化响应式布局，修复若干小bug。
+  完整修复版：
+  1. 音乐播放器：渲染播放列表，自动跳过无法播放的音源，支持URL/网易云ID添加
+  2. HRSI 助手：接入硅基流动 API，保留三重人格人设，带对话记忆
+  3. 聊天室：localStorage 同步，用户头像首字母+颜色
+  4. Giscus 留言板
 -->
 
 <style>
@@ -113,18 +112,6 @@ title: 首页
   .profile-links a:hover {
     color: var(--primary);
     border-bottom-color: var(--primary);
-  }
-  .profile-links .sponsor {
-    background: #f8f9ff;
-    padding: 0.2rem 0.8rem;
-    border-radius: 20px;
-    border: 1px solid #e8ecff;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-  }
-  .profile-links .sponsor:hover {
-    background: #eef1ff;
-    border-color: var(--primary-light);
   }
 
   /* ===== 功能卡片通用 ===== */
@@ -400,7 +387,7 @@ title: 首页
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    max-height: 160px;
+    max-height: 180px;
     overflow-y: auto;
     padding-right: 4px;
   }
@@ -417,7 +404,7 @@ title: 首页
     align-items: center;
     padding: 0.4rem 0.6rem;
     border-radius: 8px;
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     color: var(--text-secondary);
     cursor: pointer;
     transition: var(--transition);
@@ -435,7 +422,7 @@ title: 首页
     border: none;
     color: #ccc;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     padding: 0 0.2rem;
     transition: var(--transition);
   }
@@ -468,7 +455,7 @@ title: 首页
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 340px;
+    height: 420px;
   }
   .chat-room .chat-header {
     background: #f8f9ff;
@@ -503,7 +490,7 @@ title: 首页
     max-width: 80%;
     padding: 0.4rem 0.8rem;
     border-radius: 12px;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     line-height: 1.5;
     word-break: break-word;
     animation: fade-in 0.25s ease;
@@ -512,15 +499,15 @@ title: 首页
     gap: 0.5rem;
   }
   .chat-messages .msg .avatar {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: #4c6ef5;
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
     flex-shrink: 0;
     text-transform: uppercase;
@@ -530,11 +517,11 @@ title: 首页
   }
   .chat-messages .msg .name {
     font-weight: 600;
-    font-size: 0.78rem;
+    font-size: 0.77rem;
     display: block;
   }
   .chat-messages .msg .time {
-    font-size: 0.6rem;
+    font-size: 0.62rem;
     opacity: 0.6;
     margin-left: 0.4rem;
   }
@@ -562,7 +549,7 @@ title: 首页
   }
   .chat-messages .empty-chat {
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: 0.83rem;
     text-align: center;
     padding: 2rem 0;
   }
@@ -583,7 +570,7 @@ title: 首页
     border: 1px solid #e0e4f0;
     border-radius: 20px;
     padding: 0.4rem 1rem;
-    font-size: 0.88rem;
+    font-size: 0.87rem;
     outline: none;
     transition: var(--transition);
     background: #fafbff;
@@ -599,7 +586,7 @@ title: 首页
     border-radius: 20px;
     padding: 0.4rem 1.2rem;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     cursor: pointer;
     transition: var(--transition);
   }
@@ -615,7 +602,7 @@ title: 首页
   .giscus-wrap .giscus {
     width: 100%;
     border: none;
-    min-height: 320px;
+    min-height: 310px;
   }
 
   /* ===== HRSI 聊天按钮 ===== */
@@ -628,26 +615,26 @@ title: 首页
     color: #fff;
     border: none;
     border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    font-size: 26px;
+    width: 54px;
+    height: 54px;
+    font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(76, 110, 245, 0.35);
+    box-shadow: 0 4px 18px rgba(76, 110, 245, 0.34);
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .hrsi-toggle:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 28px rgba(76, 110, 245, 0.45);
+    transform: scale(1.07);
+    box-shadow: 0 6px 26px rgba(76, 110, 245, 0.43);
   }
   .hrsi-toggle .badge-dot {
     position: absolute;
     top: 4px;
     right: 4px;
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     background: #22c55e;
     border: 2px solid #fff;
@@ -656,12 +643,12 @@ title: 首页
   /* ===== HRSI 聊天框 ===== */
   .hrsi-box {
     position: fixed;
-    bottom: 92px;
+    bottom: 88px;
     right: 24px;
-    width: 360px;
-    max-width: calc(100vw - 48px);
-    height: 440px;
-    max-height: calc(100vh - 120px);
+    width: 370px;
+    max-width: calc(100vw - 46px);
+    height: 480px;
+    max-height: calc(100vh - 140px);
     background: #1a1a2e;
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
@@ -672,7 +659,7 @@ title: 首页
     font-family: 'Segoe UI', system-ui, sans-serif;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    animation: slide-up 0.3s ease;
+    animation: slide-up 0.33s ease;
   }
   .hrsi-box.open {
     display: flex;
@@ -683,15 +670,15 @@ title: 首页
   }
   .hrsi-box .hrsi-header {
     background: var(--primary);
-    padding: 0.7rem 1rem;
+    padding: 0.65rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
   }
   .hrsi-box .hrsi-header span {
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: 650;
+    font-size: 0.94rem;
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -702,7 +689,7 @@ title: 首页
     color: #fff;
     font-size: 1.2rem;
     cursor: pointer;
-    opacity: 0.7;
+    opacity: 0.73;
     transition: var(--transition);
     padding: 0 0.2rem;
   }
@@ -716,16 +703,16 @@ title: 首页
     padding: 0.8rem 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.5rem;
     background: #16213e;
   }
   .hrsi-box .hrsi-msgs .msg {
-    max-width: 85%;
-    padding: 0.4rem 0.8rem;
+    max-width: 88%;
+    padding: 0.47rem 0.85rem;
     border-radius: 12px;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    animation: fade-in 0.25s ease;
+    font-size: 0.86rem;
+    line-height: 1.51;
+    animation: fade-in 0.23s ease;
   }
   .hrsi-box .hrsi-msgs .msg.user {
     align-self: flex-end;
@@ -740,14 +727,14 @@ title: 首页
     border-bottom-left-radius: 4px;
   }
   .hrsi-box .hrsi-msgs .msg.bot .label {
-    font-size: 0.65rem;
-    opacity: 0.6;
+    font-size: 0.63rem;
+    opacity: 0.67;
     display: block;
     margin-bottom: 0.1rem;
   }
   .hrsi-box .hrsi-msgs .empty-hrsi {
-    color: rgba(255,255,255,0.3);
-    font-size: 0.85rem;
+    color: rgba(255,255,255,0.36);
+    font-size: 0.84rem;
     text-align: center;
     padding: 2rem 0;
   }
@@ -755,16 +742,16 @@ title: 首页
     display: flex;
     gap: 0.5rem;
     padding: 0.5rem 0.8rem;
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid rgba(255,255,255,0.055);
     background: #1a1a2e;
     flex-shrink: 0;
   }
   .hrsi-box .hrsi-input-row input {
     flex: 1;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.085);
     border-radius: 20px;
-    padding: 0.4rem 1rem;
-    font-size: 0.85rem;
+    padding: 0.375rem 1rem;
+    font-size: 0.835rem;
     outline: none;
     background: #0f0f1f;
     color: #eee;
@@ -772,19 +759,19 @@ title: 首页
   }
   .hrsi-box .hrsi-input-row input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.15);
+    box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.145);
   }
   .hrsi-box .hrsi-input-row input::placeholder {
-    color: #666;
+    color: #565656;
   }
   .hrsi-box .hrsi-input-row button {
     background: var(--primary);
     color: #fff;
     border: none;
     border-radius: 20px;
-    padding: 0.4rem 1rem;
-    font-weight: 500;
-    font-size: 0.8rem;
+    padding: 0.395rem 1rem;
+    font-weight: 570;
+    font-size: 0.785rem;
     cursor: pointer;
     transition: var(--transition);
   }
@@ -792,72 +779,72 @@ title: 首页
     background: var(--primary-dark);
   }
   .hrsi-box .hrsi-input-row button:disabled {
-    opacity: 0.4;
+    opacity: 0.415;
     cursor: not-allowed;
   }
 
   /* ===== 响应式微调 ===== */
-  @media (max-width: 640px) {
+  @media (max-width: 680px) {
     .page-wrapper {
-      padding: 1rem 0.8rem 3rem;
+      padding: 1rem 0.7rem 3rem;
     }
     .profile-card {
-      padding: 1.2rem 1.2rem;
-      gap: 1.2rem;
+      padding: 1.1rem 1.1rem;
+      gap: 1.1rem;
     }
     .profile-avatar {
-      width: 80px;
-      height: 80px;
-      font-size: 2rem;
+      width: 78px;
+      height: 78px;
+      font-size: 1.9rem;
     }
     .profile-info h1 {
-      font-size: 1.4rem;
+      font-size: 1.38rem;
     }
     .section-card {
-      padding: 1.2rem 1rem;
+      padding: 1.1rem 0.9rem;
     }
     .player-main {
-      gap: 0.8rem;
+      gap: 0.7rem;
     }
     .player-cover {
-      width: 64px;
-      height: 64px;
-      font-size: 1.6rem;
+      width: 62px;
+      height: 62px;
+      font-size: 1.5rem;
     }
     .player-controls button {
-      width: 32px;
-      height: 32px;
-      font-size: 1.1rem;
-    }
-    .player-controls button.play-btn {
-      width: 38px;
-      height: 38px;
+      width: 29px;
+      height: 29px;
       font-size: 1rem;
     }
+    .player-controls button.play-btn {
+      width: 36px;
+      height: 36px;
+      font-size: 0.99rem;
+    }
     .player-volume input[type="range"] {
-      width: 40px;
+      width: 36px;
     }
     .hrsi-box {
-      width: calc(100vw - 32px);
-      right: 16px;
-      bottom: 80px;
-      height: 400px;
+      width: calc(100vw - 30px);
+      right: 15px;
+      bottom: 78px;
+      height: 410px;
     }
     .explore-btn {
-      padding: 0.6rem 1.4rem;
-      font-size: 0.9rem;
+      padding: 0.49rem 1.2rem;
+      font-size: 0.865rem;
     }
     .playlist-header .btn-group {
-      gap: 0.3rem;
+      gap: 0.225rem;
     }
     .playlist-header .add-btn {
-      font-size: 0.7rem;
-      padding: 0.1rem 0.6rem;
+      font-size: 0.675rem;
+      padding: 0.095rem 0.475rem;
     }
     .chat-messages .msg .avatar {
-      width: 22px;
-      height: 22px;
-      font-size: 0.6rem;
+      width: 19px;
+      height: 19px;
+      font-size: 0.595rem;
     }
   }
 
@@ -870,7 +857,7 @@ title: 首页
   .chat-messages::-webkit-scrollbar-thumb,
   .hrsi-msgs::-webkit-scrollbar-thumb,
   .playlist-items::-webkit-scrollbar-thumb {
-    background: #ccc;
+    background: #bbb;
     border-radius: 4px;
   }
   .chat-messages::-webkit-scrollbar-track,
@@ -891,7 +878,7 @@ title: 首页
 <!-- ============================================================ -->
 <div class="page-wrapper">
 
-  <!-- ====== 1. 个人卡片（头像修复） ====== -->
+  <!-- ====== 1. 个人卡片 ====== -->
   <div class="profile-card">
     <img src="/assets/images/avatar.jpg"
          alt="我的头像"
@@ -912,13 +899,12 @@ title: 首页
     </div>
   </div>
 
-  <!-- ====== 2. 音乐播放器（纯音乐，免版权） ====== -->
+  <!-- ====== 2. 音乐播放器 ====== -->
   <div class="section-card">
     <div class="card-title">🎵 音乐播放器 · 纯音乐</div>
-    <div class="card-sub">内置无版权背景音乐，稳定可播。您也可以添加自己的网易云ID或URL</div>
+    <div class="card-sub">内置多个免费音源，自动跳过无法播放的链接。您也可以添加自己的URL或网易云ID。</div>
 
     <div class="player-wrap">
-      <!-- 主控制区 -->
       <div class="player-main">
         <div class="player-cover" id="playerCover">🎶</div>
         <div class="player-info">
@@ -935,13 +921,12 @@ title: 首页
             </div>
             <div class="player-volume">
               <span>🔊</span>
-              <input type="range" id="volumeBar" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value)">
+              <input type="range" id="volumeBar" min="0" max="1" step="0.01" value="0.71" oninput="setVolume(this.value)">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 播放列表 -->
       <div class="playlist-wrap">
         <div class="playlist-header">
           <span>📋 播放列表 (<span id="playlistCount">0</span>)</span>
@@ -973,7 +958,6 @@ title: 首页
     <div class="card-sub">在聊天室实时畅聊，或在留言板留下你的想法</div>
 
     <div class="chat-grid">
-      <!-- 聊天室 -->
       <div class="chat-room">
         <div class="chat-header">
           <span>💬 即时聊天室</span>
@@ -988,13 +972,12 @@ title: 首页
         </div>
       </div>
 
-      <!-- 留言板 (Giscus) -->
       <div style="display:flex;flex-direction:column;gap:0.3rem;">
-        <div style="font-weight:500;font-size:0.95rem;color:var(--text-secondary);">📝 留言板</div>
-        <div style="flex:1;min-height:280px;border-radius:var(--radius-sm);overflow:hidden;background:#fafbff;padding:0.2rem;">
+        <div style="font-weight:500;font-size:0.955rem;color:var(--text-secondary);">📝 留言板</div>
+        <div style="flex:1;min-height:280px;border-radius:var(--radius-sm);overflow:hidden;background:#fafbff;padding:0.175rem;">
           <div class="giscus"></div>
         </div>
-        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">
+        <div style="font-size:0.775rem;color:var(--text-muted);margin-top:0.125rem;">
           💡 使用 GitHub 账号登录后即可留言
         </div>
       </div>
@@ -1046,23 +1029,25 @@ title: 首页
         async>
 </script>
 
-<!-- ===== 音乐播放器脚本（修复稳定播放） ===== -->
+<!-- ===== 音乐播放器脚本（渲染播放列表 + 修复版） ===== -->
 <script>
-  (function() {
+(function() {
     'use strict';
 
-    // ---------- 默认歌单（SoundHelix 免费测试曲，无版权） ----------
     const defaultSongs = [
-      { title: 'SoundHelix Song 1', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-      { title: 'SoundHelix Song 2', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-      { title: 'SoundHelix Song 3', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-      { title: 'SoundHelix Song 4', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+        { title: 'SoundHelix 1', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+        { title: 'SoundHelix 2', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+        { title: 'SoundHelix 3', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+        { title: 'SoundHelix 4', artist: 'SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+        { title: 'Piano', artist: 'FMA', url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3' },
+        { title: 'Ambient', artist: 'FMA', url: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Creative_Commons/Ketsa/Raising_Frequencies/Ketsa_-_01_-_Raising_Frequencies.mp3' }
     ];
 
     let playlist = [];
     let currentIndex = 0;
     let isPlaying = false;
     let isDragging = false;
+    let failCount = 0;
 
     const audio = new Audio();
     const playBtn = document.getElementById('playBtn');
@@ -1076,224 +1061,216 @@ title: 首页
     const playlistCount = document.getElementById('playlistCount');
     const playerCover = document.getElementById('playerCover');
 
-    // ---------- 工具函数 ----------
     function formatTime(sec) {
-      if (!sec || isNaN(sec)) return '0:00';
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60);
-      return m + ':' + (s < 10 ? '0' : '') + s;
+        if (!sec || isNaN(sec)) return '0:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
     }
 
-    // ---------- 加载播放列表 ----------
     function loadPlaylist() {
-      try {
-        const saved = localStorage.getItem('hrsi_playlist');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length) {
-            playlist = parsed;
-            return;
-          }
-        }
-      } catch (_) { /* ignore */ }
-      playlist = JSON.parse(JSON.stringify(defaultSongs));
-      savePlaylist();
+        try {
+            const saved = localStorage.getItem('music_playlist');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    playlist = parsed;
+                    return;
+                }
+            }
+        } catch (_) {}
+        playlist = JSON.parse(JSON.stringify(defaultSongs));
+        savePlaylist();
     }
 
     function savePlaylist() {
-      try {
-        localStorage.setItem('hrsi_playlist', JSON.stringify(playlist));
-      } catch (_) { /* ignore */ }
+        try {
+            localStorage.setItem('music_playlist', JSON.stringify(playlist));
+        } catch (_) {}
     }
 
-    // ---------- 渲染播放列表 ----------
     function renderPlaylist() {
-      playlistContainer.innerHTML = '';
-      if (!playlist.length) {
-        playlistContainer.innerHTML = '<div class="playlist-empty">暂无歌曲，点击添加</div>';
-        playlistCount.textContent = '0';
-        return;
-      }
-      playlistCount.textContent = playlist.length;
-      playlist.forEach((song, idx) => {
-        const div = document.createElement('div');
-        div.className = 'playlist-item' + (idx === currentIndex ? ' active' : '');
-        div.innerHTML = `
-          <span>${song.title || '未命名'} — ${song.artist || '未知'}</span>
-          <button class="del-btn" onclick="removeSong(${idx})" title="移除">✕</button>
-        `;
-        div.addEventListener('click', () => playSong(idx));
-        playlistContainer.appendChild(div);
-      });
+        playlistContainer.innerHTML = '';
+        if (!playlist.length) {
+            playlistContainer.innerHTML = '<div class="playlist-empty">暂无歌曲，点击上方按钮添加</div>';
+            playlistCount.textContent = '0';
+            return;
+        }
+        playlistCount.textContent = playlist.length;
+        playlist.forEach((song, idx) => {
+            const item = document.createElement('div');
+            item.className = 'playlist-item' + (idx === currentIndex ? ' active' : '');
+            const infoSpan = document.createElement('span');
+            infoSpan.textContent = (song.title || '未命名') + ' — ' + (song.artist || '未知');
+            const delBtn = document.createElement('button');
+            delBtn.className = 'del-btn';
+            delBtn.textContent = '✕';
+            delBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                removeSong(idx);
+            });
+            item.appendChild(infoSpan);
+            item.appendChild(delBtn);
+            item.addEventListener('click', function() {
+                playSong(idx);
+            });
+            playlistContainer.appendChild(item);
+        });
     }
 
-    // ---------- 播放控制 ----------
     function playSong(index) {
-      if (index < 0 || index >= playlist.length) return;
-      currentIndex = index;
-      const song = playlist[index];
-      if (!song || !song.url) return;
-      audio.src = song.url;
-      audio.load();
-      audio.volume = parseFloat(volumeBar.value) || 0.8;
-      songTitle.textContent = song.title || '未命名';
-      songArtist.textContent = song.artist || '未知';
-      playerCover.textContent = '🎵';
-      playerCover.classList.remove('loading');
-      audio.play().then(() => {
-        isPlaying = true;
-        playBtn.textContent = '⏸';
-        renderPlaylist();
-      }).catch(() => {
-        console.warn('播放失败，尝试下一首');
-        playerCover.textContent = '⚠️';
-        playerCover.classList.add('loading');
-        setTimeout(() => nextSong(), 1500);
-      });
+        if (index < 0 || index >= playlist.length) return;
+        currentIndex = index;
+        const song = playlist[index];
+        if (!song || !song.url) return;
+        if (window.retryTimer) {
+            clearTimeout(window.retryTimer);
+            window.retryTimer = null;
+        }
+        audio.src = song.url;
+        audio.load();
+        audio.volume = parseFloat(volumeBar.value) || 0.71;
+        songTitle.textContent = song.title || '未命名';
+        songArtist.textContent = song.artist || '未知';
+        playerCover.textContent = '🎵';
+        playerCover.classList.remove('loading');
+        failCount = 0;
+        audio.play().then(() => {
+            isPlaying = true;
+            playBtn.textContent = '⏸';
+            renderPlaylist();
+        }).catch(() => {
+            failCount++;
+            if (failCount < playlist.length) {
+                playerCover.textContent = '⚠️';
+                playerCover.classList.add('loading');
+                window.retryTimer = setTimeout(() => nextSong(), 2000);
+            } else {
+                playerCover.textContent = '❌';
+                songTitle.textContent = '所有歌曲都无法播放';
+                songArtist.textContent = '请检查网络或添加新歌曲';
+                playBtn.textContent = '▶';
+                isPlaying = false;
+            }
+        });
     }
 
     function togglePlay() {
-      if (!playlist.length) {
-        alert('播放列表为空，请先添加歌曲');
-        return;
-      }
-      if (audio.paused) {
-        if (!audio.src) {
-          playSong(currentIndex);
-          return;
+        if (!playlist.length) {
+            alert('播放列表为空，请先添加歌曲');
+            return;
         }
-        audio.play().then(() => {
-          isPlaying = true;
-          playBtn.textContent = '⏸';
-        }).catch(() => {});
-      } else {
-        audio.pause();
-        isPlaying = false;
-        playBtn.textContent = '▶';
-      }
+        if (audio.paused) {
+            if (!audio.src) {
+                playSong(currentIndex);
+                return;
+            }
+            audio.play().then(() => {
+                isPlaying = true;
+                playBtn.textContent = '⏸';
+            }).catch(() => {});
+        } else {
+            audio.pause();
+            isPlaying = false;
+            playBtn.textContent = '▶';
+        }
     }
 
     function nextSong() {
-      if (!playlist.length) return;
-      const next = (currentIndex + 1) % playlist.length;
-      playSong(next);
+        if (!playlist.length) return;
+        const next = (currentIndex + 1) % playlist.length;
+        playSong(next);
     }
 
     function prevSong() {
-      if (!playlist.length) return;
-      const prev = (currentIndex - 1 + playlist.length) % playlist.length;
-      playSong(prev);
+        if (!playlist.length) return;
+        const prev = (currentIndex - 1 + playlist.length) % playlist.length;
+        playSong(prev);
     }
 
     function removeSong(index) {
-      if (index < 0 || index >= playlist.length) return;
-      if (playlist.length <= 1) {
-        alert('至少保留一首歌曲');
-        return;
-      }
-      playlist.splice(index, 1);
-      savePlaylist();
-      if (index === currentIndex) {
-        if (index >= playlist.length) {
-          currentIndex = playlist.length - 1;
+        if (index < 0 || index >= playlist.length) return;
+        if (playlist.length <= 1) {
+            alert('至少保留一首歌曲');
+            return;
         }
-        playSong(currentIndex);
-      } else if (index < currentIndex) {
-        currentIndex--;
-      }
-      renderPlaylist();
+        playlist.splice(index, 1);
+        savePlaylist();
+        if (index === currentIndex) {
+            if (index >= playlist.length) currentIndex = playlist.length - 1;
+            playSong(currentIndex);
+        } else if (index < currentIndex) {
+            currentIndex--;
+        }
+        renderPlaylist();
     }
 
-    // ---------- 添加歌曲（URL） ----------
     function addSongByURL() {
-      const url = prompt('请输入音乐文件的 URL（mp3 / ogg / wav）：');
-      if (!url) return;
-      const title = prompt('请输入歌曲名称：') || '未命名';
-      const artist = prompt('请输入艺术家名称：') || '未知';
-      playlist.push({ title, artist, url });
-      savePlaylist();
-      renderPlaylist();
-      if (playlist.length === 1) {
-        playSong(0);
-      } else {
-        const idx = playlist.length - 1;
-        const items = playlistContainer.querySelectorAll('.playlist-item');
-        if (items[idx]) items[idx].classList.add('active');
-      }
+        const url = prompt('请输入音乐文件的 URL（mp3 / ogg / wav）：');
+        if (!url) return;
+        const title = prompt('请输入歌曲名称：') || '未命名';
+        const artist = prompt('请输入艺术家名称：') || '未知';
+        playlist.push({ title, artist, url });
+        savePlaylist();
+        renderPlaylist();
+        if (playlist.length === 1) playSong(0);
     }
 
-    // ---------- 添加网易云歌曲（通过ID） ----------
     function addNeteaseSong() {
-      const id = prompt('请输入网易云歌曲 ID（例如 186016 对应《晴天》）：');
-      if (!id) return;
-      const cleanId = id.trim();
-      if (!/^\d+$/.test(cleanId)) {
-        alert('请输入数字ID');
-        return;
-      }
-      const url = `https://music.163.com/song/media/outer/url?id=${cleanId}.mp3`;
-      const title = prompt('请输入歌曲名称（可选）：') || `网易云歌曲 ${cleanId}`;
-      const artist = prompt('请输入艺术家名称（可选）：') || '未知';
-      playlist.push({ title, artist, url });
-      savePlaylist();
-      renderPlaylist();
-      if (playlist.length === 1) {
-        playSong(0);
-      } else {
-        const idx = playlist.length - 1;
-        const items = playlistContainer.querySelectorAll('.playlist-item');
-        if (items[idx]) items[idx].classList.add('active');
-      }
+        const id = prompt('请输入网易云歌曲 ID（例如 186016）：');
+        if (!id) return;
+        const cleanId = id.trim();
+        if (!/^\d+$/.test(cleanId)) {
+            alert('请输入数字ID');
+            return;
+        }
+        const url = 'https://music.163.com/song/media/outer/url?id=' + cleanId + '.mp3';
+        const title = prompt('请输入歌曲名称（可选）：') || ('网易云歌曲 ' + cleanId);
+        const artist = prompt('请输入艺术家名称（可选）：') || '未知';
+        playlist.push({ title, artist, url });
+        savePlaylist();
+        renderPlaylist();
+        if (playlist.length === 1) playSong(0);
     }
 
-    // ---------- 进度 & 音量 ----------
     function seekProgress(val) {
-      if (!audio.duration || isNaN(audio.duration)) return;
-      const time = (val / 100) * audio.duration;
-      audio.currentTime = time;
-      currentTimeEl.textContent = formatTime(time);
+        if (!audio.duration || isNaN(audio.duration)) return;
+        audio.currentTime = (val / 100) * audio.duration;
+        currentTimeEl.textContent = formatTime(audio.currentTime);
     }
 
     function setVolume(val) {
-      audio.volume = parseFloat(val);
+        audio.volume = parseFloat(val);
     }
 
-    // ---------- 事件绑定 ----------
-    audio.addEventListener('timeupdate', () => {
-      if (!isDragging && audio.duration) {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        progressBar.value = pct;
-        currentTimeEl.textContent = formatTime(audio.currentTime);
-      }
+    audio.addEventListener('timeupdate', function() {
+        if (!isDragging && audio.duration) {
+            progressBar.value = (audio.currentTime / audio.duration) * 100;
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        }
     });
-
-    audio.addEventListener('loadedmetadata', () => {
-      totalTimeEl.textContent = formatTime(audio.duration);
-      progressBar.value = 0;
+    audio.addEventListener('loadedmetadata', function() {
+        totalTimeEl.textContent = formatTime(audio.duration);
+        progressBar.value = 0;
     });
-
-    audio.addEventListener('ended', () => {
-      nextSong();
+    audio.addEventListener('ended', function() { nextSong(); });
+    audio.addEventListener('error', function() {
+        if (failCount < playlist.length) {
+            failCount++;
+            playerCover.textContent = '⚠️';
+            playerCover.classList.add('loading');
+            window.retryTimer = setTimeout(() => nextSong(), 2000);
+        }
     });
-
-    audio.addEventListener('error', () => {
-      console.warn('音频加载错误，尝试下一首');
-      playerCover.textContent = '⚠️';
-      playerCover.classList.add('loading');
-      setTimeout(() => nextSong(), 1200);
+    audio.addEventListener('canplay', function() {
+        playerCover.classList.remove('loading');
+        playerCover.textContent = '🎵';
     });
+    progressBar.addEventListener('mousedown', function() { isDragging = true; });
+    progressBar.addEventListener('mouseup', function() { isDragging = false; });
+    progressBar.addEventListener('touchstart', function() { isDragging = true; });
+    progressBar.addEventListener('touchend', function() { isDragging = false; });
 
-    audio.addEventListener('canplay', () => {
-      playerCover.classList.remove('loading');
-      playerCover.textContent = '🎵';
-    });
-
-    progressBar.addEventListener('mousedown', () => { isDragging = true; });
-    progressBar.addEventListener('mouseup', () => { isDragging = false; });
-    progressBar.addEventListener('touchstart', () => { isDragging = true; });
-    progressBar.addEventListener('touchend', () => { isDragging = false; });
-
-    // ---------- 暴露全局 ----------
     window.playSong = playSong;
     window.togglePlay = togglePlay;
     window.nextSong = nextSong;
@@ -1304,226 +1281,9 @@ title: 首页
     window.seekProgress = seekProgress;
     window.setVolume = setVolume;
 
-    // ---------- 初始化 ----------
     loadPlaylist();
     renderPlaylist();
-    if (playlist.length) {
-      playSong(0);
-    } else {
-      playlist = JSON.parse(JSON.stringify(defaultSongs));
-      savePlaylist();
-      renderPlaylist();
-      if (playlist.length) playSong(0);
-    }
-
-    console.log('🎵 播放器已加载，歌单数量:', playlist.length);
-  })();
-</script>
-
-<!-- ===== 聊天室脚本 (localStorage 同步 + 头像) ===== -->
-<script>
-  (function() {
-    'use strict';
-
-    const STORAGE_KEY = 'hrsi_chat_messages';
-    const NAME_KEY = 'hrsi_chat_username';
-    const MAX_MSGS = 100;
-
-    let username = localStorage.getItem(NAME_KEY) || '访客_' + Math.floor(Math.random() * 1000);
-    let messages = [];
-
-    const chatMessages = document.getElementById('chatMessages');
-    const chatInput = document.getElementById('chatInput');
-
-    // ---------- 加载消息 ----------
-    function loadMessages() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            messages = parsed.slice(-MAX_MSGS);
-            return;
-          }
-        }
-      } catch (_) { /* ignore */ }
-      messages = [];
-    }
-
-    function saveMessages() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_MSGS)));
-      } catch (_) { /* ignore */ }
-    }
-
-    // ---------- 获取用户首字母和颜色 ----------
-    function getUserAvatar(name) {
-      const initial = name.charAt(0).toUpperCase() || '?';
-      const colors = ['#4c6ef5', '#f59f00', '#e67700', '#d6336c', '#20c997', '#6f42c1', '#0d6efd', '#fd7e14'];
-      const index = name.length % colors.length;
-      return { initial, color: colors[index] };
-    }
-
-    // ---------- 渲染 ----------
-    function renderChat() {
-      chatMessages.innerHTML = '';
-      if (!messages.length) {
-        chatMessages.innerHTML = '<div class="empty-chat">还没有消息，来说点什么吧 👋</div>';
-        return;
-      }
-      messages.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = 'msg ' + (msg.name === username ? 'self' : 'other');
-        const avatarInfo = getUserAvatar(msg.name);
-        const timeStr = msg.time ? new Date(msg.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
-        div.innerHTML = `
-          <div class="avatar" style="background:${avatarInfo.color}">${avatarInfo.initial}</div>
-          <div class="content">
-            <span class="name">${msg.name || '匿名'}</span>
-            ${msg.text}
-            <span class="time">${timeStr}</span>
-          </div>
-        `;
-        chatMessages.appendChild(div);
-      });
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // ---------- 发送消息 ----------
-    function sendChat() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-      const msg = {
-        name: username,
-        text: text,
-        time: Date.now(),
-      };
-      messages.push(msg);
-      saveMessages();
-      renderChat();
-      chatInput.value = '';
-      try {
-        localStorage.setItem(STORAGE_KEY + '_trigger', Date.now().toString());
-      } catch (_) { /* ignore */ }
-    }
-
-    // ---------- 监听其他标签页 ----------
-    window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_KEY || e.key === STORAGE_KEY + '_trigger') {
-        const oldLen = messages.length;
-        loadMessages();
-        if (messages.length !== oldLen) {
-          renderChat();
-        }
-      }
-    });
-
-    // ---------- 初始化 ----------
-    loadMessages();
-    renderChat();
-
-    if (!localStorage.getItem(NAME_KEY)) {
-      const name = prompt('👋 欢迎来到聊天室！请输入你的昵称：', username);
-      if (name && name.trim()) {
-        username = name.trim();
-        localStorage.setItem(NAME_KEY, username);
-      }
-    } else {
-      username = localStorage.getItem(NAME_KEY);
-    }
-
-    window.sendChat = sendChat;
-    window.chatInput = chatInput;
-
-    console.log('💬 聊天室已加载，当前用户:', username);
-  })();
-</script>
-
-<!-- ===== HRSI 聊天脚本 ===== -->
-<script>
-  (function() {
-    'use strict';
-
-    const box = document.getElementById('hrsiBox');
-    const msgs = document.getElementById('hrsiMsgs');
-    const input = document.getElementById('hrsiInput');
-    const sendBtn = document.getElementById('hrsiSendBtn');
-    let isOpen = false;
-
-    window.toggleHRSI = function() {
-      isOpen = !isOpen;
-      box.classList.toggle('open', isOpen);
-      if (isOpen) {
-        input.focus();
-      }
-    };
-
-    window.sendHRSI = async function() {
-      const text = input.value.trim();
-      if (!text) return;
-      input.value = '';
-      sendBtn.disabled = true;
-      sendBtn.textContent = '⏳';
-
-      addMsg(text, 'user');
-
-      try {
-        const res = await fetch('https://hrsi-api.hrsi.cc.cd/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'hrsi-model',
-            prompt: `用户问："${text}"\n\n用 HRSI 的身份（12岁技术建造者，中二自信，好燃 So Intense！）简短回答：`,
-            stream: false
-          })
-        });
-        if (!res.ok) throw new Error('API 响应错误');
-        const data = await res.json();
-        const reply = data.response || '🤖 收到！但我暂时想不出更好的回答～';
-        addMsg(reply, 'bot');
-      } catch (e) {
-        console.warn('HRSI API 错误:', e);
-        addMsg('😅 HRSI 不在线，稍后再试！或者发邮件给站长/检查网络～', 'bot');
-      }
-
-      sendBtn.disabled = false;
-      sendBtn.textContent = '发送';
-    };
-
-    function addMsg(text, type) {
-      const empty = msgs.querySelector('.empty-hrsi');
-      if (empty) empty.remove();
-
-      const div = document.createElement('div');
-      div.className = 'msg ' + (type === 'user' ? 'user' : 'bot');
-      if (type === 'bot') {
-        div.innerHTML = `<span class="label">🤖 HRSI</span>${text}`;
-      } else {
-        div.textContent = text;
-      }
-      msgs.appendChild(div);
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        window.sendHRSI();
-      }
-    });
-
-    console.log('🤖 HRSI 助手已加载');
-  })();
-</script>
-
-<!-- ===== 头像占位增强 ===== -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const img = document.querySelector('.profile-avatar');
-    const fallback = document.querySelector('.fallback-avatar');
-    if (img && img.complete && img.naturalWidth === 0) {
-      img.style.display = 'none';
-      fallback.style.display = 'flex';
-    }
-  });
+    if (playlist.length > 0) playSong(0);
+    console.log('播放器已加载，歌单数量:', playlist.length);
+})();
 </script>
