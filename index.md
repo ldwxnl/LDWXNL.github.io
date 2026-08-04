@@ -954,7 +954,7 @@ title: 首页
 
   <!-- ====== 1. 个人卡片 ====== -->
   <div class="profile-card">
-    <img src="/avatar.png"
+    <img src="/avatar.jpg"
          alt="我的头像"
          class="profile-avatar"
          onerror="this.style.display='none'; this.parentNode.querySelector('.fallback-avatar').style.display='flex';">
