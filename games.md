@@ -262,7 +262,7 @@ permalink: /games/
       <div class="item">
         <span class="label">版本 & 模式</span>
         <span class="value">1.8.8 (Java) · 生存模式</span>
-        <span style="font-size:0.85rem;opacity:0.7;">网页与 Java 端口：25565</span>
+        <span style="font-size:0.85rem;opacity:0.7;">网页与 Java 端口：25575/25565</span>
       </div>
       <div class="item">
         <span class="label">互通性</span>
