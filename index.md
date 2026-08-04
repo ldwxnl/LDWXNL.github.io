@@ -189,16 +189,28 @@ title: 首页
     width: 90px;
     height: 90px;
     border-radius: var(--radius-sm);
-    background: linear-gradient(135deg, #4c6ef5, #a855f7);
+    background: #2a2a4a;
+    background-size: cover;
+    background-position: center;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2.4rem;
     color: #fff;
     flex-shrink: 0;
-    box-shadow: 0 4px 16px rgba(76, 110, 245, 0.25);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     transition: var(--transition);
     cursor: pointer;
+    overflow: hidden;
+  }
+  .player-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .player-cover .icon {
+    font-size: 2.4rem;
+    opacity: 0.7;
   }
   .player-cover.loading {
     animation: pulse-cover 1.2s ease-in-out infinite;
@@ -961,15 +973,17 @@ title: 首页
     </div>
   </div>
 
-  <!-- ====== 2. 音乐播放器（纯网易云） ====== -->
+  <!-- ====== 2. 音乐播放器（仅单曲，自动获取信息） ====== -->
   <div class="section-card">
     <div class="card-title">🎵 音乐播放器 · 网易云</div>
-    <div class="card-sub">仅支持网易云音乐导入 · 歌单 / 单曲</div>
+    <div class="card-sub">输入歌曲ID，自动获取名称、艺术家和封面</div>
 
     <div class="player-wrap">
       <!-- 主控制区 -->
       <div class="player-main">
-        <div class="player-cover" id="playerCover">🎶</div>
+        <div class="player-cover" id="playerCover">
+          <span class="icon">🎶</span>
+        </div>
         <div class="player-info">
           <div class="song-title" id="songTitle">未播放</div>
           <div class="song-artist" id="songArtist">—</div>
@@ -996,13 +1010,12 @@ title: 首页
         <div class="playlist-header">
           <span>📋 播放列表 (<span id="playlistCount">0</span>)</span>
           <div class="btn-group">
-            <button class="add-btn" onclick="importNeteasePlaylist()">🎵 导入歌单</button>
             <button class="add-btn" onclick="addNeteaseSong()">🎤 添加单曲</button>
             <button class="add-btn" onclick="clearPlaylist()" style="border-color:#e74c3c;color:#e74c3c;">🗑️ 清空</button>
           </div>
         </div>
         <div class="playlist-items" id="playlistContainer">
-          <div class="playlist-empty">暂无歌曲，请导入网易云歌单或添加单曲</div>
+          <div class="playlist-empty">暂无歌曲，请点击「添加单曲」</div>
         </div>
         <div class="playlist-import-status" id="importStatus"></div>
       </div>
@@ -1104,7 +1117,7 @@ title: 首页
         async>
 </script>
 
-<!-- ===== 音乐播放器脚本（纯网易云 + 三种模式） ===== -->
+<!-- ===== 音乐播放器脚本（纯网易云 + 三种模式，仅单曲） ===== -->
 <script>
   (function() {
     'use strict';
@@ -1120,7 +1133,6 @@ title: 首页
     let currentIndex = 0;
     let isPlaying = false;
     let isDragging = false;
-    let isShuffled = false; // 随机模式下的播放队列
 
     const audio = new Audio();
     const playBtn = document.getElementById('playBtn');
@@ -1156,7 +1168,7 @@ title: 首页
     // ---------- 加载/保存播放列表 ----------
     function loadPlaylist() {
       try {
-        const saved = localStorage.getItem('hrsi_playlist_v2');
+        const saved = localStorage.getItem('hrsi_playlist_v3');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length) {
@@ -1171,7 +1183,7 @@ title: 首页
 
     function savePlaylist() {
       try {
-        localStorage.setItem('hrsi_playlist_v2', JSON.stringify(playlist));
+        localStorage.setItem('hrsi_playlist_v3', JSON.stringify(playlist));
       } catch (_) { /* ignore */ }
     }
 
@@ -1195,7 +1207,7 @@ title: 首页
     function renderPlaylist() {
       playlistContainer.innerHTML = '';
       if (!playlist.length) {
-        playlistContainer.innerHTML = '<div class="playlist-empty">暂无歌曲，请导入网易云歌单或添加单曲</div>';
+        playlistContainer.innerHTML = '<div class="playlist-empty">暂无歌曲，请点击「添加单曲」</div>';
         playlistCount.textContent = '0';
         return;
       }
@@ -1218,37 +1230,29 @@ title: 首页
       currentIndex = index;
       const song = playlist[index];
       if (!song || !song.url) return;
-      
-      // 修复网易云外链：确保 URL 格式正确
-      let url = song.url;
-      if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-      // 如果是网易云外链，确保使用正确的格式
-      if (url && url.includes('music.163.com')) {
-        // 已经包含 outer/url 格式，直接使用
-      }
-      
-      audio.src = url;
+
+      audio.src = song.url;
       audio.load();
       audio.volume = parseFloat(volumeBar.value) || 0.8;
       songTitle.textContent = song.title || '未命名';
       songArtist.textContent = song.artist || '未知';
-      playerCover.textContent = '🎵';
+      // 更新封面
+      if (song.cover) {
+        playerCover.innerHTML = `<img src="${song.cover}" alt="封面">`;
+      } else {
+        playerCover.innerHTML = `<span class="icon">🎵</span>`;
+      }
       playerCover.classList.remove('loading');
-      
+
       audio.play().then(() => {
         isPlaying = true;
         playBtn.textContent = '⏸';
         renderPlaylist();
       }).catch((err) => {
         console.warn('播放失败:', err.message);
-        playerCover.textContent = '⚠️';
         playerCover.classList.add('loading');
-        // 尝试下一首
         setTimeout(() => {
           if (currentMode === MODES.SINGLE) {
-            // 单曲模式重试
             setTimeout(() => playSong(currentIndex), 2000);
           } else {
             nextSong();
@@ -1280,21 +1284,17 @@ title: 首页
 
     function getNextIndex() {
       if (currentMode === MODES.RANDOM) {
-        // 随机播放：从剩余未播放中随机选一首
         const remaining = playlist.map((_, i) => i).filter(i => i !== currentIndex);
         if (remaining.length === 0) {
-          // 全部播完，重新洗牌
           return Math.floor(Math.random() * playlist.length);
         }
         return remaining[Math.floor(Math.random() * remaining.length)];
       }
-      // 列表循环
       return (currentIndex + 1) % playlist.length;
     }
 
     function getPrevIndex() {
       if (currentMode === MODES.RANDOM) {
-        // 随机模式上一首：直接随机选一首
         return Math.floor(Math.random() * playlist.length);
       }
       return (currentIndex - 1 + playlist.length) % playlist.length;
@@ -1303,7 +1303,6 @@ title: 首页
     function nextSong() {
       if (!playlist.length) return;
       if (currentMode === MODES.SINGLE) {
-        // 单曲循环：重播当前
         playSong(currentIndex);
         return;
       }
@@ -1334,6 +1333,7 @@ title: 首页
           playBtn.textContent = '▶';
           songTitle.textContent = '未播放';
           songArtist.textContent = '—';
+          playerCover.innerHTML = `<span class="icon">🎶</span>`;
           renderPlaylist();
         }
         return;
@@ -1363,6 +1363,7 @@ title: 首页
         playBtn.textContent = '▶';
         songTitle.textContent = '未播放';
         songArtist.textContent = '—';
+        playerCover.innerHTML = `<span class="icon">🎶</span>`;
         renderPlaylist();
         importStatus.textContent = '🗑️ 已清空播放列表';
       }
@@ -1383,104 +1384,7 @@ title: 首页
       modeBtn.textContent = getModeLabel(currentMode);
     }
 
-    // ---------- 导入网易云歌单 ----------
-    async function importNeteasePlaylist() {
-      const input = prompt('请输入网易云歌单 ID（例如：3778678）：');
-      if (!input) return;
-      const playlistId = input.trim();
-      if (!/^\d+$/.test(playlistId)) {
-        importStatus.textContent = '❌ 请输入有效的数字ID';
-        return;
-      }
-
-      importStatus.textContent = '⏳ 正在获取歌单...';
-      
-      try {
-        // 使用网易云 API 获取歌单详情
-        const apiUrl = `https://api.ltzy.top/v1/netease/playlist/${playlistId}`;
-        const response = await fetch(apiUrl, {
-          headers: {
-            'Authorization': 'Bearer acu_ZaTWFQWZ2Wiqi0JOUlgbx4GjiIzactIw'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('获取歌单失败: ' + response.status);
-        }
-        
-        const data = await response.json();
-        if (!data.tracks || !data.tracks.length) {
-          throw new Error('歌单为空或无效');
-        }
-        
-        const newSongs = data.tracks.map(track => ({
-          title: track.name || '未命名',
-          artist: track.artists ? track.artists.map(a => a.name).join(', ') : '未知',
-          url: `https://music.163.com/song/media/outer/url?id=${track.id}.mp3`
-        }));
-        
-        // 去重
-        const existingIds = new Set(playlist.map(s => s.url));
-        const added = newSongs.filter(s => !existingIds.has(s.url));
-        
-        if (!added.length) {
-          importStatus.textContent = '⚠️ 歌单中的歌曲已在列表中';
-          return;
-        }
-        
-        playlist = playlist.concat(added);
-        savePlaylist();
-        renderPlaylist();
-        
-        importStatus.textContent = `✅ 成功导入 ${added.length} 首歌曲`;
-        
-        // 如果当前没有播放，自动播放第一首
-        if (!audio.src && playlist.length > 0) {
-          playSong(0);
-        }
-        
-      } catch (err) {
-        console.error('导入歌单失败:', err);
-        importStatus.textContent = '❌ 导入失败: ' + err.message;
-        // 备用方案：尝试使用备用 API
-        try {
-          importStatus.textContent = '⏳ 尝试备用方式...';
-          const fallbackUrl = `https://api.ltzy.top/v1/netease/playlist/detail?id=${playlistId}`;
-          const fallbackRes = await fetch(fallbackUrl, {
-            headers: {
-              'Authorization': 'Bearer acu_ZaTWFQWZ2Wiqi0JOUlgbx4GjiIzactIw'
-            }
-          });
-          if (fallbackRes.ok) {
-            const fallbackData = await fallbackRes.json();
-            if (fallbackData.songs && fallbackData.songs.length) {
-              const newSongs = fallbackData.songs.map(track => ({
-                title: track.name || '未命名',
-                artist: track.artists ? track.artists.map(a => a.name).join(', ') : '未知',
-                url: `https://music.163.com/song/media/outer/url?id=${track.id}.mp3`
-              }));
-              const existingIds = new Set(playlist.map(s => s.url));
-              const added = newSongs.filter(s => !existingIds.has(s.url));
-              if (added.length) {
-                playlist = playlist.concat(added);
-                savePlaylist();
-                renderPlaylist();
-                importStatus.textContent = `✅ 成功导入 ${added.length} 首歌曲 (备用)`;
-                if (!audio.src && playlist.length > 0) {
-                  playSong(0);
-                }
-                return;
-              }
-            }
-          }
-          importStatus.textContent = '❌ 所有方式均失败，请检查歌单ID或网络';
-        } catch (_) {
-          importStatus.textContent = '❌ 导入失败，请检查歌单ID是否正确';
-        }
-      }
-    }
-
-    // ---------- 添加网易云单曲 ----------
+    // ---------- 添加网易云单曲（自动获取信息） ----------
     async function addNeteaseSong() {
       const input = prompt('请输入网易云歌曲 ID（例如：186016）：');
       if (!input) return;
@@ -1493,46 +1397,62 @@ title: 首页
       importStatus.textContent = '⏳ 正在获取歌曲信息...';
 
       try {
+        // 使用网易云 API 获取歌曲详情
         const apiUrl = `https://api.ltzy.top/v1/netease/song/${songId}`;
         const response = await fetch(apiUrl, {
           headers: {
             'Authorization': 'Bearer acu_ZaTWFQWZ2Wiqi0JOUlgbx4GjiIzactIw'
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('获取歌曲失败: ' + response.status);
         }
-        
+
         const data = await response.json();
+        // 提取信息
+        const title = data.name || `网易云歌曲 ${songId}`;
+        const artist = data.artists ? data.artists.map(a => a.name).join(', ') : '未知';
+        // 封面图片（取中等尺寸）
+        let cover = '';
+        if (data.album && data.album.picUrl) {
+          cover = data.album.picUrl;
+          // 可以替换为更高质量图片（去掉大小参数）
+          cover = cover.replace(/\?.*$/, '');
+        }
+
         const song = {
-          title: data.name || '未命名',
-          artist: data.artists ? data.artists.map(a => a.name).join(', ') : '未知',
+          title: title,
+          artist: artist,
+          cover: cover,
           url: `https://music.163.com/song/media/outer/url?id=${songId}.mp3`
         };
-        
+
         // 去重
         const exists = playlist.some(s => s.url === song.url);
         if (exists) {
           importStatus.textContent = '⚠️ 该歌曲已在列表中';
           return;
         }
-        
+
         playlist.push(song);
         savePlaylist();
         renderPlaylist();
         importStatus.textContent = `✅ 已添加: ${song.title}`;
-        
+
         if (!audio.src && playlist.length > 0) {
           playSong(playlist.length - 1);
         }
-        
+
       } catch (err) {
         console.error('添加歌曲失败:', err);
         // 备用：直接添加（使用ID）
+        const title = prompt('获取歌曲信息失败，请输入歌曲名称（可选）：') || `网易云歌曲 ${songId}`;
+        const artist = prompt('请输入艺术家名称（可选）：') || '未知';
         const song = {
-          title: `网易云歌曲 ${songId}`,
-          artist: '未知',
+          title: title,
+          artist: artist,
+          cover: '',
           url: `https://music.163.com/song/media/outer/url?id=${songId}.mp3`
         };
         const exists = playlist.some(s => s.url === song.url);
@@ -1543,7 +1463,7 @@ title: 首页
         playlist.push(song);
         savePlaylist();
         renderPlaylist();
-        importStatus.textContent = `✅ 已添加: ${song.title} (直接导入)`;
+        importStatus.textContent = `✅ 已添加: ${song.title} (手动输入)`;
         if (!audio.src && playlist.length > 0) {
           playSong(playlist.length - 1);
         }
@@ -1578,32 +1498,16 @@ title: 首页
 
     audio.addEventListener('ended', () => {
       if (currentMode === MODES.SINGLE) {
-        // 单曲循环：重播
         playSong(currentIndex);
-      } else if (currentMode === MODES.RANDOM) {
-        // 随机模式：选下一首随机
-        const next = getNextIndex();
-        playSong(next);
       } else {
-        // 列表循环
-        const next = (currentIndex + 1) % playlist.length;
-        if (next < playlist.length) {
-          playSong(next);
-        } else {
-          // 列表结束，从头开始
-          playSong(0);
-        }
+        nextSong();
       }
     });
 
     audio.addEventListener('error', () => {
-      console.warn('音频加载错误');
-      playerCover.textContent = '⚠️';
       playerCover.classList.add('loading');
-      // 如果是网易云外链404，尝试下一首
       setTimeout(() => {
         if (currentMode === MODES.SINGLE) {
-          // 单曲模式重试
           setTimeout(() => playSong(currentIndex), 2000);
         } else {
           nextSong();
@@ -1613,7 +1517,6 @@ title: 首页
 
     audio.addEventListener('canplay', () => {
       playerCover.classList.remove('loading');
-      playerCover.textContent = '🎵';
     });
 
     progressBar.addEventListener('mousedown', () => { isDragging = true; });
@@ -1631,7 +1534,6 @@ title: 首页
     window.switchMode = switchMode;
     window.seekProgress = seekProgress;
     window.setVolume = setVolume;
-    window.importNeteasePlaylist = importNeteasePlaylist;
     window.addNeteaseSong = addNeteaseSong;
 
     // ---------- 初始化 ----------
@@ -1639,16 +1541,18 @@ title: 首页
     loadMode();
     renderPlaylist();
     if (playlist.length) {
-      // 不自动播放，等待用户操作
       songTitle.textContent = playlist[0]?.title || '未播放';
       songArtist.textContent = playlist[0]?.artist || '—';
+      if (playlist[0]?.cover) {
+        playerCover.innerHTML = `<img src="${playlist[0].cover}" alt="封面">`;
+      }
     }
 
     console.log('🎵 播放器已加载，歌单数量:', playlist.length);
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (localStorage 同步 + 头像/昵称可换) ===== -->
+<!-- ===== 聊天室脚本 (localStorage 同步 + 头像/昵称可换 + 0点自动清空) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1658,7 +1562,6 @@ title: 首页
     const AVATAR_KEY = 'hrsi_chat_avatar_v2';
     const MAX_MSGS = 100;
 
-    // 默认值
     let username = localStorage.getItem(NAME_KEY) || '访客_' + Math.floor(Math.random() * 1000);
     let avatarText = localStorage.getItem(AVATAR_KEY) || username.charAt(0).toUpperCase();
     let messages = [];
@@ -1669,19 +1572,28 @@ title: 首页
     const chatAvatarInput = document.getElementById('chatAvatarInput');
     const chatAvatarPreview = document.getElementById('chatAvatarPreview');
 
-    // ---------- 初始化UI ----------
     chatNameInput.value = username;
     chatAvatarInput.value = avatarText;
     updateAvatarPreview(avatarText);
 
-    // ---------- 加载消息 ----------
+    // ---------- 加载消息（检查日期，0点清空昨日消息） ----------
     function loadMessages() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) {
-            messages = parsed.slice(-MAX_MSGS);
+            // 获取今天的日期字符串
+            const today = new Date().toDateString();
+            // 只保留今天的消息
+            messages = parsed.filter(msg => {
+              const msgDate = new Date(msg.time).toDateString();
+              return msgDate === today;
+            });
+            // 如果过滤后长度变化，更新存储
+            if (messages.length !== parsed.length) {
+              saveMessages();
+            }
             return;
           }
         }
@@ -1691,7 +1603,8 @@ title: 首页
 
     function saveMessages() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_MSGS)));
+        const toSave = messages.slice(-MAX_MSGS);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
       } catch (_) { /* ignore */ }
     }
 
@@ -1723,11 +1636,8 @@ title: 首页
       localStorage.setItem(AVATAR_KEY, avatarText);
       
       updateAvatarPreview(avatarText);
-      
-      // 重新渲染消息以更新头像显示
       renderChat();
       
-      // 提示
       const status = document.querySelector('.chat-header .badge');
       if (status) {
         status.textContent = '✅ 已更新';
@@ -1782,7 +1692,6 @@ title: 首页
       renderChat();
       chatInput.value = '';
       
-      // 触发 storage 事件同步其他标签页
       try {
         localStorage.setItem(STORAGE_KEY + '_trigger', Date.now().toString());
       } catch (_) { /* ignore */ }
@@ -1811,12 +1720,25 @@ title: 首页
     loadMessages();
     renderChat();
 
+    // 每10分钟检查一次日期，若跨日则清空
+    setInterval(() => {
+      const today = new Date().toDateString();
+      const currentDate = messages.length > 0 ? new Date(messages[0].time).toDateString() : today;
+      if (currentDate !== today) {
+        // 跨日，清空
+        messages = [];
+        saveMessages();
+        renderChat();
+      }
+    }, 600000); // 10分钟
+
     // 暴露全局
     window.sendChat = sendChat;
     window.updateChatProfile = updateChatProfile;
     window.chatInput = chatInput;
 
     console.log('💬 聊天室已加载，当前用户:', username);
+    console.log('📅 每天0点自动清空消息');
   })();
 </script>
 
@@ -1826,9 +1748,7 @@ title: 首页
     'use strict';
 
     // ---------- 配置 ----------
-    // 请将此处替换为您自己的 Cloudflare Worker 地址
-    // 注意：Worker 应转发 /v1/chat/completions 请求，并在内部添加 Authorization 头
-   const WORKER_URL = 'https://api.hrsi.cc.cd/';
+    const WORKER_URL = 'https://api.hrsi.cc.cd/';
 
     const box = document.getElementById('hrsiBox');
     const msgs = document.getElementById('hrsiMsgs');
@@ -1876,7 +1796,6 @@ title: 首页
           messages.push({ role: h.role, content: h.content });
         }
 
-        // 请求 Worker（不再携带 Authorization 头）
         const response = await fetch(WORKER_URL, {
           method: 'POST',
           headers: {
