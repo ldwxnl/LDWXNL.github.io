@@ -1883,7 +1883,7 @@ title: 首页
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'meta/llama-3.1-70b-instruct',
+            model: 'openai/gpt-oss-120b',
             messages: messages,
             temperature: 0.8,
             max_tokens: 200,
