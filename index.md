@@ -1828,7 +1828,7 @@ title: 首页
     // ---------- 配置 ----------
     // 请将此处替换为您自己的 Cloudflare Worker 地址
     // 注意：Worker 应转发 /v1/chat/completions 请求，并在内部添加 Authorization 头
-   const WORKER_URL = 'https://hrsi-proxy.mos720.workers.dev/';
+   const WORKER_URL = 'https://api.hrsi.cc.cd/';
 
     const box = document.getElementById('hrsiBox');
     const msgs = document.getElementById('hrsiMsgs');
