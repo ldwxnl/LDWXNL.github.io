@@ -248,7 +248,6 @@ permalink: /games/
   <div class="server-card">
     <div class="server-title">
       🌐 我的 Minecraft 服务器
-      <span class="status-badge">🟢 在线</span>
     </div>
 
     <div class="server-detail">
