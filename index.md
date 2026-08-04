@@ -1820,16 +1820,15 @@ title: 首页
   })();
 </script>
 
-<!-- ===== HRSI 聊天脚本 (使用云端 API) ===== -->
+<!-- ===== HRSI 聊天脚本 (通过 Cloudflare Worker 代理，Key 安全) ===== -->
 <script>
   (function() {
     'use strict';
 
-    const HRSI_CONFIG = {
-      apiKey: 'acu_ZaTWFQWZ2Wiqi0JOUlgbx4GjiIzactIw',
-      baseUrl: 'https://api.ltzy.top/v1',
-      model: 'deepseek-ai/deepseek-v4-pro'
-    };
+    // ---------- 配置 ----------
+    // 请将此处替换为您自己的 Cloudflare Worker 地址
+    // 注意：Worker 应转发 /v1/chat/completions 请求，并在内部添加 Authorization 头
+   const WORKER_URL = 'https://hrsi-proxy.mos720.workers.dev/';
 
     const box = document.getElementById('hrsiBox');
     const msgs = document.getElementById('hrsiMsgs');
@@ -1838,20 +1837,15 @@ title: 首页
     let isOpen = false;
     let chatHistory = [];
 
-    // ---------- 切换 ----------
     window.toggleHRSI = function() {
       isOpen = !isOpen;
       box.classList.toggle('open', isOpen);
-      if (isOpen) {
-        input.focus();
-      }
+      if (isOpen) input.focus();
     };
 
-    // ---------- 添加消息 ----------
     function addMsg(text, type) {
       const empty = msgs.querySelector('.empty-hrsi');
       if (empty) empty.remove();
-
       const div = document.createElement('div');
       div.className = 'msg ' + (type === 'user' ? 'user' : 'bot');
       if (type === 'bot') {
@@ -1863,7 +1857,6 @@ title: 首页
       msgs.scrollTop = msgs.scrollHeight;
     }
 
-    // ---------- 发送 ----------
     window.sendHRSI = async function() {
       const text = input.value.trim();
       if (!text) return;
@@ -1875,25 +1868,22 @@ title: 首页
       chatHistory.push({ role: 'user', content: text });
 
       try {
-        // 构建消息列表（包含历史上下文）
         const messages = [
           { role: 'system', content: '你是 HRSI，一个12岁的技术建造者，中二自信，充满热情。回答要简短、有趣、充满活力。' }
         ];
-        
-        // 添加最近5条历史
         const history = chatHistory.slice(-10);
         for (const h of history) {
           messages.push({ role: h.role, content: h.content });
         }
 
-        const response = await fetch(HRSI_CONFIG.baseUrl + '/chat/completions', {
+        // 请求 Worker（不再携带 Authorization 头）
+        const response = await fetch(WORKER_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + HRSI_CONFIG.apiKey
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: HRSI_CONFIG.model,
+            model: 'deepseek-ai/deepseek-v4-pro',
             messages: messages,
             temperature: 0.8,
             max_tokens: 200,
@@ -1903,17 +1893,16 @@ title: 首页
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error('API 请求失败: ' + response.status + ' ' + errorText);
+          throw new Error('Worker 响应错误: ' + response.status + ' ' + errorText);
         }
 
         const data = await response.json();
         const reply = data.choices?.[0]?.message?.content || '🤖 收到！但我暂时想不出更好的回答～';
-        
         chatHistory.push({ role: 'assistant', content: reply });
         addMsg(reply, 'bot');
 
       } catch (e) {
-        console.warn('HRSI API 错误:', e);
+        console.warn('HRSI 请求失败:', e);
         addMsg('😅 HRSI 暂时无法回答，请稍后再试！错误: ' + e.message, 'bot');
       }
 
@@ -1921,7 +1910,6 @@ title: 首页
       sendBtn.textContent = '发送';
     };
 
-    // ---------- 键盘事件 ----------
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -1929,7 +1917,7 @@ title: 首页
       }
     });
 
-    console.log('🤖 HRSI 助手已加载 (云端 API)');
+    console.log('🤖 HRSI 助手已加载 (通过 Worker 代理)');
   })();
 </script>
 
