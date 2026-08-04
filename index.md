@@ -1883,7 +1883,7 @@ title: 首页
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'deepseek-ai/deepseek-v4-pro',
+            model: 'meta/llama-3.1-70b-instruct',
             messages: messages,
             temperature: 0.8,
             max_tokens: 200,
