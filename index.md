@@ -1552,46 +1552,17 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (底层 itty-sockets) ===== -->
+<!-- ===== 聊天室脚本 (itty-sockets 底层，无 Key) ===== -->
 <script type="module">
   (function() {
     'use strict';
 
+    // ============================================================
+    //  底层：itty-sockets（无需 API Key，永久免费，无限制）
+    // ============================================================
+
     // 动态导入 itty-sockets
     const { connect } = await import('https://cdn.jsdelivr.net/npm/itty-sockets/+esm');
-
-    function createPieSocketLike(channelName, options) {
-      const channel = connect(channelName, { as: options?.as || '匿名' });
-      
-      return {
-        // PieSocket 的 onopen / onmessage / onclose / onerror 风格
-        onopen: null,
-        onmessage: null,
-        onclose: null,
-        onerror: null,
-        send: function(data) {
-          channel.send(data);
-        },
-        close: function() {
-          try { channel.close(); } catch (_) {}
-        },
-        // 内部转发 itty-sockets 事件
-        _bind: function() {
-          channel.on('open', () => {
-            if (this.onopen) this.onopen();
-          });
-          channel.on('message', ({ message, alias }) => {
-            if (this.onmessage) this.onmessage({ data: message, alias });
-          });
-          channel.on('close', () => {
-            if (this.onclose) this.onclose();
-          });
-          channel.on('error', (err) => {
-            if (this.onerror) this.onerror(err);
-          });
-        }
-      };
-    }
 
     let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
     let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
@@ -1646,21 +1617,21 @@ title: 首页
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // ---------- 连接（使用 itty-sockets 底层） ----------
+    // ---------- 连接（itty-sockets 底层） ----------
     function connect() {
       if (ws && ws.isConnected) return;
 
       try {
-        // 创建 itty-sockets 连接，封装成 PieSocket 风格
-        ws = createPieSocketLike('haoran54188_chat_room', { as: username });
+        ws = connect('haoran54188_chat_room', { as: username });
 
-        ws.onopen = function() {
+        ws.on('open', function() {
           if (statusBadge) {
             statusBadge.textContent = '🟢 在线';
             statusBadge.style.background = '#22c55e';
           }
           const empty = chatMessages.querySelector('.empty-chat');
           if (empty) empty.remove();
+          // 发送加入消息（和原来一样）
           ws.send(JSON.stringify({
             type: 'join',
             name: username,
@@ -1668,38 +1639,38 @@ title: 首页
             text: '👋 加入了聊天室',
             time: Date.now()
           }));
-          console.log('✅ 聊天室已连接 (itty-sockets 底层)');
-        };
+          console.log('✅ 已连接 (itty-sockets)');
+        });
 
-        ws.onmessage = function(e) {
+        ws.on('message', function({ message, alias }) {
           try {
-            const data = JSON.parse(e.data);
+            const data = JSON.parse(message);
             if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
             addMessage(data);
           } catch (_) {
-            // 纯文本
+            // 纯文本消息
             try {
-              const parsed = JSON.parse(e.data);
-              addMessage(parsed);
+              const data = JSON.parse(message);
+              addMessage(data);
             } catch (_2) {}
           }
-        };
+        });
 
-        ws.onclose = function() {
+        ws.on('close', function() {
           if (statusBadge) {
             statusBadge.textContent = '🔴 断开';
             statusBadge.style.background = '#e74c3c';
           }
           if (reconnectTimer) clearTimeout(reconnectTimer);
           reconnectTimer = setTimeout(connect, 3000);
-        };
+        });
 
-        ws.onerror = function(err) {
+        ws.on('error', function(err) {
           console.log('❌ 错误:', err);
-        };
+        });
 
-        // 绑定事件
-        ws._bind();
+        // 存储 isConnected 状态方便检查
+        ws.isConnected = true;
 
       } catch (e) {
         console.error('连接失败:', e);
@@ -1711,7 +1682,7 @@ title: 首页
     window.sendChat = function() {
       const text = chatInput.value.trim();
       if (!text) return;
-      if (!ws || !ws.isConnected) {
+      if (!ws) {
         alert('未连接到聊天室');
         return;
       }
@@ -1741,7 +1712,7 @@ title: 首页
 
       updateAvatarPreview(avatarText);
 
-      if (ws && ws.isConnected) {
+      if (ws) {
         ws.send(JSON.stringify({
           type: 'update_profile',
           name: username,
@@ -1766,11 +1737,11 @@ title: 首页
     });
 
     // ---------- 启动 ----------
-    setTimeout(connect, 200);
+    setTimeout(connect, 100);
 
-    console.log('💬 聊天室已启动 (底层 itty-sockets)');
+    console.log('💬 聊天室已启动 (itty-sockets)');
     console.log('👤 用户:', username);
-    console.log('🔗 无需 API Key，永久免费');
+    console.log('🔗 无需 API Key，永久免费，无限制');
   })();
 </script>
 
