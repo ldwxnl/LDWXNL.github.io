@@ -1552,26 +1552,24 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (JWT 认证 + 预连接加速) ===== -->
+<!-- ===== 聊天室脚本 (PieSocket 直连 + 预连接加速) ===== -->
 <script>
   (function() {
     'use strict';
 
     // ============================================================
-    //  🔐 JWT 认证 + ⚡ 预连接加速
-    //  API Key 完全隐藏，前端只拿 JWT
-    //  页面加载时自动握手，点开即用
+    //  🔌 PieSocket 直连（Key 可见，但权限仅限于频道）
+    //  ⚡ 预连接加速：页面加载时自动握手，点开即用
     // ============================================================
 
-    const WORKER_URL = 'https://chat.haoran54188.ccwu.cc';
+    const WS_URL = 'wss://free.blr2.piesocket.com/v3/1?api_key=pPb1fShqHLKp36uXFzQivNjacp19mkGUQqqO37gk&notify_self=1';
 
     let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
     let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
 
     let ws = null;
-    let jwtToken = null;
     let reconnectTimer = null;
-    let isConnecting = false;
+    let isPreconnected = false;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
@@ -1620,50 +1618,26 @@ title: 首页
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // ---------- 获取 JWT ----------
-    async function fetchJWT() {
-      try {
-        const resp = await fetch(`${WORKER_URL}/get-token?user=${encodeURIComponent(username)}&room=1`);
-        if (!resp.ok) throw new Error('获取 JWT 失败');
-        const data = await resp.json();
-        jwtToken = data.token;
-        console.log('✅ JWT 获取成功');
-        return true;
-      } catch (e) {
-        console.error('❌ 获取 JWT 失败:', e);
-        return false;
-      }
-    }
-
-    // ---------- WebSocket 连接 ----------
-    function connect(usePreconnect = false) {
-      if (isConnecting) return;
-      if (ws && ws.readyState === WebSocket.OPEN) return;
-
-      isConnecting = true;
-
-      // 如果没有 JWT，先获取
-      if (!jwtToken) {
-        fetchJWT().then(success => {
-          isConnecting = false;
-          if (success) doConnect(usePreconnect);
-          else setTimeout(() => connect(), 3000);
-        });
+    // ---------- 核心连接函数 ----------
+    function connect() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        // 如果已经连接或正在连接，直接复用
+        if (ws.readyState === WebSocket.OPEN) {
+          if (statusBadge) {
+            statusBadge.textContent = '🟢 在线';
+            statusBadge.style.background = '#22c55e';
+          }
+          const empty = chatMessages.querySelector('.empty-chat');
+          if (empty) empty.remove();
+        }
         return;
       }
 
-      doConnect(usePreconnect);
-    }
-
-    function doConnect(usePreconnect) {
-      // 用 JWT 连接 PieSocket（通过 Worker 代理）
-      const wsUrl = `${WORKER_URL.replace('https://', 'wss://')}/ws?jwt=${jwtToken}`;
-
       try {
-        ws = new WebSocket(wsUrl);
+        ws = new WebSocket(WS_URL);
 
         ws.onopen = function() {
-          isConnecting = false;
+          isPreconnected = false;
           if (statusBadge) {
             statusBadge.textContent = '🟢 在线';
             statusBadge.style.background = '#22c55e';
@@ -1677,105 +1651,56 @@ title: 首页
             text: '👋 加入了聊天室',
             time: Date.now()
           }));
-          console.log('✅ 聊天室已连接 (JWT 认证)');
+          console.log('✅ 聊天室已连接 (PieSocket)');
         };
 
         ws.onmessage = function(e) {
           try {
             const data = JSON.parse(e.data);
             if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
-            if (data.type === 'error') {
-              console.warn('⚠️ 错误:', data);
-              return;
-            }
             addMessage(data);
           } catch (_) {}
         };
 
         ws.onclose = function() {
-          isConnecting = false;
           if (statusBadge) {
             statusBadge.textContent = '🔴 断开';
             statusBadge.style.background = '#e74c3c';
           }
           console.log('🔄 断开，3秒后重连...');
           if (reconnectTimer) clearTimeout(reconnectTimer);
-          reconnectTimer = setTimeout(() => {
-            // 重连时重新获取 JWT（可能过期了）
-            jwtToken = null;
-            connect();
-          }, 3000);
+          reconnectTimer = setTimeout(connect, 3000);
         };
 
         ws.onerror = function(err) {
           console.log('❌ WebSocket 错误:', err);
-          isConnecting = false;
         };
       } catch (e) {
         console.error('连接失败:', e);
-        isConnecting = false;
         setTimeout(connect, 3000);
       }
     }
 
     // ============================================================
-    //  ⚡ 预连接（页面加载时提前获取 JWT 并建立连接）
+    //  ⚡ 预连接：页面加载时立即建立连接（隐藏握手延迟）
     // ============================================================
-    async function preConnect() {
-      // 先获取 JWT
-      const success = await fetchJWT();
-      if (!success) return;
-
-      // 用 JWT 建立预连接
-      const wsUrl = `${WORKER_URL.replace('https://', 'wss://')}/ws?jwt=${jwtToken}`;
+    function preConnect() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
       try {
-        const preWs = new WebSocket(wsUrl);
-        preWs.onopen = function() {
+        ws = new WebSocket(WS_URL);
+        ws.onopen = function() {
+          isPreconnected = true;
+          // 预连接成功，等待用户打开聊天室时复用
           console.log('✅ 预连接成功 (握手延迟已隐藏)');
-          // 预连接成功后，把连接赋值给 ws
-          ws = preWs;
-          // 绑定消息处理
-          ws.onmessage = function(e) {
-            try {
-              const data = JSON.parse(e.data);
-              if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
-              if (data.type === 'error') return;
-              addMessage(data);
-            } catch (_) {}
-          };
-          ws.onclose = function() {
-            if (statusBadge) {
-              statusBadge.textContent = '🔴 断开';
-              statusBadge.style.background = '#e74c3c';
-            }
-            if (reconnectTimer) clearTimeout(reconnectTimer);
-            reconnectTimer = setTimeout(() => {
-              jwtToken = null;
-              connect();
-            }, 3000);
-          };
-          ws.onerror = function() {};
-          // 发送加入消息
-          if (statusBadge) {
-            statusBadge.textContent = '🟢 在线';
-            statusBadge.style.background = '#22c55e';
-          }
-          const empty = chatMessages.querySelector('.empty-chat');
-          if (empty) empty.remove();
-          ws.send(JSON.stringify({
-            type: 'join',
-            name: username,
-            avatar: avatarText,
-            text: '👋 加入了聊天室',
-            time: Date.now()
-          }));
+          // 发送静默消息（不显示在聊天界面）
         };
-        preWs.onerror = function() {
+        ws.onerror = function() {
+          // 预连接失败，聊天室打开时会重试
           console.log('⚠️ 预连接失败，正式连接时会重试');
-          // 预连接失败，不影响主流程
         };
+        // 预连接不处理消息，等正式连接时再绑定
       } catch (e) {
-        console.log('⚠️ 预连接异常:', e.message);
+        // 预连接失败不影响主流程
       }
     }
 
@@ -1841,17 +1766,57 @@ title: 首页
     //  🚀 启动：先预连接，再正式连接
     // ============================================================
 
-    // 页面加载时立即预连接（获取 JWT + 建立 WebSocket）
+    // 1. 立即预连接（页面加载时就开始握手）
     preConnect();
 
-    // 如果预连接没成功，3秒后正式连接
+    // 2. 稍后正式连接（接管预连接的连接，或者新建）
     setTimeout(() => {
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
+      // 如果预连接的连接已经建立，直接复用
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        // 复用预连接，绑定消息处理
+        const oldWs = ws;
+        // 重新绑定消息处理
+        oldWs.onmessage = function(e) {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
+            addMessage(data);
+          } catch (_) {}
+        };
+        oldWs.onclose = function() {
+          if (statusBadge) {
+            statusBadge.textContent = '🔴 断开';
+            statusBadge.style.background = '#e74c3c';
+          }
+          console.log('🔄 断开，3秒后重连...');
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(connect, 3000);
+        };
+        oldWs.onerror = function(err) {
+          console.log('❌ WebSocket 错误:', err);
+        };
+        // 发送加入消息
+        if (statusBadge) {
+          statusBadge.textContent = '🟢 在线';
+          statusBadge.style.background = '#22c55e';
+        }
+        const empty = chatMessages.querySelector('.empty-chat');
+        if (empty) empty.remove();
+        oldWs.send(JSON.stringify({
+          type: 'join',
+          name: username,
+          avatar: avatarText,
+          text: '👋 加入了聊天室',
+          time: Date.now()
+        }));
+        console.log('✅ 聊天室已连接 (复用预连接)');
+      } else {
+        // 预连接没成功，正常连接
         connect();
       }
-    }, 3000);
+    }, 500);
 
-    console.log('💬 聊天室已启动 (JWT 认证 + 预连接加速)');
+    console.log('💬 聊天室已启动 (PieSocket 直连 + 预连接加速)');
     console.log('👤 用户:', username);
   })();
 </script>
