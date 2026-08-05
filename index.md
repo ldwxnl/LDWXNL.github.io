@@ -1552,16 +1552,15 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (PieSocket 实时 WebSocket) ===== -->
+<!-- ===== 聊天室脚本 (通过 Worker 代理，Key 安全) ===== -->
 <script>
   (function() {
     'use strict';
 
     // ============================================================
-    //  🔑 PieSocket 配置（已集成你的 API Key）
+    //  🔗 通过 Worker 代理连接（Key 在服务器端，不暴露）
     // ============================================================
-    const PIESOCKET_API_KEY = 'pPb1fShqHLKp36uXFzQivNjacp19mkGUQqqO37gk';
-    const CHANNEL = 'chatroom';  // 频道名，可随意改
+    const WS_URL = 'wss://chat.haoran54188.ccwu.cc/ws';
 
     // ============================================================
 
@@ -1572,6 +1571,8 @@ title: 首页
     let ws = null;
     let isConnected = false;
     let reconnectTimer = null;
+    let reconnectAttempts = 0;
+    const MAX_RECONNECT_ATTEMPTS = 10;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
@@ -1598,6 +1599,9 @@ title: 首页
 
     // ---------- 添加消息 ----------
     function addMessage(data) {
+      // 如果是空消息或系统消息，忽略
+      if (!data || !data.text) return;
+      // 如果是加入/离开消息，显示特殊样式
       const isSelf = data.name === username;
       const div = document.createElement('div');
       div.className = 'msg ' + (isSelf ? 'self' : 'other');
@@ -1625,56 +1629,72 @@ title: 首页
 
     // ---------- WebSocket 连接 ----------
     function connect() {
-      const wsUrl = `wss://demo.piesocket.com/v3/channel_1/ws?api_key=${PIESOCKET_API_KEY}&notify_self=1`;
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
 
-      ws = new WebSocket(wsUrl);
+      try {
+        ws = new WebSocket(WS_URL);
 
-      ws.onopen = function() {
-        isConnected = true;
-        if (statusBadge) {
-          statusBadge.textContent = '🟢 在线';
-          statusBadge.style.background = '#22c55e';
-        }
-        chatMessages.innerHTML = '<div class="empty-chat">连接成功，开始聊天吧！</div>';
-        // 发送加入消息
-        ws.send(JSON.stringify({
-          type: 'join',
-          name: username,
-          avatar: avatarText,
-          text: '👋 加入了聊天室',
-          time: Date.now()
-        }));
-        console.log('✅ 聊天室已连接');
-      };
-
-      ws.onmessage = function(e) {
-        try {
-          const data = JSON.parse(e.data);
-          // 忽略系统消息
-          if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
-          if (data.type === 'join' || data.type === 'message') {
-            addMessage(data);
+        ws.onopen = function() {
+          isConnected = true;
+          reconnectAttempts = 0;
+          if (statusBadge) {
+            statusBadge.textContent = '🟢 在线';
+            statusBadge.style.background = '#22c55e';
           }
-        } catch (err) {
-          // 忽略非 JSON 消息
-        }
-      };
+          // 清空并显示连接成功
+          const empty = chatMessages.querySelector('.empty-chat');
+          if (empty) empty.remove();
+          // 发送加入消息
+          ws.send(JSON.stringify({
+            type: 'join',
+            name: username,
+            avatar: avatarText,
+            text: '👋 加入了聊天室',
+            time: Date.now()
+          }));
+          console.log('✅ 聊天室已连接');
+        };
 
-      ws.onclose = function() {
-        isConnected = false;
-        if (statusBadge) {
-          statusBadge.textContent = '🔴 断开';
-          statusBadge.style.background = '#e74c3c';
-        }
-        chatMessages.innerHTML = '<div class="empty-chat">连接已断开，尝试重连...</div>';
-        console.log('🔄 断开，3秒后重连...');
-        if (reconnectTimer) clearTimeout(reconnectTimer);
-        reconnectTimer = setTimeout(connect, 3000);
-      };
+        ws.onmessage = function(e) {
+          try {
+            const data = JSON.parse(e.data);
+            // 忽略 ping/pong/system 消息
+            if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
+            addMessage(data);
+          } catch (err) {
+            // 忽略非 JSON 消息
+          }
+        };
 
-      ws.onerror = function(err) {
-        console.log('❌ WebSocket 错误:', err);
-      };
+        ws.onclose = function() {
+          isConnected = false;
+          if (statusBadge) {
+            statusBadge.textContent = '🔴 断开';
+            statusBadge.style.background = '#e74c3c';
+          }
+          // 显示断开状态
+          const empty = chatMessages.querySelector('.empty-chat');
+          if (!empty && chatMessages.children.length === 0) {
+            chatMessages.innerHTML = '<div class="empty-chat">连接已断开，尝试重连...</div>';
+          }
+          console.log('🔄 断开，3秒后重连...');
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectAttempts++;
+          if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+            reconnectTimer = setTimeout(connect, 3000);
+          } else {
+            chatMessages.innerHTML = '<div class="empty-chat">⚠️ 无法连接到聊天室，请刷新页面重试</div>';
+          }
+        };
+
+        ws.onerror = function(err) {
+          console.log('❌ WebSocket 错误:', err);
+          // 不在这里重连，close 事件会处理
+        };
+      } catch (e) {
+        console.error('连接失败:', e);
+        setTimeout(connect, 3000);
+      }
     }
 
     // ---------- 发送消息 ----------
@@ -1720,7 +1740,6 @@ title: 首页
         }));
       }
 
-      // 提示
       if (statusBadge) {
         statusBadge.textContent = '✅ 已更新';
         statusBadge.style.background = '#22c55e';
@@ -1738,11 +1757,19 @@ title: 首页
       }
     });
 
+    // ---------- 手动重连（可暴露给用户） ----------
+    window.reconnectChat = function() {
+      if (ws) ws.close();
+      reconnectAttempts = 0;
+      setTimeout(connect, 500);
+    };
+
     // ---------- 初始化 ----------
     connect();
 
-    console.log('💬 实时聊天室已启动 (PieSocket)');
+    console.log('💬 实时聊天室已启动 (通过 Worker 代理)');
     console.log('👤 当前用户:', username);
+    console.log('🔗 连接地址:', WS_URL);
   })();
 </script>
 
