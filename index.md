@@ -1552,18 +1552,19 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (极简直连) ===== -->
-<script>
+<!-- ===== 聊天室脚本 (itty-sockets 底层，修复发送) ===== -->
+<script type="module">
   (function() {
     'use strict';
 
-    const WS_URL = 'wss://free.blr2.piesocket.com/v3/1?api_key=pPb1fShqHLKp36uXFzQivNjacp19mkGUQqqO37gk&notify_self=1';
+    // 动态导入 itty-sockets
+    const { connect } = await import('https://cdn.jsdelivr.net/npm/itty-sockets/+esm');
 
     let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
     let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
 
-    let ws = null;
-    let reconnectTimer = null;
+    let channel = null;
+    let isConnected = false;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
@@ -1612,63 +1613,96 @@ title: 首页
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function connect() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+    // ---------- 连接 ----------
+    function connectToChat() {
+      if (channel && isConnected) return;
 
       try {
-        ws = new WebSocket(WS_URL);
+        channel = connect('haoran54188_chat_room', { as: username });
 
-        ws.onopen = function() {
+        channel.on('open', () => {
+          isConnected = true;
           if (statusBadge) {
             statusBadge.textContent = '🟢 在线';
             statusBadge.style.background = '#22c55e';
           }
           const empty = chatMessages.querySelector('.empty-chat');
           if (empty) empty.remove();
-          ws.send(JSON.stringify({
+          // 发送加入消息
+          channel.send(JSON.stringify({
             type: 'join',
             name: username,
             avatar: avatarText,
             text: '👋 加入了聊天室',
             time: Date.now()
           }));
-          console.log('✅ 已连接');
-        };
+          console.log('✅ 已连接 (itty-sockets)');
+        });
 
-        ws.onmessage = function(e) {
+        channel.on('message', ({ message, alias }) => {
           try {
-            const data = JSON.parse(e.data);
-            if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
+            const data = JSON.parse(message);
+            if (data.type === 'join' || data.type === 'leave') {
+              const sysDiv = document.createElement('div');
+              sysDiv.style.cssText = 'text-align:center;color:#999;font-size:0.75rem;padding:0.2rem 0;';
+              sysDiv.textContent = data.text || '系统消息';
+              const empty = chatMessages.querySelector('.empty-chat');
+              if (empty) empty.remove();
+              chatMessages.appendChild(sysDiv);
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+              return;
+            }
             addMessage(data);
-          } catch (_) {}
-        };
+          } catch (_) {
+            // 纯文本消息
+            const div = document.createElement('div');
+            div.className = 'msg other';
+            div.innerHTML = `
+              <div class="avatar" style="background:#888;">?</div>
+              <div class="content">
+                <span class="name">${alias || '未知'}</span>
+                ${message}
+              </div>
+            `;
+            const empty = chatMessages.querySelector('.empty-chat');
+            if (empty) empty.remove();
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        });
 
-        ws.onclose = function() {
+        channel.on('close', () => {
+          isConnected = false;
           if (statusBadge) {
             statusBadge.textContent = '🔴 断开';
             statusBadge.style.background = '#e74c3c';
           }
-          if (reconnectTimer) clearTimeout(reconnectTimer);
-          reconnectTimer = setTimeout(connect, 3000);
-        };
+          console.log('🔄 断开，3秒后重连...');
+          setTimeout(connectToChat, 3000);
+        });
 
-        ws.onerror = function(err) {
+        channel.on('error', (err) => {
           console.log('❌ 错误:', err);
-        };
+        });
+
       } catch (e) {
         console.error('连接失败:', e);
-        setTimeout(connect, 3000);
+        setTimeout(connectToChat, 3000);
       }
     }
 
+    // ---------- 发送消息（用 channel.send，不是 ws.send） ----------
     window.sendChat = function() {
       const text = chatInput.value.trim();
-      if (!text) return;
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        alert('未连接到聊天室');
+      if (!text) {
+        alert('请输入消息内容');
         return;
       }
-      ws.send(JSON.stringify({
+      if (!channel || !isConnected) {
+        alert('未连接到聊天室，请稍后再试');
+        return;
+      }
+      channel.send(JSON.stringify({
         type: 'message',
         name: username,
         avatar: avatarText,
@@ -1678,6 +1712,7 @@ title: 首页
       chatInput.value = '';
     };
 
+    // ---------- 更新资料 ----------
     window.updateChatProfile = function() {
       const newName = chatNameInput.value.trim();
       const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
@@ -1693,11 +1728,10 @@ title: 首页
 
       updateAvatarPreview(avatarText);
 
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-          type: 'update_profile',
-          name: username,
-          avatar: avatarText
+      if (channel && isConnected) {
+        channel.send(JSON.stringify({
+          type: 'system',
+          text: '👤 ' + username + ' 更新了资料'
         }));
       }
 
@@ -1710,6 +1744,7 @@ title: 首页
       }
     };
 
+    // ---------- 键盘事件 ----------
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -1717,11 +1752,12 @@ title: 首页
       }
     });
 
-    // 页面加载时立即连接
-    setTimeout(connect, 100);
+    // ---------- 启动 ----------
+    connectToChat();
 
-    console.log('💬 聊天室已启动 (直连)');
+    console.log('💬 聊天室已启动 (itty-sockets)');
     console.log('👤 用户:', username);
+    console.log('📡 频道: haoran54188_chat_room');
   })();
 </script>
 
