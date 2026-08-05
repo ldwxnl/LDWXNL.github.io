@@ -1552,228 +1552,218 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (itty-sockets，无 Key) ===== -->
-<script>
+<!-- ===== 聊天室脚本 (itty-sockets ESM 方式) ===== -->
+<script type="module">
   (function() {
     'use strict';
 
-    // 动态加载 itty-sockets
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/itty-sockets/dist/itty-sockets.min.js';
-    script.onload = function() {
-      initChat();
-    };
-    script.onerror = function() {
-      document.getElementById('chatMessages').innerHTML = '<div class="empty-chat">⚠️ 加载聊天库失败，请刷新页面重试</div>';
-    };
-    document.head.appendChild(script);
+    // 动态导入 itty-sockets
+    const { connect } = await import('https://cdn.jsdelivr.net/npm/itty-sockets/+esm');
 
-    function initChat() {
-      const connect = window.ittySockets.connect;
+    let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
+    let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
 
-      let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
-      let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
+    let channel = null;
+    let isConnected = false;
 
-      let channel = null;
-      let isConnected = false;
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatNameInput = document.getElementById('chatNameInput');
+    const chatAvatarInput = document.getElementById('chatAvatarInput');
+    const chatAvatarPreview = document.getElementById('chatAvatarPreview');
+    const statusBadge = document.querySelector('.chat-header .badge');
 
-      const chatMessages = document.getElementById('chatMessages');
-      const chatInput = document.getElementById('chatInput');
-      const chatNameInput = document.getElementById('chatNameInput');
-      const chatAvatarInput = document.getElementById('chatAvatarInput');
-      const chatAvatarPreview = document.getElementById('chatAvatarPreview');
-      const statusBadge = document.querySelector('.chat-header .badge');
+    chatNameInput.value = username;
+    chatAvatarInput.value = avatarText;
+    updateAvatarPreview(avatarText);
 
-      chatNameInput.value = username;
-      chatAvatarInput.value = avatarText;
-      updateAvatarPreview(avatarText);
+    function updateAvatarPreview(text) {
+      const display = text || '?';
+      chatAvatarPreview.textContent = display.charAt(0).toUpperCase();
+      chatAvatarPreview.style.background = getAvatarColor(username);
+    }
 
-      function updateAvatarPreview(text) {
-        const display = text || '?';
-        chatAvatarPreview.textContent = display.charAt(0).toUpperCase();
-        chatAvatarPreview.style.background = getAvatarColor(username);
-      }
+    function getAvatarColor(name) {
+      const colors = ['#4c6ef5', '#f59f00', '#e67700', '#d6336c', '#20c997', '#6f42c1', '#0d6efd', '#fd7e14', '#e83e8c', '#20c997'];
+      return colors[name.length % colors.length];
+    }
 
-      function getAvatarColor(name) {
-        const colors = ['#4c6ef5', '#f59f00', '#e67700', '#d6336c', '#20c997', '#6f42c1', '#0d6efd', '#fd7e14', '#e83e8c', '#20c997'];
-        return colors[name.length % colors.length];
-      }
+    function addMessage(data) {
+      if (!data || !data.text) return;
+      const isSelf = data.name === username;
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isSelf ? 'self' : 'other');
 
-      function addMessage(data) {
-        if (!data || !data.text) return;
-        const isSelf = data.name === username;
-        const div = document.createElement('div');
-        div.className = 'msg ' + (isSelf ? 'self' : 'other');
+      const msgAvatar = data.avatar || data.name.charAt(0).toUpperCase();
+      const avatarColor = getAvatarColor(data.name);
+      const timeStr = data.time ? new Date(data.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
 
-        const msgAvatar = data.avatar || data.name.charAt(0).toUpperCase();
-        const avatarColor = getAvatarColor(data.name);
-        const timeStr = data.time ? new Date(data.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
+      div.innerHTML = `
+        <div class="avatar" style="background:${avatarColor}">${msgAvatar}</div>
+        <div class="content">
+          <span class="name">${data.name || '匿名'}</span>
+          ${data.text}
+          <span class="time">${timeStr}</span>
+        </div>
+      `;
 
-        div.innerHTML = `
-          <div class="avatar" style="background:${avatarColor}">${msgAvatar}</div>
-          <div class="content">
-            <span class="name">${data.name || '匿名'}</span>
-            ${data.text}
-            <span class="time">${timeStr}</span>
-          </div>
-        `;
+      const empty = chatMessages.querySelector('.empty-chat');
+      if (empty) empty.remove();
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-        const empty = chatMessages.querySelector('.empty-chat');
-        if (empty) empty.remove();
-        chatMessages.appendChild(div);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+    // ---------- 连接 ----------
+    function connectToChat() {
+      if (channel && isConnected) return;
 
-      function connectToChat() {
-        if (channel) {
-          if (isConnected) return;
-          try { channel.close(); } catch (_) {}
-          channel = null;
-        }
+      try {
+        const CHANNEL_NAME = 'haoran54188_chat_room';
+        channel = connect(CHANNEL_NAME, { as: username });
 
-        try {
-          const CHANNEL_NAME = 'haoran54188_chat_room';
-          channel = connect(CHANNEL_NAME, { as: username });
+        channel.on('open', () => {
+          isConnected = true;
+          if (statusBadge) {
+            statusBadge.textContent = '🟢 在线';
+            statusBadge.style.background = '#22c55e';
+          }
+          const empty = chatMessages.querySelector('.empty-chat');
+          if (empty) empty.remove();
+          channel.send(JSON.stringify({
+            type: 'join',
+            name: username,
+            avatar: avatarText,
+            text: '👋 加入了聊天室',
+            time: Date.now()
+          }));
+          console.log('✅ 聊天室已连接 (itty-sockets)');
+        });
 
-          channel.on('open', () => {
-            isConnected = true;
-            if (statusBadge) {
-              statusBadge.textContent = '🟢 在线';
-              statusBadge.style.background = '#22c55e';
-            }
-            const empty = chatMessages.querySelector('.empty-chat');
-            if (empty) empty.remove();
-            channel.send(JSON.stringify({
-              type: 'join',
-              name: username,
-              avatar: avatarText,
-              text: '👋 加入了聊天室',
-              time: Date.now()
-            }));
-            console.log('✅ 聊天室已连接 (itty-sockets)');
-          });
-
-          channel.on('message', ({ message, alias }) => {
-            try {
-              const data = JSON.parse(message);
-              if (data.type === 'join' || data.type === 'leave') {
-                const sysDiv = document.createElement('div');
-                sysDiv.style.cssText = 'text-align:center;color:#999;font-size:0.75rem;padding:0.2rem 0;';
-                sysDiv.textContent = data.text || '系统消息';
-                const empty = chatMessages.querySelector('.empty-chat');
-                if (empty) empty.remove();
-                chatMessages.appendChild(sysDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                return;
-              }
-              addMessage(data);
-            } catch (_) {
-              const div = document.createElement('div');
-              div.className = 'msg other';
-              div.innerHTML = `
-                <div class="avatar" style="background:#888;">?</div>
-                <div class="content">
-                  <span class="name">${alias || '未知'}</span>
-                  ${message}
-                </div>
-              `;
+        channel.on('message', ({ message, alias }) => {
+          try {
+            const data = JSON.parse(message);
+            if (data.type === 'join' || data.type === 'leave') {
+              const sysDiv = document.createElement('div');
+              sysDiv.style.cssText = 'text-align:center;color:#999;font-size:0.75rem;padding:0.2rem 0;';
+              sysDiv.textContent = data.text || '系统消息';
               const empty = chatMessages.querySelector('.empty-chat');
               if (empty) empty.remove();
-              chatMessages.appendChild(div);
+              chatMessages.appendChild(sysDiv);
               chatMessages.scrollTop = chatMessages.scrollHeight;
+              return;
             }
-          });
+            addMessage(data);
+          } catch (_) {
+            // 纯文本消息
+            const div = document.createElement('div');
+            div.className = 'msg other';
+            div.innerHTML = `
+              <div class="avatar" style="background:#888;">?</div>
+              <div class="content">
+                <span class="name">${alias || '未知'}</span>
+                ${message}
+              </div>
+            `;
+            const empty = chatMessages.querySelector('.empty-chat');
+            if (empty) empty.remove();
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        });
 
-          channel.on('close', () => {
-            isConnected = false;
-            if (statusBadge) {
-              statusBadge.textContent = '🔴 断开';
-              statusBadge.style.background = '#e74c3c';
-            }
-            console.log('🔄 断开，3秒后重连...');
-            setTimeout(connectToChat, 3000);
-          });
-
-          channel.on('error', (err) => {
-            console.log('❌ itty-sockets 错误:', err);
-          });
-
-        } catch (e) {
-          console.error('连接失败:', e);
+        channel.on('close', () => {
+          isConnected = false;
+          if (statusBadge) {
+            statusBadge.textContent = '🔴 断开';
+            statusBadge.style.background = '#e74c3c';
+          }
+          console.log('🔄 断开，3秒后重连...');
           setTimeout(connectToChat, 3000);
-        }
+        });
+
+        channel.on('error', (err) => {
+          console.log('❌ itty-sockets 错误:', err);
+        });
+
+      } catch (e) {
+        console.error('连接失败:', e);
+        setTimeout(connectToChat, 3000);
+      }
+    }
+
+    // ---------- 发送消息 ----------
+    window.sendChat = function() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      if (!channel || !isConnected) {
+        alert('未连接到聊天室，请稍后再试');
+        return;
+      }
+      const msg = {
+        type: 'message',
+        name: username,
+        avatar: avatarText,
+        text: text,
+        time: Date.now()
+      };
+      channel.send(JSON.stringify(msg));
+      chatInput.value = '';
+    };
+
+    // ---------- 更新资料 ----------
+    window.updateChatProfile = function() {
+      const newName = chatNameInput.value.trim();
+      const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
+
+      if (newName) {
+        username = newName;
+        localStorage.setItem('hrsi_chat_username_v2', username);
+      }
+      if (newAvatar) {
+        avatarText = newAvatar.charAt(0).toUpperCase();
+        localStorage.setItem('hrsi_chat_avatar_v2', avatarText);
       }
 
-      window.sendChat = function() {
-        const text = chatInput.value.trim();
-        if (!text) return;
-        if (!channel || !isConnected) {
-          alert('未连接到聊天室，请稍后再试');
-          return;
-        }
-        const msg = {
-          type: 'message',
-          name: username,
-          avatar: avatarText,
-          text: text,
-          time: Date.now()
-        };
-        channel.send(JSON.stringify(msg));
-        chatInput.value = '';
-      };
+      updateAvatarPreview(avatarText);
 
-      window.updateChatProfile = function() {
-        const newName = chatNameInput.value.trim();
-        const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
+      if (channel && isConnected) {
+        channel.send(JSON.stringify({
+          type: 'system',
+          text: '👤 ' + username + ' 更新了资料'
+        }));
+      }
 
-        if (newName) {
-          username = newName;
-          localStorage.setItem('hrsi_chat_username_v2', username);
-        }
-        if (newAvatar) {
-          avatarText = newAvatar.charAt(0).toUpperCase();
-          localStorage.setItem('hrsi_chat_avatar_v2', avatarText);
-        }
+      if (statusBadge) {
+        statusBadge.textContent = '✅ 已更新';
+        statusBadge.style.background = '#22c55e';
+        setTimeout(() => {
+          statusBadge.textContent = '🟢 在线';
+        }, 1500);
+      }
+    };
 
-        updateAvatarPreview(avatarText);
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.sendChat();
+      }
+    });
 
-        if (channel && isConnected) {
-          channel.send(JSON.stringify({
-            type: 'system',
-            text: '👤 ' + username + ' 更新了资料'
-          }));
-        }
+    // ---------- 启动 ----------
+    connectToChat();
 
-        if (statusBadge) {
-          statusBadge.textContent = '✅ 已更新';
-          statusBadge.style.background = '#22c55e';
-          setTimeout(() => {
-            statusBadge.textContent = '🟢 在线';
-          }, 1500);
-        }
-      };
+    console.log('💬 聊天室已启动 (itty-sockets)');
+    console.log('👤 用户:', username);
 
-      chatInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          window.sendChat();
-        }
-      });
-
-      setTimeout(connectToChat, 300);
-
-      console.log('💬 聊天室已启动 (itty-sockets)');
-      console.log('👤 用户:', username);
-
-      window.reconnectChat = function() {
-        if (channel) {
-          try { channel.close(); } catch (_) {}
-          channel = null;
-        }
-        isConnected = false;
-        setTimeout(connectToChat, 500);
-      };
-    }
+    // 暴露重连
+    window.reconnectChat = function() {
+      if (channel) {
+        try { channel.close(); } catch (_) {}
+        channel = null;
+      }
+      isConnected = false;
+      setTimeout(connectToChat, 500);
+    };
   })();
 </script>
 
