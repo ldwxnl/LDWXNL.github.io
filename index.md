@@ -1552,18 +1552,20 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (极简直连) ===== -->
-<script>
+<!-- ===== 聊天室脚本 (itty-sockets 底层，API 完全不变) ===== -->
+<script type="module">
   (function() {
     'use strict';
 
-    const WS_URL = 'wss://free.blr2.piesocket.com/v3/1?api_key=pPb1fShqHLKp36uXFzQivNjacp19mkGUQqqO37gk&notify_self=1';
+    // 只改这里：用 itty-sockets 替代 WebSocket
+    const { connect } = await import('https://cdn.jsdelivr.net/npm/itty-sockets/+esm');
 
     let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
     let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
 
     let ws = null;
     let reconnectTimer = null;
+    let isConnected = false;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
@@ -1613,18 +1615,21 @@ title: 首页
     }
 
     function connect() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+      if (ws && isConnected) return;
 
       try {
-        ws = new WebSocket(WS_URL);
+        // 用 itty-sockets 连接
+        ws = connect('haoran54188_chat_room', { as: username });
 
-        ws.onopen = function() {
+        ws.on('open', function() {
+          isConnected = true;
           if (statusBadge) {
             statusBadge.textContent = '🟢 在线';
             statusBadge.style.background = '#22c55e';
           }
           const empty = chatMessages.querySelector('.empty-chat');
           if (empty) empty.remove();
+          // 和原来完全一样的发送方式
           ws.send(JSON.stringify({
             type: 'join',
             name: username,
@@ -1632,29 +1637,31 @@ title: 首页
             text: '👋 加入了聊天室',
             time: Date.now()
           }));
-          console.log('✅ 已连接');
-        };
+          console.log('✅ 已连接 (itty-sockets)');
+        });
 
-        ws.onmessage = function(e) {
+        ws.on('message', function({ message, alias }) {
           try {
-            const data = JSON.parse(e.data);
+            const data = JSON.parse(message);
             if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
             addMessage(data);
           } catch (_) {}
-        };
+        });
 
-        ws.onclose = function() {
+        ws.on('close', function() {
+          isConnected = false;
           if (statusBadge) {
             statusBadge.textContent = '🔴 断开';
             statusBadge.style.background = '#e74c3c';
           }
           if (reconnectTimer) clearTimeout(reconnectTimer);
           reconnectTimer = setTimeout(connect, 3000);
-        };
+        });
 
-        ws.onerror = function(err) {
+        ws.on('error', function(err) {
           console.log('❌ 错误:', err);
-        };
+        });
+
       } catch (e) {
         console.error('连接失败:', e);
         setTimeout(connect, 3000);
@@ -1664,7 +1671,7 @@ title: 首页
     window.sendChat = function() {
       const text = chatInput.value.trim();
       if (!text) return;
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
+      if (!ws || !isConnected) {
         alert('未连接到聊天室');
         return;
       }
@@ -1693,7 +1700,7 @@ title: 首页
 
       updateAvatarPreview(avatarText);
 
-      if (ws && ws.readyState === WebSocket.OPEN) {
+      if (ws && isConnected) {
         ws.send(JSON.stringify({
           type: 'update_profile',
           name: username,
@@ -1717,10 +1724,9 @@ title: 首页
       }
     });
 
-    // 页面加载时立即连接
     setTimeout(connect, 100);
 
-    console.log('💬 聊天室已启动 (直连)');
+    console.log('💬 聊天室已启动 (itty-sockets)');
     console.log('👤 用户:', username);
   })();
 </script>
