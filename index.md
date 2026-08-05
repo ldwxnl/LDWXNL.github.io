@@ -1552,13 +1552,12 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (itty-sockets 直连) ===== -->
-<script type="module">
+<!-- ===== 聊天室脚本 (极简直连) ===== -->
+<script>
   (function() {
     'use strict';
 
-    // 导入 itty-sockets
-    const { connect } = await import('https://cdn.jsdelivr.net/npm/itty-sockets/+esm');
+    const WS_URL = 'wss://free.blr2.piesocket.com/v3/1?api_key=pPb1fShqHLKp36uXFzQivNjacp19mkGUQqqO37gk&notify_self=1';
 
     let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
     let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
@@ -1613,15 +1612,13 @@ title: 首页
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // ---------- 连接 ----------
     function connect() {
-      if (ws) return;
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
 
       try {
-        // itty-sockets 连接
-        ws = connect('haoran54188_chat_room', { as: username });
+        ws = new WebSocket(WS_URL);
 
-        ws.on('open', function() {
+        ws.onopen = function() {
           if (statusBadge) {
             statusBadge.textContent = '🟢 在线';
             statusBadge.style.background = '#22c55e';
@@ -1635,41 +1632,39 @@ title: 首页
             text: '👋 加入了聊天室',
             time: Date.now()
           }));
-          console.log('✅ 已连接 (itty-sockets)');
-        });
+          console.log('✅ 已连接');
+        };
 
-        ws.on('message', function({ message, alias }) {
+        ws.onmessage = function(e) {
           try {
-            const data = JSON.parse(message);
+            const data = JSON.parse(e.data);
             if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
             addMessage(data);
           } catch (_) {}
-        });
+        };
 
-        ws.on('close', function() {
+        ws.onclose = function() {
           if (statusBadge) {
             statusBadge.textContent = '🔴 断开';
             statusBadge.style.background = '#e74c3c';
           }
           if (reconnectTimer) clearTimeout(reconnectTimer);
           reconnectTimer = setTimeout(connect, 3000);
-        });
+        };
 
-        ws.on('error', function(err) {
+        ws.onerror = function(err) {
           console.log('❌ 错误:', err);
-        });
-
+        };
       } catch (e) {
         console.error('连接失败:', e);
         setTimeout(connect, 3000);
       }
     }
 
-    // ---------- 发送消息 ----------
     window.sendChat = function() {
       const text = chatInput.value.trim();
       if (!text) return;
-      if (!ws) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
         alert('未连接到聊天室');
         return;
       }
@@ -1683,7 +1678,6 @@ title: 首页
       chatInput.value = '';
     };
 
-    // ---------- 更新资料 ----------
     window.updateChatProfile = function() {
       const newName = chatNameInput.value.trim();
       const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
@@ -1699,7 +1693,7 @@ title: 首页
 
       updateAvatarPreview(avatarText);
 
-      if (ws) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
           type: 'update_profile',
           name: username,
@@ -1723,11 +1717,11 @@ title: 首页
       }
     });
 
+    // 页面加载时立即连接
     setTimeout(connect, 100);
 
-    console.log('💬 聊天室已启动 (itty-sockets)');
+    console.log('💬 聊天室已启动 (直连)');
     console.log('👤 用户:', username);
-    console.log('📡 频道: haoran54188_chat_room');
   })();
 </script>
 
