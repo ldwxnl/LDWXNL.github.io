@@ -1552,7 +1552,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (PieSocket 直连 + 预连接加速) ===== -->
+<!-- ===== 聊天室脚本 (极简直连) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1564,7 +1564,6 @@ title: 首页
 
     let ws = null;
     let reconnectTimer = null;
-    let isConnected = false;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
@@ -1613,9 +1612,6 @@ title: 首页
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // ============================================================
-    //  核心连接函数
-    // ============================================================
     function connect() {
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
 
@@ -1623,7 +1619,6 @@ title: 首页
         ws = new WebSocket(WS_URL);
 
         ws.onopen = function() {
-          isConnected = true;
           if (statusBadge) {
             statusBadge.textContent = '🟢 在线';
             statusBadge.style.background = '#22c55e';
@@ -1637,7 +1632,7 @@ title: 首页
             text: '👋 加入了聊天室',
             time: Date.now()
           }));
-          console.log('✅ 聊天室已连接 (PieSocket 直连)');
+          console.log('✅ 已连接');
         };
 
         ws.onmessage = function(e) {
@@ -1649,18 +1644,16 @@ title: 首页
         };
 
         ws.onclose = function() {
-          isConnected = false;
           if (statusBadge) {
             statusBadge.textContent = '🔴 断开';
             statusBadge.style.background = '#e74c3c';
           }
-          console.log('🔄 断开，3秒后重连...');
           if (reconnectTimer) clearTimeout(reconnectTimer);
           reconnectTimer = setTimeout(connect, 3000);
         };
 
         ws.onerror = function(err) {
-          console.log('❌ WebSocket 错误:', err);
+          console.log('❌ 错误:', err);
         };
       } catch (e) {
         console.error('连接失败:', e);
@@ -1668,67 +1661,11 @@ title: 首页
       }
     }
 
-    // ============================================================
-    //  ⚡ 预连接：页面加载时立即建立连接
-    // ============================================================
-    function preConnect() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
-      try {
-        const preWs = new WebSocket(WS_URL);
-        preWs.onopen = function() {
-          // 预连接成功，把连接交给正式流程
-          ws = preWs;
-          // 绑定正式的消息处理
-          ws.onmessage = function(e) {
-            try {
-              const data = JSON.parse(e.data);
-              if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
-              addMessage(data);
-            } catch (_) {}
-          };
-          ws.onclose = function() {
-            isConnected = false;
-            if (statusBadge) {
-              statusBadge.textContent = '🔴 断开';
-              statusBadge.style.background = '#e74c3c';
-            }
-            if (reconnectTimer) clearTimeout(reconnectTimer);
-            reconnectTimer = setTimeout(connect, 3000);
-          };
-          ws.onerror = function() {};
-          // 发送加入消息
-          isConnected = true;
-          if (statusBadge) {
-            statusBadge.textContent = '🟢 在线';
-            statusBadge.style.background = '#22c55e';
-          }
-          const empty = chatMessages.querySelector('.empty-chat');
-          if (empty) empty.remove();
-          ws.send(JSON.stringify({
-            type: 'join',
-            name: username,
-            avatar: avatarText,
-            text: '👋 加入了聊天室',
-            time: Date.now()
-          }));
-          console.log('✅ 聊天室已连接 (预连接)');
-        };
-        preWs.onerror = function() {
-          console.log('⚠️ 预连接失败，正式连接时会重试');
-        };
-      } catch (e) {
-        console.log('⚠️ 预连接异常:', e.message);
-      }
-    }
-
-    // ============================================================
-    //  发送消息
-    // ============================================================
     window.sendChat = function() {
       const text = chatInput.value.trim();
       if (!text) return;
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        alert('未连接到聊天室，请稍后再试');
+        alert('未连接到聊天室');
         return;
       }
       ws.send(JSON.stringify({
@@ -1741,9 +1678,6 @@ title: 首页
       chatInput.value = '';
     };
 
-    // ============================================================
-    //  更新个人资料
-    // ============================================================
     window.updateChatProfile = function() {
       const newName = chatNameInput.value.trim();
       const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
@@ -1783,21 +1717,10 @@ title: 首页
       }
     });
 
-    // ============================================================
-    //  🚀 启动：先预连接，再正式连接（双保险）
-    // ============================================================
+    // 页面加载时立即连接
+    setTimeout(connect, 100);
 
-    // 立即预连接
-    preConnect();
-
-    // 如果预连接没成功，3秒后正式连接
-    setTimeout(() => {
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        connect();
-      }
-    }, 3000);
-
-    console.log('💬 聊天室已启动 (PieSocket 直连 + 预连接)');
+    console.log('💬 聊天室已启动 (直连)');
     console.log('👤 用户:', username);
   })();
 </script>
