@@ -1552,7 +1552,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (itty-sockets 官方用法) ===== -->
+<!-- ===== 聊天室脚本 (itty-sockets 修复版) ===== -->
 <script type="importmap">
 {
   "imports": {
@@ -1569,6 +1569,7 @@ title: 首页
 
   let channel = null;
   let reconnectTimer = null;
+  let messageCache = []; // 缓存最近50条消息
 
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
@@ -1592,7 +1593,17 @@ title: 首页
     return colors[name.length % colors.length];
   }
 
-  function addMessage(data) {
+  // ---------- 显示历史消息 ----------
+  function showHistory() {
+    if (messageCache.length === 0) return;
+    chatMessages.innerHTML = '';
+    messageCache.forEach(msg => {
+      addMessageToUI(msg);
+    });
+  }
+
+  // ---------- 添加消息到UI ----------
+  function addMessageToUI(data) {
     if (!data || !data.text) return;
     const isSelf = data.name === username;
     const div = document.createElement('div');
@@ -1617,6 +1628,15 @@ title: 首页
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
+  // ---------- 添加消息（带缓存） ----------
+  function addMessage(data) {
+    if (!data || !data.text) return;
+    // 缓存消息（最多50条）
+    messageCache.push(data);
+    if (messageCache.length > 50) messageCache.shift();
+    addMessageToUI(data);
+  }
+
   // ---------- 连接 ----------
   function connectToChat() {
     if (channel) return;
@@ -1624,15 +1644,35 @@ title: 首页
     try {
       channel = connect('haoran54188_chat_room', {
         as: username,
-        echo: true,      // 收到自己发送的消息
-        announce: true   // 加入/离开通知
+        echo: true,
+        announce: true
       });
 
-      // 监听消息
+      // 连接打开
+      channel.on('open', () => {
+        if (statusBadge) {
+          statusBadge.textContent = '🟢 在线';
+          statusBadge.style.background = '#22c55e';
+        }
+        // 显示历史消息
+        showHistory();
+        // 发送加入通知
+        channel.send(JSON.stringify({
+          type: 'join',
+          name: username,
+          avatar: avatarText,
+          text: '👋 加入了聊天室',
+          time: Date.now()
+        }));
+        console.log('✅ 已连接 (itty-sockets)');
+      });
+
+      // 接收消息
       channel.on('message', ({ message, uid, alias }) => {
         try {
           const data = JSON.parse(message);
           if (data.type === 'join' || data.type === 'leave') {
+            // 系统消息不缓存
             const sysDiv = document.createElement('div');
             sysDiv.style.cssText = 'text-align:center;color:#999;font-size:0.75rem;padding:0.2rem 0;';
             sysDiv.textContent = data.text || '系统消息';
@@ -1661,24 +1701,6 @@ title: 首页
         }
       });
 
-      // 连接打开
-      channel.on('open', () => {
-        if (statusBadge) {
-          statusBadge.textContent = '🟢 在线';
-          statusBadge.style.background = '#22c55e';
-        }
-        const empty = chatMessages.querySelector('.empty-chat');
-        if (empty) empty.remove();
-        channel.send(JSON.stringify({
-          type: 'join',
-          name: username,
-          avatar: avatarText,
-          text: '👋 加入了聊天室',
-          time: Date.now()
-        }));
-        console.log('✅ 已连接 (itty-sockets)');
-      });
-
       // 断开连接
       channel.on('close', () => {
         if (statusBadge) {
@@ -1699,7 +1721,8 @@ title: 首页
   window.sendChat = function() {
     const text = chatInput.value.trim();
     if (!text) {
-      alert('请输入消息');
+      // 不用 alert，直接聚焦输入框
+      chatInput.focus();
       return;
     }
     if (!channel) {
@@ -1714,6 +1737,7 @@ title: 首页
       time: Date.now()
     }));
     chatInput.value = '';
+    chatInput.focus();
   };
 
   // ---------- 更新资料 ----------
@@ -1748,9 +1772,11 @@ title: 首页
     }
   };
 
+  // ---------- 键盘事件（修复） ----------
   chatInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      // 直接调用 sendChat
       window.sendChat();
     }
   });
@@ -1758,11 +1784,10 @@ title: 首页
   // ---------- 启动 ----------
   setTimeout(connectToChat, 200);
 
-  console.log('💬 聊天室已启动 (itty-sockets 官方版)');
+  console.log('💬 聊天室已启动 (itty-sockets 修复版)');
   console.log('👤 用户:', username);
   console.log('📡 频道: haoran54188_chat_room');
 
-  // 暴露重连
   window.reconnectChat = function() {
     if (channel) {
       try { channel.close(); } catch (_) {}
