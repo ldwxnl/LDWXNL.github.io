@@ -1552,193 +1552,197 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (localStorage 同步 + 头像/昵称可换 + 0点自动清空) ===== -->
+<!-- ===== 聊天室脚本 (PieSocket 实时 WebSocket) ===== -->
 <script>
   (function() {
     'use strict';
 
-    const STORAGE_KEY = 'hrsi_chat_messages_v2';
-    const NAME_KEY = 'hrsi_chat_username_v2';
-    const AVATAR_KEY = 'hrsi_chat_avatar_v2';
-    const MAX_MSGS = 100;
+    // ============================================================
+    //  🔑 PieSocket 配置（已集成你的 API Key）
+    // ============================================================
+    const PIESOCKET_API_KEY = 'pPb1fShqHLKp36uXFzQivNjacp19mkGUQqqO37gk';
+    const CHANNEL = 'chatroom';  // 频道名，可随意改
 
-    let username = localStorage.getItem(NAME_KEY) || '访客_' + Math.floor(Math.random() * 1000);
-    let avatarText = localStorage.getItem(AVATAR_KEY) || username.charAt(0).toUpperCase();
-    let messages = [];
+    // ============================================================
+
+    // 用户信息
+    let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
+    let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
+
+    let ws = null;
+    let isConnected = false;
+    let reconnectTimer = null;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const chatNameInput = document.getElementById('chatNameInput');
     const chatAvatarInput = document.getElementById('chatAvatarInput');
     const chatAvatarPreview = document.getElementById('chatAvatarPreview');
+    const statusBadge = document.querySelector('.chat-header .badge');
 
+    // 初始化 UI
     chatNameInput.value = username;
     chatAvatarInput.value = avatarText;
     updateAvatarPreview(avatarText);
 
-    // ---------- 加载消息（检查日期，0点清空昨日消息） ----------
-    function loadMessages() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            // 获取今天的日期字符串
-            const today = new Date().toDateString();
-            // 只保留今天的消息
-            messages = parsed.filter(msg => {
-              const msgDate = new Date(msg.time).toDateString();
-              return msgDate === today;
-            });
-            // 如果过滤后长度变化，更新存储
-            if (messages.length !== parsed.length) {
-              saveMessages();
-            }
-            return;
-          }
-        }
-      } catch (_) { /* ignore */ }
-      messages = [];
-    }
-
-    function saveMessages() {
-      try {
-        const toSave = messages.slice(-MAX_MSGS);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-      } catch (_) { /* ignore */ }
-    }
-
-    // ---------- 获取用户头像颜色 ----------
-    function getAvatarColor(name) {
-      const colors = ['#4c6ef5', '#f59f00', '#e67700', '#d6336c', '#20c997', '#6f42c1', '#0d6efd', '#fd7e14', '#e83e8c', '#20c997'];
-      const index = name.length % colors.length;
-      return colors[index];
-    }
-
-    // ---------- 更新头像预览 ----------
     function updateAvatarPreview(text) {
       const display = text || '?';
       chatAvatarPreview.textContent = display.charAt(0).toUpperCase();
       chatAvatarPreview.style.background = getAvatarColor(username);
     }
 
-    // ---------- 更新个人资料 ----------
-    function updateChatProfile() {
-      const newName = chatNameInput.value.trim();
-      const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
-      
-      if (newName) {
-        username = newName;
-        localStorage.setItem(NAME_KEY, username);
-      }
-      
-      avatarText = newAvatar.charAt(0).toUpperCase();
-      localStorage.setItem(AVATAR_KEY, avatarText);
-      
-      updateAvatarPreview(avatarText);
-      renderChat();
-      
-      const status = document.querySelector('.chat-header .badge');
-      if (status) {
-        status.textContent = '✅ 已更新';
-        setTimeout(() => {
-          status.textContent = '🟢 在线';
-        }, 1500);
-      }
+    function getAvatarColor(name) {
+      const colors = ['#4c6ef5', '#f59f00', '#e67700', '#d6336c', '#20c997', '#6f42c1', '#0d6efd', '#fd7e14', '#e83e8c', '#20c997'];
+      return colors[name.length % colors.length];
     }
 
-    // ---------- 渲染 ----------
-    function renderChat() {
-      chatMessages.innerHTML = '';
-      if (!messages.length) {
-        chatMessages.innerHTML = '<div class="empty-chat">还没有消息，来说点什么吧 👋</div>';
-        return;
-      }
-      messages.forEach(msg => {
-        const isSelf = msg.name === username;
-        const div = document.createElement('div');
-        div.className = 'msg ' + (isSelf ? 'self' : 'other');
-        
-        const msgAvatar = msg.avatar || msg.name.charAt(0).toUpperCase();
-        const avatarColor = getAvatarColor(msg.name);
-        const timeStr = msg.time ? new Date(msg.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
-        
-        div.innerHTML = `
-          <div class="avatar" style="background:${avatarColor}">${msgAvatar}</div>
-          <div class="content">
-            <span class="name">${msg.name || '匿名'}</span>
-            ${msg.text}
-            <span class="time">${timeStr}</span>
-          </div>
-        `;
-        chatMessages.appendChild(div);
-      });
+    // ---------- 添加消息 ----------
+    function addMessage(data) {
+      const isSelf = data.name === username;
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isSelf ? 'self' : 'other');
+
+      const msgAvatar = data.avatar || data.name.charAt(0).toUpperCase();
+      const avatarColor = getAvatarColor(data.name);
+      const timeStr = data.time ? new Date(data.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
+
+      div.innerHTML = `
+        <div class="avatar" style="background:${avatarColor}">${msgAvatar}</div>
+        <div class="content">
+          <span class="name">${data.name || '匿名'}</span>
+          ${data.text}
+          <span class="time">${timeStr}</span>
+        </div>
+      `;
+
+      // 移除空状态
+      const empty = chatMessages.querySelector('.empty-chat');
+      if (empty) empty.remove();
+
+      chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // ---------- WebSocket 连接 ----------
+    function connect() {
+      const wsUrl = `wss://demo.piesocket.com/v3/channel_1/ws?api_key=${PIESOCKET_API_KEY}&notify_self=1`;
+
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = function() {
+        isConnected = true;
+        if (statusBadge) {
+          statusBadge.textContent = '🟢 在线';
+          statusBadge.style.background = '#22c55e';
+        }
+        chatMessages.innerHTML = '<div class="empty-chat">连接成功，开始聊天吧！</div>';
+        // 发送加入消息
+        ws.send(JSON.stringify({
+          type: 'join',
+          name: username,
+          avatar: avatarText,
+          text: '👋 加入了聊天室',
+          time: Date.now()
+        }));
+        console.log('✅ 聊天室已连接');
+      };
+
+      ws.onmessage = function(e) {
+        try {
+          const data = JSON.parse(e.data);
+          // 忽略系统消息
+          if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
+          if (data.type === 'join' || data.type === 'message') {
+            addMessage(data);
+          }
+        } catch (err) {
+          // 忽略非 JSON 消息
+        }
+      };
+
+      ws.onclose = function() {
+        isConnected = false;
+        if (statusBadge) {
+          statusBadge.textContent = '🔴 断开';
+          statusBadge.style.background = '#e74c3c';
+        }
+        chatMessages.innerHTML = '<div class="empty-chat">连接已断开，尝试重连...</div>';
+        console.log('🔄 断开，3秒后重连...');
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(connect, 3000);
+      };
+
+      ws.onerror = function(err) {
+        console.log('❌ WebSocket 错误:', err);
+      };
+    }
+
     // ---------- 发送消息 ----------
-    function sendChat() {
+    window.sendChat = function() {
       const text = chatInput.value.trim();
       if (!text) return;
-      
-      const msg = {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert('未连接到聊天室，请稍后再试');
+        return;
+      }
+      ws.send(JSON.stringify({
+        type: 'message',
         name: username,
         avatar: avatarText,
         text: text,
-        time: Date.now(),
-      };
-      messages.push(msg);
-      saveMessages();
-      renderChat();
+        time: Date.now()
+      }));
       chatInput.value = '';
-      
-      try {
-        localStorage.setItem(STORAGE_KEY + '_trigger', Date.now().toString());
-      } catch (_) { /* ignore */ }
-    }
+    };
 
-    // ---------- 监听其他标签页 ----------
-    window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_KEY || e.key === STORAGE_KEY + '_trigger') {
-        const oldLen = messages.length;
-        loadMessages();
-        if (messages.length !== oldLen) {
-          renderChat();
-        }
+    // ---------- 更新个人资料 ----------
+    window.updateChatProfile = function() {
+      const newName = chatNameInput.value.trim();
+      const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
+
+      if (newName) {
+        username = newName;
+        localStorage.setItem('hrsi_chat_username_v2', username);
       }
-    });
+      if (newAvatar) {
+        avatarText = newAvatar.charAt(0).toUpperCase();
+        localStorage.setItem('hrsi_chat_avatar_v2', avatarText);
+      }
+
+      updateAvatarPreview(avatarText);
+
+      // 发送更新到服务器
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'update_profile',
+          name: username,
+          avatar: avatarText
+        }));
+      }
+
+      // 提示
+      if (statusBadge) {
+        statusBadge.textContent = '✅ 已更新';
+        statusBadge.style.background = '#22c55e';
+        setTimeout(() => {
+          statusBadge.textContent = '🟢 在线';
+        }, 1500);
+      }
+    };
 
     // ---------- 键盘事件 ----------
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        sendChat();
+        window.sendChat();
       }
     });
 
     // ---------- 初始化 ----------
-    loadMessages();
-    renderChat();
+    connect();
 
-    // 每10分钟检查一次日期，若跨日则清空
-    setInterval(() => {
-      const today = new Date().toDateString();
-      const currentDate = messages.length > 0 ? new Date(messages[0].time).toDateString() : today;
-      if (currentDate !== today) {
-        // 跨日，清空
-        messages = [];
-        saveMessages();
-        renderChat();
-      }
-    }, 600000); // 10分钟
-
-    // 暴露全局
-    window.sendChat = sendChat;
-    window.updateChatProfile = updateChatProfile;
-    window.chatInput = chatInput;
-
-    console.log('💬 聊天室已加载，当前用户:', username);
-    console.log('📅 每天0点自动清空消息');
+    console.log('💬 实时聊天室已启动 (PieSocket)');
+    console.log('👤 当前用户:', username);
   })();
 </script>
 
