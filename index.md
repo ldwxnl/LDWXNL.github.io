@@ -1552,7 +1552,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (纯 Ably，最精简) ===== -->
+<!-- ===== 聊天室脚本 (纯 Ably，完整修复) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1570,8 +1570,8 @@ title: 首页
     let ablyChannel = null;
     let isConnected = false;
     let reconnectTimer = null;
+    let hasLoadedHistory = false;
 
-    // 用户名
     let username = localStorage.getItem('chat_username') || '访客_' + Math.floor(Math.random() * 10000);
 
     const chatMessages = document.getElementById('chatMessages');
@@ -1644,6 +1644,118 @@ title: 首页
     }
 
     // ============================================================
+    //  清除旧消息（0点自动执行）
+    // ============================================================
+    function clearOldMessages() {
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
+      
+      // 清除所有消息
+      const messages = chatMessages.querySelectorAll('.msg:not(.system)');
+      messages.forEach(msg => {
+        // 检查消息时间，如果小于今天0点就删除
+        const timeSpan = msg.querySelector('.time');
+        if (timeSpan) {
+          // 简单判断：如果消息中没有今天的日期，就删除
+          // 或者直接删除所有非系统消息（因为0点后历史消息重新加载）
+        }
+      });
+
+      // 更简单：0点后清空消息区域，重新加载历史
+      chatMessages.innerHTML = '<div class="empty-chat">📡 加载消息中...</div>';
+      
+      // 重新加载历史消息
+      if (ablyChannel && isConnected) {
+        setTimeout(loadHistory, 500);
+      }
+    }
+
+    // 检查是否需要清除（每小时检查一次）
+    function checkMidnightClear() {
+      const now = new Date();
+      // 如果是0点到0点5分之间，执行清除
+      if (now.getHours() === 0 && now.getMinutes() < 5) {
+        const lastClear = localStorage.getItem('chat_last_clear');
+        const today = now.toDateString();
+        if (lastClear !== today) {
+          localStorage.setItem('chat_last_clear', today);
+          clearOldMessages();
+        }
+      }
+    }
+
+    // ============================================================
+    //  加载历史消息
+    // ============================================================
+    async function loadHistory() {
+      if (!ablyChannel || !isConnected) return;
+      
+      try {
+        // 获取今天的0点时间戳
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
+        
+        const history = await ablyChannel.history({ 
+          limit: 100, 
+          direction: 'backwards' 
+        });
+        const items = history.items;
+        
+        // 清空现有消息（保留系统消息）
+        const systemMsgs = chatMessages.querySelectorAll('.msg.system');
+        chatMessages.innerHTML = '';
+        systemMsgs.forEach(el => chatMessages.appendChild(el));
+        
+        let hasMessages = false;
+        for (let i = items.length - 1; i >= 0; i--) {
+          const item = items[i];
+          // 只加载今天0点以后的消息
+          if (item.data && item.data.type !== 'system') {
+            if (item.data.time && item.data.time < todayStart) {
+              continue; // 跳过今天之前的消息
+            }
+            if (item.data.name !== username) {
+              addMessageToUI(item.data);
+              hasMessages = true;
+            }
+          }
+        }
+        
+        // 如果是自己发的消息，显示在历史中
+        for (let i = items.length - 1; i >= 0; i--) {
+          const item = items[i];
+          if (item.data && item.data.type !== 'system') {
+            if (item.data.time && item.data.time < todayStart) {
+              continue;
+            }
+            if (item.data.name === username) {
+              // 检查是否已显示
+              const existing = chatMessages.querySelector(`.msg.self .content`);
+              if (!existing || existing.textContent !== item.data.text) {
+                addMessageToUI(item.data);
+                hasMessages = true;
+              }
+            }
+          }
+        }
+        
+        if (!hasMessages) {
+          const empty = chatMessages.querySelector('.empty-chat');
+          if (!empty) {
+            const div = document.createElement('div');
+            div.className = 'empty-chat';
+            div.textContent = '💬 开始聊天吧！';
+            chatMessages.appendChild(div);
+          }
+        }
+        
+        hasLoadedHistory = true;
+      } catch (e) {
+        console.warn('历史消息加载失败:', e);
+      }
+    }
+
+    // ============================================================
     //  Ably 连接
     // ============================================================
     async function connectAbly() {
@@ -1696,16 +1808,36 @@ title: 首页
         ably.connection.on('connected', () => {
           isConnected = true;
           updateStatus(true);
-          const empty = chatMessages.querySelector('.empty-chat');
-          if (empty) empty.remove();
+          
+          ablyChannel = ably.channels.get(CHANNEL_NAME);
 
+          // 订阅消息（只绑定一次）
+          ablyChannel.subscribe('message', (msg) => {
+            const data = msg.data;
+            
+            if (data.type === 'system') {
+              addSystemMessage(data.text);
+              return;
+            }
+            
+            if (data.name === username) return;
+            
+            addMessageToUI(data);
+          });
+
+          // 加入 Presence
+          ablyChannel.presence.enter({ name: username });
+
+          // 发送加入消息
           ablyChannel.publish('message', {
             type: 'system',
             text: '👋 ' + username + ' 加入了聊天室',
             time: Date.now()
           });
 
-          addSystemMessage('👋 欢迎来到聊天室！');
+          // 加载历史消息
+          setTimeout(loadHistory, 500);
+          
           console.log('✅ Ably 已连接');
         });
 
@@ -1720,36 +1852,6 @@ title: 首页
           updateStatus(false);
           scheduleReconnect();
         });
-
-        ablyChannel = ably.channels.get(CHANNEL_NAME);
-
-        ablyChannel.subscribe('message', (msg) => {
-          const data = msg.data;
-          
-          if (data.type === 'system') {
-            addSystemMessage(data.text);
-            return;
-          }
-          
-          if (data.name === username) return;
-          
-          addMessageToUI(data);
-        });
-
-        setTimeout(async () => {
-          try {
-            const history = await ablyChannel.history({ limit: 30, direction: 'backwards' });
-            const items = history.items;
-            for (let i = items.length - 1; i >= 0; i--) {
-              const item = items[i];
-              if (item.data && item.data.type !== 'system' && item.data.name !== username) {
-                addMessageToUI(item.data);
-              }
-            }
-          } catch (e) {
-            console.warn('历史消息加载失败:', e);
-          }
-        }, 500);
 
       } catch (e) {
         console.error('Ably 连接失败:', e);
@@ -1766,9 +1868,9 @@ title: 首页
     }
 
     // ============================================================
-    //  发送消息
+    //  发送消息（修复：只发一次，清空输入框）
     // ============================================================
-    window.sendChat = function() {
+    function sendMessage() {
       const text = chatInput.value.trim();
       if (!text) {
         chatInput.focus();
@@ -1785,18 +1887,21 @@ title: 首页
         time: Date.now()
       };
 
+      // 自己显示
       addMessageToUI(msg);
+
+      // 发送到频道
       ablyChannel.publish('message', msg).catch(console.error);
 
       // ✅ 清空输入框
       chatInput.value = '';
       chatInput.focus();
-    };
+    }
 
     // ============================================================
     //  更新资料（改名）
     // ============================================================
-    window.updateChatProfile = function() {
+    function updateProfile() {
       const newName = chatNameInput.value.trim();
       if (!newName) {
         alert('请输入昵称');
@@ -1817,7 +1922,7 @@ title: 首页
       } else {
         applyNameChange(newName);
       }
-    };
+    }
 
     function applyNameChange(newName) {
       const oldName = username;
@@ -1847,23 +1952,21 @@ title: 首页
     }
 
     // ============================================================
-    //  键盘事件（只绑定一次，不会重复发送）
+    //  ✅ 键盘事件（只绑定一次，防止重复发送）
     // ============================================================
     chatInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
-        e.preventDefault();
-        window.sendChat();
+        e.preventDefault();  // 阻止默认行为
+        sendMessage();       // 只调用一次
+        return false;        // 确保不触发其他事件
       }
     });
 
     // ============================================================
-    //  启动
+    //  暴露全局函数
     // ============================================================
-    setTimeout(connectAbly, 300);
-
-    console.log('💬 聊天室已启动');
-    console.log('👤 用户:', username);
-
+    window.sendChat = sendMessage;
+    window.updateChatProfile = updateProfile;
     window.reconnectChat = function() {
       if (ably) {
         try { ably.close(); } catch (_) {}
@@ -1873,6 +1976,21 @@ title: 首页
       isConnected = false;
       connectAbly();
     };
+
+    // ============================================================
+    //  定时检查0点清除（每小时检查一次）
+    // ============================================================
+    setInterval(checkMidnightClear, 3600000);
+    // 启动时也检查一次
+    setTimeout(checkMidnightClear, 5000);
+
+    // ============================================================
+    //  启动
+    // ============================================================
+    setTimeout(connectAbly, 300);
+
+    console.log('💬 聊天室已启动');
+    console.log('👤 用户:', username);
 
   })();
 </script>
