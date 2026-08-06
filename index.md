@@ -1037,7 +1037,7 @@ title: 首页
       <div class="chat-room">
         <div class="chat-header">
           <span>💬 即时聊天室</span>
-          <span class="badge" id="statusBadge">🟢 在线</span>
+          <span class="badge" id="statusBadge">🔴 断开</span>
           <div class="user-controls">
             <span class="avatar-preview" id="chatAvatarPreview" style="background:#4c6ef5;">?</span>
             <input type="text" id="chatNameInput" placeholder="昵称" value="">
@@ -1048,7 +1048,6 @@ title: 首页
           <div class="empty-chat">还没有消息，来说点什么吧 👋</div>
         </div>
         <div class="chat-input-row">
-          <!-- ✅ 修复1: 删除 onkeydown 属性 -->
           <input type="text" id="chatInput" placeholder="输入消息…">
           <button onclick="sendChat()">发送</button>
         </div>
@@ -1086,7 +1085,6 @@ title: 首页
     <div class="empty-hrsi">👋 你好！我是 HRSI，有什么可以帮你？</div>
   </div>
   <div class="hrsi-input-row">
-    <!-- ✅ 修复2: 删除 onkeydown 属性 -->
     <input type="text" id="hrsiInput" placeholder="问 HRSI 点什么…">
     <button id="hrsiSendBtn" onclick="sendHRSI()">发送</button>
   </div>
@@ -1520,7 +1518,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (纯 Ably，修复重复消息) ===== -->
+<!-- ===== 聊天室脚本 (最终完整修复版) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1610,34 +1608,57 @@ title: 首页
     }
 
     // ============================================================
-    //  加载历史消息
+    //  ✅ 加载历史消息 - 修复 DOM 引用问题
     // ============================================================
     async function loadHistory() {
       if (!ablyChannel || !isConnected) return;
-      
+
       try {
+        // ✅ 先保存系统消息的文本内容（不是 DOM 元素）
+        const systemTexts = [];
         const systemMsgs = chatMessages.querySelectorAll('.msg.system');
+        systemMsgs.forEach(el => systemTexts.push(el.textContent));
+
+        // 清空消息区域
         chatMessages.innerHTML = '';
-        systemMsgs.forEach(el => chatMessages.appendChild(el));
-        
+
+        // ✅ 重新创建系统消息
+        systemTexts.forEach(text => {
+          const div = document.createElement('div');
+          div.className = 'msg system';
+          div.textContent = text;
+          chatMessages.appendChild(div);
+        });
+
+        // 加载历史消息
         const history = await ablyChannel.history({ limit: 100, direction: 'backwards' });
         const items = history.items;
-        
-        for (let i = items.length - 1; i >= 0; i--) {
-          const item = items[i];
-          if (item.data && item.data.type !== 'system') {
-            addMessageToUI(item.data);
-          }
-        }
-        
+
         if (items.length === 0) {
           const div = document.createElement('div');
           div.className = 'empty-chat';
           div.textContent = '💬 开始聊天吧！';
           chatMessages.appendChild(div);
+          return;
+        }
+
+        // 从旧到新显示
+        for (let i = items.length - 1; i >= 0; i--) {
+          const item = items[i];
+          if (item.data) {
+            if (item.data.type === 'system') {
+              addSystemMessage(item.data.text);
+            } else {
+              addMessageToUI(item.data);
+            }
+          }
         }
       } catch (e) {
         console.warn('历史消息加载失败:', e);
+        const div = document.createElement('div');
+        div.className = 'empty-chat';
+        div.textContent = '💬 开始聊天吧！';
+        chatMessages.appendChild(div);
       }
     }
 
@@ -1697,16 +1718,13 @@ title: 首页
 
           ablyChannel = ably.channels.get(CHANNEL_NAME);
 
-          // ✅ 订阅消息 - 显示所有人（包括自己）
+          // 订阅消息
           ablyChannel.subscribe('message', (msg) => {
             const data = msg.data;
-            
             if (data.type === 'system') {
               addSystemMessage(data.text);
               return;
             }
-            
-            // ✅ 显示所有消息
             addMessageToUI(data);
           });
 
@@ -1719,7 +1737,6 @@ title: 首页
           });
 
           setTimeout(loadHistory, 500);
-          
           console.log('✅ Ably 已连接');
         });
 
@@ -1750,16 +1767,24 @@ title: 首页
     }
 
     // ============================================================
-    //  ✅ 发送消息 - 不自已显示（由订阅回调统一显示）
+    //  ✅ 发送消息 - 先清空输入框再发送
     // ============================================================
     function sendMessage() {
+      // ✅ 先获取内容
       const text = chatInput.value.trim();
+
+      // ✅ 立即清空输入框（无论后续是否成功）
+      chatInput.value = '';
+
       if (!text) {
         chatInput.focus();
         return;
       }
+
       if (!isConnected || !ablyChannel) {
         alert('未连接到聊天室');
+        chatInput.value = text;
+        chatInput.focus();
         return;
       }
 
@@ -1769,10 +1794,17 @@ title: 首页
         time: Date.now()
       };
 
-      // ✅ 直接发送，不自已显示
-      ablyChannel.publish('message', msg).catch(console.error);
+      // 发送消息
+      ablyChannel.publish('message', msg)
+        .then(() => {
+          console.log('✅ 消息已发送:', text);
+        })
+        .catch((err) => {
+          console.error('❌ 发送失败:', err);
+          chatInput.value = text;
+          alert('发送失败，请重试');
+        });
 
-      chatInput.value = '';
       chatInput.focus();
     }
 
@@ -1830,7 +1862,7 @@ title: 首页
     }
 
     // ============================================================
-    //  ✅ 键盘事件
+    //  ✅ 键盘事件 - 只绑定一次
     // ============================================================
     chatInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -1949,7 +1981,7 @@ title: 首页
       sendBtn.textContent = '发送';
     };
 
-    // ✅ HRSI 键盘事件 - 只绑定一次
+    // HRSI 键盘事件 - 只绑定一次
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
