@@ -1552,7 +1552,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (Ably + itty-sockets，完整功能版) ===== -->
+<!-- ===== 聊天室脚本 (纯 Ably) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1561,69 +1561,34 @@ title: 首页
     //  配置区
     // ============================================================
     const ABLY_TOKEN_URL = 'https://chat1.haoran54188.ccwu.cc/token';
-    const ITTY_SIGNALING = 'wss://chat2.haoran54188.ccwu.cc';
+    const CHANNEL_NAME = 'chat:global';
 
     // ============================================================
     //  状态
     // ============================================================
-    let currentMode = localStorage.getItem('hrsi_chat_mode') || 'ably';
-    let currentRoom = 'lobby';
     let ably = null;
     let ablyChannel = null;
-    let ittyChannel = null;
     let isConnected = false;
     let reconnectTimer = null;
-    let onlineUsers = [];
     let pendingImage = null;
 
-    // 用户信息
-    let username = localStorage.getItem('hrsi_chat_username_v3') || '访客_' + Math.floor(Math.random() * 10000);
-    let avatarData = localStorage.getItem('hrsi_chat_avatar_v3') || '';
+    let username = localStorage.getItem('hrsi_chat_username_v5') || '访客_' + Math.floor(Math.random() * 10000);
+    let avatarData = localStorage.getItem('hrsi_chat_avatar_v5') || '';
 
-    // DOM 引用
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const chatNameInput = document.getElementById('chatNameInput');
     const chatAvatarInput = document.getElementById('chatAvatarInput');
     const chatAvatarPreview = document.getElementById('chatAvatarPreview');
     const statusBadge = document.querySelector('.chat-header .badge');
-    const onlineListEl = document.getElementById('onlineList');
-    const onlineCountEl = document.getElementById('onlineCount');
-    const emojiPicker = document.getElementById('emojiPicker');
-    const settingsPanel = document.getElementById('settingsPanel');
-    const roomList = document.getElementById('roomList');
 
     // ============================================================
-    //  切换按钮（只有 Ably 和 itty）
-    // ============================================================
-    const modeToggle = document.createElement('div');
-    modeToggle.style.cssText = 'display:flex;gap:0.3rem;align-items:center;margin-left:0.5rem;';
-    modeToggle.innerHTML = `
-      <span style="font-size:0.7rem;color:#888;">驱动:</span>
-      <button id="modeAbly" style="padding:0.1rem 0.5rem;border-radius:4px;border:1px solid ${currentMode === 'ably' ? '#4c6ef5' : '#ccc'};background:${currentMode === 'ably' ? '#4c6ef5' : '#fff'};color:${currentMode === 'ably' ? '#fff' : '#333'};font-size:0.7rem;cursor:pointer;">Ably</button>
-      <button id="modeItty" style="padding:0.1rem 0.5rem;border-radius:4px;border:1px solid ${currentMode === 'itty' ? '#4c6ef5' : '#ccc'};background:${currentMode === 'itty' ? '#4c6ef5' : '#fff'};color:${currentMode === 'itty' ? '#fff' : '#333'};font-size:0.7rem;cursor:pointer;">Itty</button>
-    `;
-    const headerControls = document.querySelector('.chat-header .user-controls');
-    if (headerControls) {
-      headerControls.parentNode.insertBefore(modeToggle, headerControls);
-    }
-
-    document.getElementById('modeAbly').addEventListener('click', function() {
-      if (currentMode === 'ably') return;
-      switchMode('ably');
-    });
-    document.getElementById('modeItty').addEventListener('click', function() {
-      if (currentMode === 'itty') return;
-      switchMode('itty');
-    });
-
-    // ============================================================
-    //  初始化用户信息
+    //  初始化
     // ============================================================
     chatNameInput.value = username;
     if (avatarData) {
-      chatAvatarInput.value = '👤';
       updateAvatarPreviewWithImage(avatarData);
+      chatAvatarInput.value = '📷';
     } else {
       chatAvatarInput.value = username.charAt(0).toUpperCase();
       updateAvatarPreview(username.charAt(0).toUpperCase());
@@ -1636,6 +1601,7 @@ title: 首页
       if (text && text.startsWith('data:image')) {
         chatAvatarPreview.innerHTML = `<img src="${text}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
         chatAvatarPreview.style.background = 'transparent';
+        chatAvatarPreview.style.color = 'transparent';
       } else {
         const display = text || '?';
         chatAvatarPreview.textContent = display.charAt(0).toUpperCase();
@@ -1647,6 +1613,7 @@ title: 首页
     function updateAvatarPreviewWithImage(imageData) {
       chatAvatarPreview.innerHTML = `<img src="${imageData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
       chatAvatarPreview.style.background = 'transparent';
+      chatAvatarPreview.style.color = 'transparent';
     }
 
     function getAvatarColor(name) {
@@ -1656,14 +1623,15 @@ title: 首页
 
     function getAvatarHtml(name, avatar) {
       if (avatar && avatar.startsWith('data:image')) {
-        return `<img src="${avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        return `<img src="${avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
       }
       return name.charAt(0).toUpperCase();
     }
 
     function addMessageToUI(data) {
-      if (!data || (!data.text && !data.image && !data.emoji)) return;
-      if (data.type === 'update_profile') return;
+      if (!data) return;
+      if (!data.text && !data.image && !data.emoji) return;
+      if (data.type === 'update_profile' || data.type === 'system') return;
 
       const isSelf = data.name === username;
       const div = document.createElement('div');
@@ -1675,16 +1643,11 @@ title: 首页
 
       let contentHtml = '';
       if (data.text) {
-        // 检测是否包含图片链接
-        if (data.text.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i)) {
-          contentHtml = `<img src="${data.text}" class="msg-image" onclick="window.open('${data.text}','_blank')">`;
-        } else {
-          contentHtml = data.text;
-        }
+        contentHtml = data.text;
       } else if (data.emoji) {
-        contentHtml = `<span class="msg-emoji">${data.emoji}</span>`;
+        contentHtml = `<span style="font-size:2rem;line-height:1.2;">${data.emoji}</span>`;
       } else if (data.image) {
-        contentHtml = `<img src="${data.image}" class="msg-image" onclick="window.open('${data.image}','_blank')">`;
+        contentHtml = `<img src="${data.image}" class="msg-image" onclick="window.open('${data.image}','_blank')" style="max-width:200px;max-height:200px;border-radius:8px;cursor:pointer;margin-top:0.2rem;display:block;">`;
       }
 
       div.innerHTML = `
@@ -1714,87 +1677,50 @@ title: 首页
 
     function updateStatus(connected) {
       if (statusBadge) {
-        const modeLabel = { ably: 'Ably', itty: 'itty-sockets' }[currentMode] || currentMode;
         if (connected) {
-          statusBadge.textContent = '🟢 在线 (' + modeLabel + ')';
+          statusBadge.textContent = '🟢 在线';
           statusBadge.style.background = '#22c55e';
         } else {
-          statusBadge.textContent = '🔴 断开 (' + modeLabel + ')';
+          statusBadge.textContent = '🔴 断开';
           statusBadge.style.background = '#e74c3c';
         }
       }
     }
 
-    function updateOnlineList(users) {
-      if (!onlineListEl) return;
-      onlineListEl.innerHTML = '';
-      if (!users || users.length === 0) {
-        onlineListEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;text-align:center;">暂无在线用户</div>';
-        if (onlineCountEl) onlineCountEl.textContent = '0';
-        return;
-      }
-      users.forEach(user => {
-        const div = document.createElement('div');
-        div.className = 'online-user';
-        const avatarHtml = getAvatarHtml(user.name || '匿名', user.avatar);
-        const color = getAvatarColor(user.name || '匿名');
-        div.innerHTML = `
-          <div class="avatar-sm" style="background:${color}">${avatarHtml}</div>
-          <span>${user.name || '匿名'}</span>
-          <span class="status-dot"></span>
-        `;
-        onlineListEl.appendChild(div);
-      });
-      if (onlineCountEl) onlineCountEl.textContent = users.length;
-    }
-
     // ============================================================
-    //  房间切换
+    //  在线列表
     // ============================================================
-    function switchRoom(roomId) {
-      currentRoom = roomId;
-      document.querySelectorAll('.chat-room-item').forEach(el => {
-        el.classList.toggle('active', el.dataset.room === roomId);
-      });
-      const roomNames = {
-        'lobby': '🏛️ 公共大厅',
-        'private-1': '🔒 私人房间 1',
-        'private-2': '🔒 私人房间 2'
-      };
-      const nameEl = document.querySelector('.chat-main-header .room-name');
-      if (nameEl) {
-        nameEl.innerHTML = `${roomNames[roomId] || roomId} <small id="roomMemberCount">0 人在线</small>`;
-      }
-      chatMessages.innerHTML = '<div class="empty-chat">📡 连接中...</div>';
-      reconnectToRoom();
-    }
-
-    // 房间列表点击
-    if (roomList) {
-      roomList.querySelectorAll('.chat-room-item').forEach(el => {
-        el.addEventListener('click', function() {
-          if (this.dataset.room === currentRoom) return;
-          switchRoom(this.dataset.room);
+    function updateOnlineList() {
+      if (!ablyChannel) return;
+      ablyChannel.presence.get((err, members) => {
+        if (err) return;
+        const list = document.getElementById('onlineList');
+        const count = document.getElementById('onlineCount');
+        if (!list) return;
+        list.innerHTML = '';
+        if (!members || members.length === 0) {
+          list.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;text-align:center;">暂无在线用户</div>';
+          if (count) count.textContent = '0';
+          return;
+        }
+        members.forEach(m => {
+          const name = m.data?.name || m.clientId;
+          const avatar = m.data?.avatar || '';
+          const div = document.createElement('div');
+          div.className = 'online-user';
+          const avatarColor = getAvatarColor(name);
+          const avatarHtml = avatar && avatar.startsWith('data:image') 
+            ? `<img src="${avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` 
+            : name.charAt(0).toUpperCase();
+          div.innerHTML = `
+            <div class="avatar-sm" style="background:${avatarColor}">${avatarHtml}</div>
+            <span>${name}</span>
+            <span class="status-dot"></span>
+          `;
+          list.appendChild(div);
         });
+        if (count) count.textContent = members.length;
       });
-    }
-
-    // ============================================================
-    //  重连
-    // ============================================================
-    function reconnectToRoom() {
-      if (currentMode === 'ably') {
-        if (ablyChannel) {
-          ablyChannel.unsubscribe();
-          ablyChannel.presence.leave();
-        }
-        connectAbly();
-      } else {
-        if (ittyChannel) {
-          ittyChannel.close();
-        }
-        connectItty();
-      }
     }
 
     // ============================================================
@@ -1808,6 +1734,7 @@ title: 首页
       }
 
       try {
+        // 动态加载 Ably SDK
         if (typeof Ably === 'undefined') {
           await new Promise((resolve, reject) => {
             const script = document.createElement('script');
@@ -1818,6 +1745,7 @@ title: 首页
           });
         }
 
+        // 通过 Worker 获取 Token
         const tokenResponse = await fetch(ABLY_TOKEN_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1825,10 +1753,11 @@ title: 首页
         });
 
         if (!tokenResponse.ok) {
-          throw new Error('Token 获取失败');
+          const err = await tokenResponse.json();
+          throw new Error('获取 Token 失败: ' + (err.error || tokenResponse.status));
         }
 
-        const tokenData = await tokenResponse.json();
+        const tokenDetails = await tokenResponse.json();
 
         ably = new Ably.Realtime({
           authCallback: async function(params, callback) {
@@ -1850,210 +1779,104 @@ title: 首页
         ably.connection.on('connected', () => {
           isConnected = true;
           updateStatus(true);
-          joinAblyRoom();
+          const empty = chatMessages.querySelector('.empty-chat');
+          if (empty) empty.remove();
+
+          const joinMsg = {
+            type: 'join',
+            name: username,
+            avatar: avatarData || username.charAt(0).toUpperCase(),
+            text: '👋 加入了聊天室',
+            time: Date.now()
+          };
+          ablyChannel.publish('message', joinMsg);
+          addSystemMessage('👋 欢迎来到聊天室！');
+          console.log('✅ Ably 已连接');
         });
 
-        ably.connection.on('failed', () => {
+        ably.connection.on('failed', (err) => {
+          console.log('❌ Ably 连接失败:', err);
           isConnected = false;
           updateStatus(false);
-          scheduleReconnect('ably');
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(() => {
+            if (!isConnected) connectAbly();
+          }, 3000);
         });
 
         ably.connection.on('closed', () => {
           isConnected = false;
           updateStatus(false);
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(() => {
+            if (!isConnected) connectAbly();
+          }, 3000);
         });
+
+        ablyChannel = ably.channels.get(CHANNEL_NAME);
+
+        ablyChannel.subscribe('message', (msg) => {
+          const data = msg.data;
+          if (data.name === username && data.type !== 'join') return;
+          if (data.type === 'update_profile') return;
+          if (data.type === 'system') {
+            addSystemMessage(data.text);
+            return;
+          }
+          addMessageToUI(data);
+        });
+
+        // 在线状态
+        ablyChannel.presence.subscribe('enter', (presence) => {
+          const member = presence.member;
+          if (member.clientId !== username) {
+            addSystemMessage(`👤 ${member.clientId} 进入了聊天室`);
+          }
+          setTimeout(updateOnlineList, 500);
+        });
+
+        ablyChannel.presence.subscribe('leave', (presence) => {
+          const member = presence.member;
+          if (member.clientId !== username) {
+            addSystemMessage(`👤 ${member.clientId} 离开了聊天室`);
+          }
+          setTimeout(updateOnlineList, 500);
+        });
+
+        ablyChannel.presence.subscribe('update', () => {
+          setTimeout(updateOnlineList, 500);
+        });
+
+        ablyChannel.presence.enter({ name: username, avatar: avatarData || username.charAt(0).toUpperCase() });
+
+        // 加载历史消息
+        setTimeout(async () => {
+          try {
+            const history = await ablyChannel.history({ limit: 50, direction: 'backwards' });
+            const items = history.items;
+            for (let i = items.length - 1; i >= 0; i--) {
+              const item = items[i];
+              if (item.data && item.data.type !== 'update_profile' && item.data.type !== 'system' && item.data.type !== 'join') {
+                addMessageToUI(item.data);
+              }
+            }
+            if (items.length === 0) {
+              addSystemMessage('💬 开始聊天吧！');
+            }
+          } catch (e) {
+            console.warn('历史消息加载失败:', e);
+          }
+        }, 500);
+
+        setTimeout(updateOnlineList, 1000);
 
       } catch (e) {
         console.error('Ably 连接失败:', e);
         updateStatus(false);
-        scheduleReconnect('ably');
+        setTimeout(() => {
+          if (!isConnected) connectAbly();
+        }, 3000);
       }
-    }
-
-    function joinAblyRoom() {
-      if (!ably) return;
-      
-      const channelName = currentRoom === 'lobby' ? 'chat:lobby' : 'chat:private_' + currentRoom;
-      ablyChannel = ably.channels.get(channelName);
-
-      ablyChannel.subscribe('message', (msg) => {
-        const data = msg.data;
-        if (data.name === username && data.type !== 'join') return;
-        if (data.type === 'update_profile') return;
-        if (data.type === 'system') {
-          addSystemMessage(data.text);
-          return;
-        }
-        addMessageToUI(data);
-      });
-
-      ablyChannel.presence.subscribe('enter', (presence) => {
-        const member = presence.member;
-        if (member.clientId !== username) {
-          addSystemMessage(`👤 ${member.clientId} 进入了房间`);
-        }
-        updatePresenceList();
-      });
-
-      ablyChannel.presence.subscribe('leave', (presence) => {
-        const member = presence.member;
-        if (member.clientId !== username) {
-          addSystemMessage(`👤 ${member.clientId} 离开了房间`);
-        }
-        updatePresenceList();
-      });
-
-      ablyChannel.presence.subscribe('update', () => {
-        updatePresenceList();
-      });
-
-      ablyChannel.presence.enter({ name: username, avatar: avatarData });
-
-      setTimeout(async () => {
-        try {
-          const history = await ablyChannel.history({ limit: 50, direction: 'backwards' });
-          const items = history.items;
-          for (let i = items.length - 1; i >= 0; i--) {
-            const item = items[i];
-            if (item.data && item.data.type !== 'update_profile' && item.data.type !== 'system') {
-              addMessageToUI(item.data);
-            }
-          }
-          if (items.length === 0) {
-            addSystemMessage('💬 欢迎来到 ' + (currentRoom === 'lobby' ? '公共大厅' : '私人房间'));
-          }
-        } catch (e) {
-          console.warn('历史消息加载失败:', e);
-        }
-      }, 500);
-
-      setTimeout(updatePresenceList, 1000);
-    }
-
-    function updatePresenceList() {
-      if (!ablyChannel) return;
-      ablyChannel.presence.get((err, members) => {
-        if (err) return;
-        const users = members.map(m => ({
-          name: m.data?.name || m.clientId,
-          avatar: m.data?.avatar || ''
-        }));
-        updateOnlineList(users);
-      });
-    }
-
-    // ============================================================
-    //  itty-sockets 连接
-    // ============================================================
-    async function connectItty() {
-      if (ittyChannel) {
-        try { ittyChannel.close(); } catch (_) {}
-        ittyChannel = null;
-      }
-
-      try {
-        const { connect } = await import('https://cdn.jsdelivr.net/npm/itty-sockets/+esm');
-
-        const channelName = currentRoom === 'lobby' ? 'itty_lobby' : 'itty_private_' + currentRoom;
-
-        ittyChannel = connect(channelName, {
-          as: username,
-          echo: true,
-          announce: true,
-          signaling: ITTY_SIGNALING,
-        });
-
-        ittyChannel.on('open', () => {
-          isConnected = true;
-          updateStatus(true);
-          addSystemMessage('💬 欢迎来到 ' + (currentRoom === 'lobby' ? '公共大厅' : '私人房间'));
-        });
-
-        ittyChannel.on('message', ({ message, alias }) => {
-          try {
-            const data = JSON.parse(message);
-            if (data.type === 'system' || data.type === 'update_profile') return;
-            if (data.name === username) return;
-            addMessageToUI(data);
-          } catch (_) {
-            // 纯文本
-            const div = document.createElement('div');
-            div.className = 'msg other';
-            div.innerHTML = `
-              <div class="avatar" style="background:#888;">?</div>
-              <div class="content">
-                <span class="name">${alias || '未知'}</span>
-                ${message}
-              </div>
-            `;
-            const empty = chatMessages.querySelector('.empty-chat');
-            if (empty) empty.remove();
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-          }
-        });
-
-        ittyChannel.on('close', () => {
-          isConnected = false;
-          updateStatus(false);
-          scheduleReconnect('itty');
-        });
-
-        ittyChannel.on('error', (err) => {
-          console.error('itty-sockets 错误:', err);
-        });
-
-      } catch (e) {
-        console.error('itty-sockets 连接失败:', e);
-        scheduleReconnect('itty');
-      }
-    }
-
-    // ============================================================
-    //  切换模式
-    // ============================================================
-    function switchMode(mode) {
-      if (mode === currentMode && isConnected) return;
-      
-      currentMode = mode;
-      localStorage.setItem('hrsi_chat_mode', mode);
-
-      if (ably) {
-        try { ably.close(); } catch (_) {}
-        ably = null;
-        ablyChannel = null;
-      }
-      if (ittyChannel) {
-        try { ittyChannel.close(); } catch (_) {}
-        ittyChannel = null;
-      }
-      isConnected = false;
-      updateStatus(false);
-
-      chatMessages.innerHTML = '<div class="empty-chat">📡 连接中...</div>';
-
-      document.getElementById('modeAbly').style.background = mode === 'ably' ? '#4c6ef5' : '#fff';
-      document.getElementById('modeAbly').style.color = mode === 'ably' ? '#fff' : '#333';
-      document.getElementById('modeAbly').style.borderColor = mode === 'ably' ? '#4c6ef5' : '#ccc';
-      document.getElementById('modeItty').style.background = mode === 'itty' ? '#4c6ef5' : '#fff';
-      document.getElementById('modeItty').style.color = mode === 'itty' ? '#fff' : '#333';
-      document.getElementById('modeItty').style.borderColor = mode === 'itty' ? '#4c6ef5' : '#ccc';
-
-      setTimeout(() => {
-        if (mode === 'ably') connectAbly();
-        else connectItty();
-      }, 300);
-
-      console.log(`🔄 切换到 ${mode}`);
-    }
-
-    function scheduleReconnect(mode) {
-      if (reconnectTimer) clearTimeout(reconnectTimer);
-      reconnectTimer = setTimeout(() => {
-        if (mode === 'ably') connectAbly();
-        else connectItty();
-      }, 3000);
     }
 
     // ============================================================
@@ -2065,7 +1888,7 @@ title: 首页
         chatInput.focus();
         return;
       }
-      if (!isConnected) {
+      if (!isConnected || !ablyChannel) {
         alert('未连接到聊天室');
         return;
       }
@@ -2092,11 +1915,7 @@ title: 首页
 
       addMessageToUI(msg);
 
-      if (currentMode === 'ably' && ablyChannel) {
-        ablyChannel.publish('message', msg).catch(console.error);
-      } else if (currentMode === 'itty' && ittyChannel) {
-        ittyChannel.send(JSON.stringify(msg));
-      }
+      ablyChannel.publish('message', msg).catch(console.error);
 
       chatInput.value = '';
       chatInput.focus();
@@ -2121,28 +1940,16 @@ title: 首页
     //  Emoji 面板
     // ============================================================
     window.toggleEmoji = function() {
-      if (emojiPicker) {
-        emojiPicker.classList.toggle('open');
-      }
+      const picker = document.getElementById('emojiPicker');
+      if (picker) picker.classList.toggle('open');
     };
-
-    if (emojiPicker) {
-      emojiPicker.querySelectorAll('span').forEach(el => {
-        el.addEventListener('click', function() {
-          chatInput.value += this.textContent;
-          chatInput.focus();
-          emojiPicker.classList.remove('open');
-        });
-      });
-    }
 
     // ============================================================
     //  设置面板
     // ============================================================
     window.toggleSettings = function() {
-      if (settingsPanel) {
-        settingsPanel.classList.toggle('open');
-      }
+      const panel = document.getElementById('settingsPanel');
+      if (panel) panel.classList.toggle('open');
     };
 
     window.previewSettingsAvatar = function(event) {
@@ -2163,29 +1970,81 @@ title: 首页
       const newName = document.getElementById('settingsName')?.value.trim();
       if (newName) {
         username = newName;
-        localStorage.setItem('hrsi_chat_username_v3', username);
+        localStorage.setItem('hrsi_chat_username_v5', username);
       }
       if (window._newAvatarData) {
         avatarData = window._newAvatarData;
-        localStorage.setItem('hrsi_chat_avatar_v3', avatarData);
+        localStorage.setItem('hrsi_chat_avatar_v5', avatarData);
         window._newAvatarData = null;
       }
-      
-      // 更新头像预览
+
       if (avatarData) {
         updateAvatarPreviewWithImage(avatarData);
       } else {
         updateAvatarPreview(username.charAt(0).toUpperCase());
       }
       chatNameInput.value = username;
-      
-      if (currentMode === 'ably' && ablyChannel && isConnected) {
-        ablyChannel.presence.update({ name: username, avatar: avatarData });
+
+      if (ablyChannel && isConnected) {
+        ablyChannel.presence.update({ name: username, avatar: avatarData || username.charAt(0).toUpperCase() });
       }
 
-      if (settingsPanel) settingsPanel.classList.remove('open');
+      document.getElementById('settingsPanel')?.classList.remove('open');
       addSystemMessage('✅ 设置已更新');
     };
+
+    // ============================================================
+    //  更新资料（原模板风格）
+    // ============================================================
+    window.updateChatProfile = function() {
+      const newName = chatNameInput.value.trim();
+      const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
+
+      if (newName) {
+        username = newName;
+        localStorage.setItem('hrsi_chat_username_v5', username);
+      }
+      if (newAvatar) {
+        // 如果输入的是文字，直接使用
+        if (!newAvatar.startsWith('data:image')) {
+          avatarData = '';
+          localStorage.setItem('hrsi_chat_avatar_v5', '');
+          updateAvatarPreview(newAvatar);
+        }
+      }
+
+      // 如果 avatarData 有图片，保留
+      if (avatarData) {
+        updateAvatarPreviewWithImage(avatarData);
+      } else {
+        updateAvatarPreview(username.charAt(0).toUpperCase());
+      }
+
+      if (ablyChannel && isConnected) {
+        ablyChannel.presence.update({ name: username, avatar: avatarData || username.charAt(0).toUpperCase() });
+      }
+
+      if (statusBadge) {
+        statusBadge.textContent = '✅ 已更新';
+        statusBadge.style.background = '#22c55e';
+        setTimeout(() => {
+          updateStatus(isConnected);
+        }, 1500);
+      }
+    };
+
+    // ============================================================
+    //  Emoji 点击插入
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('#emojiPicker span').forEach(el => {
+        el.addEventListener('click', function() {
+          chatInput.value += this.textContent;
+          chatInput.focus();
+          document.getElementById('emojiPicker')?.classList.remove('open');
+        });
+      });
+    });
 
     // ============================================================
     //  键盘事件
@@ -2200,23 +2059,21 @@ title: 首页
     // ============================================================
     //  启动
     // ============================================================
-    if (currentMode === 'ably') {
-      setTimeout(connectAbly, 300);
-    } else {
-      setTimeout(connectItty, 300);
-    }
+    setTimeout(connectAbly, 300);
 
-    console.log('💬 双服务聊天室已启动');
+    console.log('💬 纯 Ably 聊天室已启动');
     console.log('👤 用户:', username);
-    console.log('🔄 当前模式:', currentMode);
-    console.log('🔗 Ably 代理: chat1.haoran54188.ccwu.cc');
-    console.log('🔗 itty-sockets 代理: chat2.haoran54188.ccwu.cc');
+    console.log('🔗 Token 代理: chat1.haoran54188.ccwu.cc');
 
     window.reconnectChat = function() {
-      switchMode(currentMode);
+      if (ably) {
+        try { ably.close(); } catch (_) {}
+        ably = null;
+        ablyChannel = null;
+      }
+      isConnected = false;
+      connectAbly();
     };
-    window.switchMode = switchMode;
-    window.switchRoom = switchRoom;
 
   })();
 </script>
