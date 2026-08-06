@@ -1552,7 +1552,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (纯 Ably，完整修复) ===== -->
+<!-- ===== 聊天室脚本 (纯 Ably，最终正确版) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1570,9 +1570,8 @@ title: 首页
     let ablyChannel = null;
     let isConnected = false;
     let reconnectTimer = null;
-    let hasLoadedHistory = false;
-
     let username = localStorage.getItem('chat_username') || '访客_' + Math.floor(Math.random() * 10000);
+    let messageCount = 0;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
@@ -1644,112 +1643,34 @@ title: 首页
     }
 
     // ============================================================
-    //  清除旧消息（0点自动执行）
-    // ============================================================
-    function clearOldMessages() {
-      const now = new Date();
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
-      
-      // 清除所有消息
-      const messages = chatMessages.querySelectorAll('.msg:not(.system)');
-      messages.forEach(msg => {
-        // 检查消息时间，如果小于今天0点就删除
-        const timeSpan = msg.querySelector('.time');
-        if (timeSpan) {
-          // 简单判断：如果消息中没有今天的日期，就删除
-          // 或者直接删除所有非系统消息（因为0点后历史消息重新加载）
-        }
-      });
-
-      // 更简单：0点后清空消息区域，重新加载历史
-      chatMessages.innerHTML = '<div class="empty-chat">📡 加载消息中...</div>';
-      
-      // 重新加载历史消息
-      if (ablyChannel && isConnected) {
-        setTimeout(loadHistory, 500);
-      }
-    }
-
-    // 检查是否需要清除（每小时检查一次）
-    function checkMidnightClear() {
-      const now = new Date();
-      // 如果是0点到0点5分之间，执行清除
-      if (now.getHours() === 0 && now.getMinutes() < 5) {
-        const lastClear = localStorage.getItem('chat_last_clear');
-        const today = now.toDateString();
-        if (lastClear !== today) {
-          localStorage.setItem('chat_last_clear', today);
-          clearOldMessages();
-        }
-      }
-    }
-
-    // ============================================================
     //  加载历史消息
     // ============================================================
     async function loadHistory() {
       if (!ablyChannel || !isConnected) return;
       
       try {
-        // 获取今天的0点时间戳
-        const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime();
-        
-        const history = await ablyChannel.history({ 
-          limit: 100, 
-          direction: 'backwards' 
-        });
-        const items = history.items;
-        
-        // 清空现有消息（保留系统消息）
+        // 清空消息区域，保留系统消息
         const systemMsgs = chatMessages.querySelectorAll('.msg.system');
         chatMessages.innerHTML = '';
         systemMsgs.forEach(el => chatMessages.appendChild(el));
         
-        let hasMessages = false;
-        for (let i = items.length - 1; i >= 0; i--) {
-          const item = items[i];
-          // 只加载今天0点以后的消息
-          if (item.data && item.data.type !== 'system') {
-            if (item.data.time && item.data.time < todayStart) {
-              continue; // 跳过今天之前的消息
-            }
-            if (item.data.name !== username) {
-              addMessageToUI(item.data);
-              hasMessages = true;
-            }
-          }
-        }
+        const history = await ablyChannel.history({ limit: 100, direction: 'backwards' });
+        const items = history.items;
         
-        // 如果是自己发的消息，显示在历史中
+        // 从旧到新显示
         for (let i = items.length - 1; i >= 0; i--) {
           const item = items[i];
           if (item.data && item.data.type !== 'system') {
-            if (item.data.time && item.data.time < todayStart) {
-              continue;
-            }
-            if (item.data.name === username) {
-              // 检查是否已显示
-              const existing = chatMessages.querySelector(`.msg.self .content`);
-              if (!existing || existing.textContent !== item.data.text) {
-                addMessageToUI(item.data);
-                hasMessages = true;
-              }
-            }
+            addMessageToUI(item.data);
           }
         }
         
-        if (!hasMessages) {
-          const empty = chatMessages.querySelector('.empty-chat');
-          if (!empty) {
-            const div = document.createElement('div');
-            div.className = 'empty-chat';
-            div.textContent = '💬 开始聊天吧！';
-            chatMessages.appendChild(div);
-          }
+        if (items.length === 0) {
+          const div = document.createElement('div');
+          div.className = 'empty-chat';
+          div.textContent = '💬 开始聊天吧！';
+          chatMessages.appendChild(div);
         }
-        
-        hasLoadedHistory = true;
       } catch (e) {
         console.warn('历史消息加载失败:', e);
       }
@@ -1808,10 +1729,10 @@ title: 首页
         ably.connection.on('connected', () => {
           isConnected = true;
           updateStatus(true);
-          
+
           ablyChannel = ably.channels.get(CHANNEL_NAME);
 
-          // 订阅消息（只绑定一次）
+          // 订阅消息
           ablyChannel.subscribe('message', (msg) => {
             const data = msg.data;
             
@@ -1820,6 +1741,7 @@ title: 首页
               return;
             }
             
+            // 不显示自己发的（已在前端显示）
             if (data.name === username) return;
             
             addMessageToUI(data);
@@ -1835,7 +1757,7 @@ title: 首页
             time: Date.now()
           });
 
-          // 加载历史消息
+          // 加载历史
           setTimeout(loadHistory, 500);
           
           console.log('✅ Ably 已连接');
@@ -1868,7 +1790,7 @@ title: 首页
     }
 
     // ============================================================
-    //  发送消息（修复：只发一次，清空输入框）
+    //  发送消息
     // ============================================================
     function sendMessage() {
       const text = chatInput.value.trim();
@@ -1890,10 +1812,10 @@ title: 首页
       // 自己显示
       addMessageToUI(msg);
 
-      // 发送到频道
+      // 发送
       ablyChannel.publish('message', msg).catch(console.error);
 
-      // ✅ 清空输入框
+      // 清空输入框
       chatInput.value = '';
       chatInput.focus();
     }
@@ -1952,13 +1874,12 @@ title: 首页
     }
 
     // ============================================================
-    //  ✅ 键盘事件（只绑定一次，防止重复发送）
+    //  ✅ 键盘事件 - 只绑定一次
     // ============================================================
     chatInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
-        e.preventDefault();  // 阻止默认行为
-        sendMessage();       // 只调用一次
-        return false;        // 确保不触发其他事件
+        e.preventDefault();
+        sendMessage();
       }
     });
 
@@ -1976,13 +1897,6 @@ title: 首页
       isConnected = false;
       connectAbly();
     };
-
-    // ============================================================
-    //  定时检查0点清除（每小时检查一次）
-    // ============================================================
-    setInterval(checkMidnightClear, 3600000);
-    // 启动时也检查一次
-    setTimeout(checkMidnightClear, 5000);
 
     // ============================================================
     //  启动
