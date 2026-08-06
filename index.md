@@ -1520,7 +1520,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (纯 Ably，修复双重事件绑定) ===== -->
+<!-- ===== 聊天室脚本 (纯 Ably，修复重复消息) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1697,6 +1697,7 @@ title: 首页
 
           ablyChannel = ably.channels.get(CHANNEL_NAME);
 
+          // ✅ 订阅消息 - 显示所有人（包括自己）
           ablyChannel.subscribe('message', (msg) => {
             const data = msg.data;
             
@@ -1705,8 +1706,7 @@ title: 首页
               return;
             }
             
-            if (data.name === username) return;
-            
+            // ✅ 显示所有消息
             addMessageToUI(data);
           });
 
@@ -1750,7 +1750,7 @@ title: 首页
     }
 
     // ============================================================
-    //  发送消息
+    //  ✅ 发送消息 - 不自已显示（由订阅回调统一显示）
     // ============================================================
     function sendMessage() {
       const text = chatInput.value.trim();
@@ -1769,7 +1769,7 @@ title: 首页
         time: Date.now()
       };
 
-      addMessageToUI(msg);
+      // ✅ 直接发送，不自已显示
       ablyChannel.publish('message', msg).catch(console.error);
 
       chatInput.value = '';
@@ -1830,7 +1830,7 @@ title: 首页
     }
 
     // ============================================================
-    //  ✅ 键盘事件 - 只绑定一次（通过 JS 监听，没有 HTML onkeydown）
+    //  ✅ 键盘事件
     // ============================================================
     chatInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
