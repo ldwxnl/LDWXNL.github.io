@@ -1552,82 +1552,699 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (三服务：Ably / PieSocket / itty-sockets) ===== -->
+<!-- ===== 聊天室完整版 (Ably + itty-sockets) ===== -->
+<style>
+  /* ============================================================
+     聊天室样式 - 完整版
+     ============================================================ */
+
+  /* ----- 布局 ----- */
+  .chat-wrapper {
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    gap: 0;
+    height: 520px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-md);
+    border: 1px solid #eee;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 820px) {
+    .chat-wrapper {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      height: auto;
+      min-height: 480px;
+    }
+    .chat-sidebar-left,
+    .chat-sidebar-right {
+      display: none;
+    }
+    .chat-sidebar-left.mobile-show,
+    .chat-sidebar-right.mobile-show {
+      display: block;
+    }
+  }
+
+  /* ----- 左侧：房间列表 ----- */
+  .chat-sidebar-left {
+    background: #f8f9fc;
+    border-right: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0.6rem 0;
+  }
+  .chat-sidebar-left .section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.3rem 1rem;
+    margin: 0;
+  }
+  .chat-room-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.2rem 0.4rem;
+  }
+  .chat-room-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0.1rem 0.4rem;
+  }
+  .chat-room-item:hover {
+    background: #eef1ff;
+  }
+  .chat-room-item.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  .chat-room-item .room-icon {
+    font-size: 1.1rem;
+  }
+  .chat-room-item .room-badge {
+    margin-left: auto;
+    font-size: 0.6rem;
+    background: #e74c3c;
+    color: #fff;
+    padding: 0.05rem 0.4rem;
+    border-radius: 10px;
+  }
+  .chat-room-item.active .room-badge {
+    background: rgba(255,255,255,0.3);
+  }
+  .chat-room-item .room-private {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    margin-left: 0.2rem;
+  }
+  .chat-room-item.active .room-private {
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* ----- 中间：聊天主区域 ----- */
+  .chat-main {
+    display: flex;
+    flex-direction: column;
+    background: #fafbff;
+    min-height: 0;
+  }
+  .chat-main-header {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    background: #fff;
+  }
+  .chat-main-header .room-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+  .chat-main-header .room-name small {
+    font-weight: 400;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-left: 0.4rem;
+  }
+  .chat-main-header .header-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+  }
+  .chat-main-header .header-actions button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+    transition: var(--transition);
+    color: var(--text-secondary);
+  }
+  .chat-main-header .header-actions button:hover {
+    background: #f0f2ff;
+    color: var(--primary);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-height: 200px;
+  }
+  .chat-messages .msg {
+    max-width: 80%;
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    animation: fade-in 0.25s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .chat-messages .msg .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    color: #fff;
+    overflow: hidden;
+    background: var(--primary);
+  }
+  .chat-messages .msg .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .chat-messages .msg .content {
+    flex: 1;
+    min-width: 0;
+  }
+  .chat-messages .msg .name {
+    font-weight: 600;
+    font-size: 0.78rem;
+    display: block;
+  }
+  .chat-messages .msg .time {
+    font-size: 0.6rem;
+    opacity: 0.6;
+    margin-left: 0.4rem;
+  }
+  .chat-messages .msg .msg-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 0.2rem;
+    display: block;
+  }
+  .chat-messages .msg .msg-emoji {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  .chat-messages .msg.self {
+    align-self: flex-end;
+    background: var(--primary);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .chat-messages .msg.self .avatar {
+    order: 1;
+  }
+  .chat-messages .msg.self .name {
+    color: rgba(255,255,255,0.8);
+  }
+  .chat-messages .msg.other {
+    align-self: flex-start;
+    background: #fff;
+    color: var(--text-primary);
+    border: 1px solid #e8ecff;
+    border-bottom-left-radius: 4px;
+  }
+  .chat-messages .msg.other .name {
+    color: var(--primary);
+  }
+  .chat-messages .msg.system {
+    align-self: center;
+    background: #f0f2f5;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    padding: 0.2rem 1rem;
+    border-radius: 12px;
+    max-width: 90%;
+  }
+  .chat-messages .empty-chat {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  /* ----- 输入区域 ----- */
+  .chat-input-area {
+    padding: 0.5rem 0.8rem;
+    border-top: 1px solid #eee;
+    background: #fff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .chat-input-row .input-tools {
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+  }
+  .chat-input-row .input-tools button {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.2rem 0.3rem;
+    border-radius: 6px;
+    transition: var(--transition);
+    color: var(--text-muted);
+  }
+  .chat-input-row .input-tools button:hover {
+    background: #f0f2ff;
+    color: var(--primary);
+  }
+  .chat-input-row input[type="text"] {
+    flex: 1;
+    border: 1px solid #e0e4f0;
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    font-size: 0.88rem;
+    outline: none;
+    transition: var(--transition);
+    background: #fafbff;
+    min-width: 60px;
+  }
+  .chat-input-row input[type="text"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.12);
+  }
+  .chat-input-row .send-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .chat-input-row .send-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.04);
+  }
+  .chat-input-row .send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ----- Emoji 面板 ----- */
+  .emoji-picker {
+    display: none;
+    padding: 0.4rem;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .emoji-picker.open {
+    display: flex;
+  }
+  .emoji-picker span {
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0.1rem 0.2rem;
+    border-radius: 4px;
+    transition: var(--transition);
+  }
+  .emoji-picker span:hover {
+    background: #f0f2ff;
+    transform: scale(1.1);
+  }
+
+  /* ----- 右侧：在线列表 + 设置 ----- */
+  .chat-sidebar-right {
+    background: #f8f9fc;
+    border-left: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0.6rem 0;
+  }
+  .chat-sidebar-right .section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.3rem 1rem;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-sidebar-right .section-title .count {
+    font-size: 0.6rem;
+    background: #eef1ff;
+    color: var(--primary);
+    padding: 0.05rem 0.4rem;
+    border-radius: 10px;
+  }
+  .online-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.2rem 0.4rem;
+  }
+  .online-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+  .online-user:hover {
+    background: #eef1ff;
+  }
+  .online-user .avatar-sm {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  .online-user .avatar-sm img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .online-user .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* ----- 设置面板 ----- */
+  .settings-panel {
+    display: none;
+    padding: 0.8rem 1rem;
+    border-top: 1px solid #eee;
+    background: #fff;
+  }
+  .settings-panel.open {
+    display: block;
+  }
+  .settings-panel .setting-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.82rem;
+  }
+  .settings-panel .setting-row label {
+    min-width: 50px;
+    color: var(--text-secondary);
+  }
+  .settings-panel .setting-row input[type="text"],
+  .settings-panel .setting-row input[type="file"] {
+    flex: 1;
+    border: 1px solid #e0e4f0;
+    border-radius: 12px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+    outline: none;
+    background: #fafbff;
+  }
+  .settings-panel .setting-row input[type="text"]:focus {
+    border-color: var(--primary);
+  }
+  .settings-panel .setting-row .avatar-preview-settings {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  .settings-panel .setting-row .avatar-preview-settings img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .settings-panel .save-settings-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 0.2rem 1rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 0.2rem;
+  }
+  .settings-panel .save-settings-btn:hover {
+    background: var(--primary-dark);
+  }
+
+  /* ----- 动画 ----- */
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ----- 滚动条 ----- */
+  .chat-messages::-webkit-scrollbar,
+  .chat-room-list::-webkit-scrollbar,
+  .online-list::-webkit-scrollbar,
+  .emoji-picker::-webkit-scrollbar {
+    width: 4px;
+  }
+  .chat-messages::-webkit-scrollbar-thumb,
+  .chat-room-list::-webkit-scrollbar-thumb,
+  .online-list::-webkit-scrollbar-thumb,
+  .emoji-picker::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  /* ----- 响应式按钮 ----- */
+  .mobile-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0.2rem 0.4rem;
+  }
+  @media (max-width: 820px) {
+    .mobile-toggle-btn {
+      display: inline-block;
+    }
+  }
+</style>
+
+<!-- ============================================================
+     聊天室 HTML 结构
+     ============================================================ -->
+<div class="chat-wrapper" id="chatWrapper">
+  
+  <!-- 左侧：房间列表 -->
+  <div class="chat-sidebar-left" id="chatSidebarLeft">
+    <p class="section-title">📋 房间</p>
+    <div class="chat-room-list" id="roomList">
+      <div class="chat-room-item active" data-room="lobby">
+        <span class="room-icon">🏛️</span>
+        公共大厅
+      </div>
+      <div class="chat-room-item" data-room="private-1">
+        <span class="room-icon">🔒</span>
+        私人房间 1
+        <span class="room-private">(邀请)</span>
+      </div>
+      <div class="chat-room-item" data-room="private-2">
+        <span class="room-icon">🔒</span>
+        私人房间 2
+        <span class="room-private">(邀请)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中间：聊天主区域 -->
+  <div class="chat-main">
+    <div class="chat-main-header">
+      <span class="room-name" id="currentRoomName">
+        🏛️ 公共大厅
+        <small id="roomMemberCount">0 人在线</small>
+      </span>
+      <div class="header-actions">
+        <button onclick="toggleSidebar('left')" class="mobile-toggle-btn" title="房间列表">📋</button>
+        <button onclick="toggleSidebar('right')" class="mobile-toggle-btn" title="在线列表">👥</button>
+        <button onclick="toggleSettings()" title="设置" id="settingsToggleBtn">⚙️</button>
+        <button onclick="toggleEmoji()" title="表情">😊</button>
+        <span style="font-size:0.7rem;color:#888;" id="modeDisplay">Ably</span>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-chat">👋 欢迎来到聊天室！选择房间开始聊天吧</div>
+    </div>
+
+    <!-- Emoji 面板 -->
+    <div class="emoji-picker" id="emojiPicker">
+      <span>😊</span><span>😂</span><span>🤣</span><span>❤️</span><span>💕</span>
+      <span>✨</span><span>🌟</span><span>🔥</span><span>💯</span><span>🎉</span>
+      <span>🎊</span><span>🥳</span><span>👏</span><span>🙌</span><span>🤝</span>
+      <span>👍</span><span>👎</span><span>👋</span><span>🤔</span><span>😅</span>
+      <span>🥺</span><span>😭</span><span>😡</span><span>🤬</span><span>💀</span>
+      <span>👻</span><span>🎃</span><span>🤖</span><span>👽</span><span>💪</span>
+    </div>
+
+    <!-- 输入区域 -->
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <div class="input-tools">
+          <button onclick="toggleEmoji()" title="表情">😊</button>
+          <button onclick="document.getElementById('imageInput').click()" title="图片">🖼️</button>
+          <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="sendImage(event)">
+        </div>
+        <input type="text" id="chatInput" placeholder="输入消息…" onkeydown="if(event.key==='Enter') sendChat()">
+        <button class="send-btn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧：在线列表 + 设置 -->
+  <div class="chat-sidebar-right" id="chatSidebarRight">
+    <p class="section-title">
+      👥 在线
+      <span class="count" id="onlineCount">0</span>
+    </p>
+    <div class="online-list" id="onlineList">
+      <div class="online-user">
+        <div class="avatar-sm">👤</div>
+        <span>加载中...</span>
+        <span class="status-dot"></span>
+      </div>
+    </div>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel">
+      <div class="setting-row">
+        <label>昵称</label>
+        <input type="text" id="settingsName" placeholder="输入昵称">
+      </div>
+      <div class="setting-row">
+        <label>头像</label>
+        <div class="avatar-preview-settings" id="settingsAvatarPreview">👤</div>
+        <input type="file" id="settingsAvatarInput" accept="image/*" style="display:none" onchange="previewSettingsAvatar(event)">
+        <button onclick="document.getElementById('settingsAvatarInput').click()" style="font-size:0.7rem;padding:0.1rem 0.6rem;border-radius:10px;border:1px solid #ccc;background:#fff;cursor:pointer;">选择图片</button>
+      </div>
+      <button class="save-settings-btn" onclick="saveSettings()">💾 保存设置</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     聊天室 JavaScript
+     ============================================================ -->
 <script>
   (function() {
     'use strict';
 
     // ============================================================
-    //  配置区
+    //  配置
     // ============================================================
-    // 使用子域名代理（所有 Key 都隐藏在 Worker 中）
     const ABLY_TOKEN_URL = 'https://chat1.haoran54188.ccwu.cc/token';
-    const PIESOCKET_URL = 'wss://chat2.haoran54188.ccwu.cc';
     const ITTY_SIGNALING = 'wss://chat3.haoran54188.ccwu.cc';
-    const ITTY_CHANNEL = 'haoran_private_9xK7mP2wQ5nR8vT3yF6uA1eL4oJ0cZ';
+    const ITTY_CHANNEL = 'haoran_chat_' + Date.now();
 
     // ============================================================
     //  状态
     // ============================================================
-    let currentMode = localStorage.getItem('hrsi_chat_mode') || 'ably'; // 'ably' | 'pie' | 'itty'
-    let ws = null;
-    let channel = null;
+    let currentMode = localStorage.getItem('hrsi_chat_mode') || 'ably';
+    let currentRoom = 'lobby';
     let ably = null;
     let ablyChannel = null;
+    let ittyChannel = null;
     let isConnected = false;
     let reconnectTimer = null;
+    let onlineUsers = [];
+    let messageHistory = [];
 
-    let username = localStorage.getItem('hrsi_chat_username_v2') || '访客_' + Math.floor(Math.random() * 10000);
-    let avatarText = localStorage.getItem('hrsi_chat_avatar_v2') || username.charAt(0).toUpperCase();
+    // 用户信息
+    let username = localStorage.getItem('hrsi_chat_username_v3') || '访客_' + Math.floor(Math.random() * 10000);
+    let avatarData = localStorage.getItem('hrsi_chat_avatar_v3') || '';
 
+    // DOM 引用
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
-    const chatNameInput = document.getElementById('chatNameInput');
-    const chatAvatarInput = document.getElementById('chatAvatarInput');
-    const chatAvatarPreview = document.getElementById('chatAvatarPreview');
-    const statusBadge = document.querySelector('.chat-header .badge');
+    const roomList = document.getElementById('roomList');
+    const onlineList = document.getElementById('onlineList');
+    const onlineCount = document.getElementById('onlineCount');
+    const currentRoomName = document.getElementById('currentRoomName');
+    const roomMemberCount = document.getElementById('roomMemberCount');
+    const modeDisplay = document.getElementById('modeDisplay');
+    const emojiPicker = document.getElementById('emojiPicker');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const settingsName = document.getElementById('settingsName');
+    const settingsAvatarPreview = document.getElementById('settingsAvatarPreview');
+
+    // 初始化设置
+    settingsName.value = username;
+    updateAvatarUI(settingsAvatarPreview, avatarData, username);
+    updateChatAvatar();
 
     // ============================================================
-    //  切换按钮
+    //  UI 工具
     // ============================================================
-    const modeToggle = document.createElement('div');
-    modeToggle.style.cssText = 'display:flex;gap:0.3rem;align-items:center;margin-left:0.5rem;';
-    modeToggle.innerHTML = `
-      <span style="font-size:0.7rem;color:#888;">驱动:</span>
-      <button id="modeAbly" style="padding:0.1rem 0.5rem;border-radius:4px;border:1px solid ${currentMode === 'ably' ? '#4c6ef5' : '#ccc'};background:${currentMode === 'ably' ? '#4c6ef5' : '#fff'};color:${currentMode === 'ably' ? '#fff' : '#333'};font-size:0.7rem;cursor:pointer;">Ably</button>
-      <button id="modePie" style="padding:0.1rem 0.5rem;border-radius:4px;border:1px solid ${currentMode === 'pie' ? '#4c6ef5' : '#ccc'};background:${currentMode === 'pie' ? '#4c6ef5' : '#fff'};color:${currentMode === 'pie' ? '#fff' : '#333'};font-size:0.7rem;cursor:pointer;">Pie</button>
-      <button id="modeItty" style="padding:0.1rem 0.5rem;border-radius:4px;border:1px solid ${currentMode === 'itty' ? '#4c6ef5' : '#ccc'};background:${currentMode === 'itty' ? '#4c6ef5' : '#fff'};color:${currentMode === 'itty' ? '#fff' : '#333'};font-size:0.7rem;cursor:pointer;">Itty</button>
-    `;
-    const headerControls = document.querySelector('.chat-header .user-controls');
-    if (headerControls) {
-      headerControls.parentNode.insertBefore(modeToggle, headerControls);
-    }
-
-    // 切换按钮事件
-    document.getElementById('modeAbly').addEventListener('click', function() {
-      if (currentMode === 'ably') return;
-      switchMode('ably');
-    });
-    document.getElementById('modePie').addEventListener('click', function() {
-      if (currentMode === 'pie') return;
-      switchMode('pie');
-    });
-    document.getElementById('modeItty').addEventListener('click', function() {
-      if (currentMode === 'itty') return;
-      switchMode('itty');
-    });
-
-    chatNameInput.value = username;
-    chatAvatarInput.value = avatarText;
-    updateAvatarPreview(avatarText);
-
-    // ============================================================
-    //  UI 工具函数
-    // ============================================================
-    function updateAvatarPreview(text) {
-      const display = text || '?';
-      chatAvatarPreview.textContent = display.charAt(0).toUpperCase();
-      chatAvatarPreview.style.background = getAvatarColor(username);
+    function updateAvatarUI(element, avatarData, name) {
+      if (avatarData && avatarData.startsWith('data:image')) {
+        element.innerHTML = `<img src="${avatarData}" alt="avatar">`;
+      } else {
+        element.textContent = name.charAt(0).toUpperCase();
+        element.style.background = getAvatarColor(name);
+      }
     }
 
     function getAvatarColor(name) {
@@ -1635,23 +2252,49 @@ title: 首页
       return colors[name.length % colors.length];
     }
 
+    function updateChatAvatar() {
+      const preview = document.querySelector('.chat-header .avatar-preview');
+      if (preview) {
+        if (avatarData && avatarData.startsWith('data:image')) {
+          preview.innerHTML = `<img src="${avatarData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+          preview.textContent = username.charAt(0).toUpperCase();
+          preview.style.background = getAvatarColor(username);
+          preview.style.color = '#fff';
+        }
+      }
+    }
+
     function addMessageToUI(data) {
-      if (!data || !data.text) return;
-      if (data.type === 'update_profile') return;
+      if (!data || (!data.text && !data.image && !data.emoji)) return;
+      if (data.type === 'system' || data.type === 'update_profile') return;
 
       const isSelf = data.name === username;
       const div = document.createElement('div');
       div.className = 'msg ' + (isSelf ? 'self' : 'other');
 
-      const msgAvatar = data.avatar || data.name.charAt(0).toUpperCase();
+      // 头像
+      const avatarContent = (data.avatar && data.avatar.startsWith('data:image')) 
+        ? `<img src="${data.avatar}" alt="avatar">` 
+        : (data.avatar || data.name.charAt(0).toUpperCase());
+
       const avatarColor = getAvatarColor(data.name);
       const timeStr = data.time ? new Date(data.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
 
+      let contentHtml = '';
+      if (data.text) {
+        contentHtml = data.text;
+      } else if (data.emoji) {
+        contentHtml = `<span class="msg-emoji">${data.emoji}</span>`;
+      } else if (data.image) {
+        contentHtml = `<img src="${data.image}" class="msg-image" onclick="window.open('${data.image}','_blank')">`;
+      }
+
       div.innerHTML = `
-        <div class="avatar" style="background:${avatarColor}">${msgAvatar}</div>
+        <div class="avatar" style="background:${avatarColor}">${avatarContent}</div>
         <div class="content">
           <span class="name">${data.name || '匿名'}</span>
-          ${data.text}
+          ${contentHtml}
           <span class="time">${timeStr}</span>
         </div>
       `;
@@ -1662,27 +2305,115 @@ title: 首页
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    function addSystemMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'msg system';
+      div.textContent = text;
+      const empty = chatMessages.querySelector('.empty-chat');
+      if (empty) empty.remove();
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
     function updateStatus(connected) {
-      if (statusBadge) {
+      const badge = document.querySelector('.chat-header .badge');
+      if (badge) {
+        const label = currentMode === 'ably' ? 'Ably' : 'itty';
         if (connected) {
-          const modeLabel = { ably: 'Ably', pie: 'PieSocket', itty: 'itty-sockets' }[currentMode] || currentMode;
-          statusBadge.textContent = '🟢 在线 (' + modeLabel + ')';
-          statusBadge.style.background = '#22c55e';
+          badge.textContent = '🟢 在线 (' + label + ')';
+          badge.style.background = '#22c55e';
         } else {
-          statusBadge.textContent = '🔴 断开 (' + currentMode.toUpperCase() + ')';
-          statusBadge.style.background = '#e74c3c';
+          badge.textContent = '🔴 断开 (' + label + ')';
+          badge.style.background = '#e74c3c';
         }
+      }
+      modeDisplay.textContent = currentMode === 'ably' ? 'Ably' : 'itty';
+    }
+
+    function updateOnlineList(users) {
+      onlineList.innerHTML = '';
+      if (!users || users.length === 0) {
+        onlineList.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;text-align:center;">暂无在线用户</div>';
+        onlineCount.textContent = '0';
+        return;
+      }
+      users.forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'online-user';
+        const avatarContent = (user.avatar && user.avatar.startsWith('data:image'))
+          ? `<img src="${user.avatar}" alt="avatar">`
+          : (user.avatar || user.name?.charAt(0).toUpperCase() || '?');
+        div.innerHTML = `
+          <div class="avatar-sm" style="background:${getAvatarColor(user.name || '匿名')}">${avatarContent}</div>
+          <span>${user.name || '匿名'}</span>
+          <span class="status-dot"></span>
+        `;
+        onlineList.appendChild(div);
+      });
+      onlineCount.textContent = users.length;
+      roomMemberCount.textContent = users.length + ' 人在线';
+    }
+
+    // ============================================================
+    //  房间切换
+    // ============================================================
+    function switchRoom(roomId) {
+      currentRoom = roomId;
+      // 更新 UI
+      document.querySelectorAll('.chat-room-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.room === roomId);
+      });
+      const roomNames = {
+        'lobby': '🏛️ 公共大厅',
+        'private-1': '🔒 私人房间 1',
+        'private-2': '🔒 私人房间 2'
+      };
+      currentRoomName.innerHTML = `${roomNames[roomId] || roomId} <small id="roomMemberCount">0 人在线</small>`;
+      
+      // 清空消息
+      chatMessages.innerHTML = '<div class="empty-chat">📡 连接中...</div>';
+      
+      // 重新连接
+      reconnectToRoom();
+    }
+
+    // 房间列表点击事件
+    document.querySelectorAll('.chat-room-item').forEach(el => {
+      el.addEventListener('click', function() {
+        if (this.dataset.room === currentRoom) return;
+        switchRoom(this.dataset.room);
+      });
+    });
+
+    // ============================================================
+    //  重连到当前房间
+    // ============================================================
+    function reconnectToRoom() {
+      if (currentMode === 'ably') {
+        if (ablyChannel) {
+          ablyChannel.unsubscribe();
+          ablyChannel.presence.leave();
+        }
+        connectAbly();
+      } else {
+        if (ittyChannel) {
+          ittyChannel.close();
+        }
+        connectItty();
       }
     }
 
     // ============================================================
-    //  Ably 连接 (通过 chat1.haoran54188.ccwu.cc 代理)
+    //  Ably 连接
     // ============================================================
     async function connectAbly() {
-      if (ably) return;
+      if (ably) {
+        try { ably.close(); } catch (_) {}
+        ably = null;
+        ablyChannel = null;
+      }
 
       try {
-        // 动态加载 Ably SDK
         if (typeof Ably === 'undefined') {
           await new Promise((resolve, reject) => {
             const script = document.createElement('script');
@@ -1693,187 +2424,171 @@ title: 首页
           });
         }
 
-        // 通过 Worker 获取 Token
         const tokenResponse = await fetch(ABLY_TOKEN_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientId: username }),
+          body: JSON.stringify({ clientId: username })
         });
 
         if (!tokenResponse.ok) {
-          const err = await tokenResponse.json();
-          throw new Error('获取 Token 失败: ' + (err.error || tokenResponse.status));
+          throw new Error('Token 获取失败');
         }
 
-        const tokenDetails = await tokenResponse.json();
+        const tokenData = await tokenResponse.json();
 
-        ably = new Ably.Realtime({ tokenDetails: tokenDetails });
+        ably = new Ably.Realtime({
+          authCallback: async function(params, callback) {
+            try {
+              const res = await fetch(ABLY_TOKEN_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: username })
+              });
+              const data = await res.json();
+              callback(null, data);
+            } catch (err) {
+              callback(err);
+            }
+          },
+          clientId: username
+        });
 
         ably.connection.on('connected', () => {
           isConnected = true;
           updateStatus(true);
-          const empty = chatMessages.querySelector('.empty-chat');
-          if (empty) empty.remove();
-
-          const joinMsg = {
-            type: 'join',
-            name: username,
-            avatar: avatarText,
-            text: '👋 加入了聊天室 (Ably)',
-            time: Date.now()
-          };
-          ablyChannel.publish('message', joinMsg);
-          addMessageToUI(joinMsg);
-          console.log('✅ Ably 已连接');
+          joinAblyRoom();
         });
 
-        ably.connection.on('failed', (err) => {
-          console.log('❌ Ably 连接失败:', err);
+        ably.connection.on('failed', () => {
           isConnected = false;
           updateStatus(false);
-          if (reconnectTimer) clearTimeout(reconnectTimer);
-          reconnectTimer = setTimeout(() => {
-            if (currentMode === 'ably') connectAbly();
-          }, 3000);
+          scheduleReconnect('ably');
         });
 
         ably.connection.on('closed', () => {
           isConnected = false;
           updateStatus(false);
-          if (reconnectTimer) clearTimeout(reconnectTimer);
-          reconnectTimer = setTimeout(() => {
-            if (currentMode === 'ably') connectAbly();
-          }, 3000);
         });
 
-        ablyChannel = ably.channels.get('chat:global');
+      } catch (e) {
+        console.error('Ably 连接失败:', e);
+        updateStatus(false);
+        scheduleReconnect('ably');
+      }
+    }
 
-        ablyChannel.subscribe('message', (msg) => {
-          const data = msg.data;
-          if (data.name === username && data.type !== 'join') return;
-          if (data.type === 'update_profile') return;
-          addMessageToUI(data);
-        });
+    function joinAblyRoom() {
+      if (!ably) return;
+      
+      const channelName = currentRoom === 'lobby' ? 'chat:lobby' : 'chat:private-' + currentRoom;
+      ablyChannel = ably.channels.get(channelName);
 
-        // 在线状态
-        ablyChannel.presence.subscribe('enter', (presence) => {
-          console.log(`👤 ${presence.clientId} 进入聊天室`);
-        });
-        ablyChannel.presence.enter({ name: username, avatar: avatarText });
+      // 订阅消息
+      ablyChannel.subscribe('message', (msg) => {
+        const data = msg.data;
+        if (data.name === username && data.type !== 'join') return;
+        if (data.type === 'update_profile') return;
+        if (data.type === 'system') {
+          addSystemMessage(data.text);
+          return;
+        }
+        addMessageToUI(data);
+      });
 
-        // 加载历史消息
+      // 在线状态
+      ablyChannel.presence.subscribe('enter', (presence) => {
+        const member = presence.member;
+        if (member.clientId !== username) {
+          addSystemMessage(`👤 ${member.clientId} 进入了房间`);
+        }
+        updatePresenceList();
+      });
+
+      ablyChannel.presence.subscribe('leave', (presence) => {
+        const member = presence.member;
+        if (member.clientId !== username) {
+          addSystemMessage(`👤 ${member.clientId} 离开了房间`);
+        }
+        updatePresenceList();
+      });
+
+      ablyChannel.presence.subscribe('update', () => {
+        updatePresenceList();
+      });
+
+      // 进入房间
+      ablyChannel.presence.enter({ name: username, avatar: avatarData });
+
+      // 加载历史消息
+      setTimeout(async () => {
         try {
           const history = await ablyChannel.history({ limit: 50, direction: 'backwards' });
           const items = history.items;
           for (let i = items.length - 1; i >= 0; i--) {
             const item = items[i];
-            if (item.data && item.data.type !== 'update_profile') {
+            if (item.data && item.data.type !== 'update_profile' && item.data.type !== 'system') {
               addMessageToUI(item.data);
             }
           }
+          if (items.length === 0) {
+            addSystemMessage('💬 欢迎来到 ' + (currentRoom === 'lobby' ? '公共大厅' : '私人房间'));
+          }
         } catch (e) {
-          console.warn('获取历史消息失败:', e);
+          console.warn('历史消息加载失败:', e);
         }
+      }, 500);
 
-      } catch (e) {
-        console.error('Ably 连接失败:', e);
-        updateStatus(false);
-        setTimeout(() => {
-          if (currentMode === 'ably') connectAbly();
-        }, 3000);
-      }
+      // 更新在线列表
+      setTimeout(updatePresenceList, 1000);
+    }
+
+    function updatePresenceList() {
+      if (!ablyChannel) return;
+      ablyChannel.presence.get((err, members) => {
+        if (err) return;
+        const users = members.map(m => ({
+          name: m.data?.name || m.clientId,
+          avatar: m.data?.avatar || ''
+        }));
+        updateOnlineList(users);
+      });
     }
 
     // ============================================================
-    //  PieSocket 连接 (通过 chat2.haoran54188.ccwu.cc 代理)
-    // ============================================================
-    function connectPie() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
-
-      try {
-        ws = new WebSocket(PIESOCKET_URL);
-
-        ws.onopen = function() {
-          isConnected = true;
-          updateStatus(true);
-          const empty = chatMessages.querySelector('.empty-chat');
-          if (empty) empty.remove();
-          ws.send(JSON.stringify({
-            type: 'join',
-            name: username,
-            avatar: avatarText,
-            text: '👋 加入了聊天室 (PieSocket)',
-            time: Date.now()
-          }));
-          console.log('✅ PieSocket 已连接');
-        };
-
-        ws.onmessage = function(e) {
-          try {
-            const data = JSON.parse(e.data);
-            if (data.type === 'ping' || data.type === 'pong' || data.type === 'system') return;
-            if (data.type === 'update_profile') return;
-            addMessageToUI(data);
-          } catch (_) {}
-        };
-
-        ws.onclose = function() {
-          isConnected = false;
-          updateStatus(false);
-          if (reconnectTimer) clearTimeout(reconnectTimer);
-          reconnectTimer = setTimeout(() => {
-            if (currentMode === 'pie') connectPie();
-          }, 3000);
-        };
-
-        ws.onerror = function(err) {
-          console.log('❌ PieSocket 错误:', err);
-        };
-      } catch (e) {
-        console.error('PieSocket 连接失败:', e);
-        setTimeout(() => {
-          if (currentMode === 'pie') connectPie();
-        }, 3000);
-      }
-    }
-
-    // ============================================================
-    //  itty-sockets 连接 (通过 chat3.haoran54188.ccwu.cc 代理)
+    //  itty-sockets 连接
     // ============================================================
     async function connectItty() {
-      if (channel) return;
+      if (ittyChannel) {
+        try { ittyChannel.close(); } catch (_) {}
+        ittyChannel = null;
+      }
 
       try {
         const { connect } = await import('https://cdn.jsdelivr.net/npm/itty-sockets/+esm');
 
-        channel = connect(ITTY_CHANNEL, {
+        const channelName = currentRoom === 'lobby' ? 'itty_lobby' : 'itty_private_' + currentRoom;
+
+        ittyChannel = connect(channelName, {
           as: username,
           echo: true,
           announce: true,
           signaling: ITTY_SIGNALING,
         });
 
-        channel.on('open', () => {
+        ittyChannel.on('open', () => {
           isConnected = true;
           updateStatus(true);
-          const empty = chatMessages.querySelector('.empty-chat');
-          if (empty) empty.remove();
-          channel.send(JSON.stringify({
-            type: 'join',
-            name: username,
-            avatar: avatarText,
-            text: '👋 加入了聊天室 (itty-sockets)',
-            time: Date.now()
-          }));
-          console.log('✅ itty-sockets 已连接');
+          addSystemMessage('💬 欢迎来到 ' + (currentRoom === 'lobby' ? '公共大厅' : '私人房间'));
         });
 
-        channel.on('message', ({ message, alias }) => {
+        ittyChannel.on('message', ({ message, alias }) => {
           try {
             const data = JSON.parse(message);
             if (data.type === 'system' || data.type === 'update_profile') return;
+            if (data.name === username) return;
             addMessageToUI(data);
           } catch (_) {
+            // 纯文本
             const div = document.createElement('div');
             div.className = 'msg other';
             div.innerHTML = `
@@ -1890,24 +2605,19 @@ title: 首页
           }
         });
 
-        channel.on('close', () => {
+        ittyChannel.on('close', () => {
           isConnected = false;
           updateStatus(false);
-          if (reconnectTimer) clearTimeout(reconnectTimer);
-          reconnectTimer = setTimeout(() => {
-            if (currentMode === 'itty') connectItty();
-          }, 3000);
+          scheduleReconnect('itty');
         });
 
-        channel.on('error', (err) => {
-          console.log('❌ itty-sockets 错误:', err);
+        ittyChannel.on('error', (err) => {
+          console.error('itty-sockets 错误:', err);
         });
 
       } catch (e) {
         console.error('itty-sockets 连接失败:', e);
-        setTimeout(() => {
-          if (currentMode === 'itty') connectItty();
-        }, 3000);
+        scheduleReconnect('itty');
       }
     }
 
@@ -1915,51 +2625,47 @@ title: 首页
     //  切换模式
     // ============================================================
     function switchMode(mode) {
+      if (mode === currentMode && isConnected) return;
+      
       currentMode = mode;
       localStorage.setItem('hrsi_chat_mode', mode);
 
-      // 断开当前连接
-      if (ws) {
-        try { ws.close(); } catch (_) {}
-        ws = null;
-      }
-      if (channel) {
-        try { channel.close(); } catch (_) {}
-        channel = null;
-      }
+      // 断开所有连接
       if (ably) {
         try { ably.close(); } catch (_) {}
         ably = null;
         ablyChannel = null;
       }
+      if (ittyChannel) {
+        try { ittyChannel.close(); } catch (_) {}
+        ittyChannel = null;
+      }
       isConnected = false;
       updateStatus(false);
 
-      // 清空消息
-      chatMessages.innerHTML = '<div class="empty-chat">连接中...</div>';
+      chatMessages.innerHTML = '<div class="empty-chat">📡 连接中...</div>';
 
       // 更新按钮样式
-      const ablyBtn = document.getElementById('modeAbly');
-      const pieBtn = document.getElementById('modePie');
-      const ittyBtn = document.getElementById('modeItty');
-
-      const btns = [ablyBtn, pieBtn, ittyBtn];
-      const ids = ['ably', 'pie', 'itty'];
-      btns.forEach((btn, i) => {
-        const isActive = ids[i] === mode;
+      document.querySelectorAll('.mode-toggle-wrapper button').forEach(btn => {
+        const id = btn.id.replace('mode-', '');
+        const isActive = id === mode;
         btn.style.background = isActive ? '#4c6ef5' : '#fff';
         btn.style.color = isActive ? '#fff' : '#333';
         btn.style.borderColor = isActive ? '#4c6ef5' : '#ccc';
       });
 
-      // 启动对应的连接
       setTimeout(() => {
         if (mode === 'ably') connectAbly();
-        else if (mode === 'pie') connectPie();
-        else if (mode === 'itty') connectItty();
+        else connectItty();
       }, 300);
+    }
 
-      console.log(`🔄 切换到 ${mode}`);
+    function scheduleReconnect(mode) {
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      reconnectTimer = setTimeout(() => {
+        if (mode === 'ably') connectAbly();
+        else connectItty();
+      }, 3000);
     }
 
     // ============================================================
@@ -1967,7 +2673,7 @@ title: 首页
     // ============================================================
     window.sendChat = function() {
       const text = chatInput.value.trim();
-      if (!text) {
+      if (!text && !window._pendingImage) {
         chatInput.focus();
         return;
       }
@@ -1979,21 +2685,30 @@ title: 首页
       const msg = {
         type: 'message',
         name: username,
-        avatar: avatarText,
-        text: text,
+        avatar: avatarData,
+        text: text || '',
         time: Date.now()
       };
 
-      // 自己立即显示
+      // 如果有待发送的图片
+      if (window._pendingImage) {
+        msg.image = window._pendingImage;
+        window._pendingImage = null;
+      }
+
+      // 检查是否是 Emoji
+      if (text && /^[\u{1F600}-\u{1F9FF}\u{2600}-\u{27BF}\u{FE0F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}]+$/u.test(text) && text.length <= 4) {
+        msg.emoji = text;
+        msg.text = '';
+      }
+
       addMessageToUI(msg);
 
-      // 根据模式发送
+      // 发送
       if (currentMode === 'ably' && ablyChannel) {
         ablyChannel.publish('message', msg).catch(console.error);
-      } else if (currentMode === 'pie' && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(msg));
-      } else if (currentMode === 'itty' && channel) {
-        channel.send(JSON.stringify(msg));
+      } else if (currentMode === 'itty' && ittyChannel) {
+        ittyChannel.send(JSON.stringify(msg));
       }
 
       chatInput.value = '';
@@ -2001,35 +2716,82 @@ title: 首页
     };
 
     // ============================================================
-    //  更新资料
+    //  发送图片
     // ============================================================
-    window.updateChatProfile = function() {
-      const newName = chatNameInput.value.trim();
-      const newAvatar = chatAvatarInput.value.trim() || newName.charAt(0).toUpperCase();
+    window.sendImage = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        window._pendingImage = e.target.result;
+        window.sendChat();
+        event.target.value = '';
+      };
+      reader.readAsDataURL(file);
+    };
 
+    // ============================================================
+    //  Emoji 面板
+    // ============================================================
+    window.toggleEmoji = function() {
+      emojiPicker.classList.toggle('open');
+    };
+
+    document.querySelectorAll('.emoji-picker span').forEach(el => {
+      el.addEventListener('click', function() {
+        chatInput.value += this.textContent;
+        chatInput.focus();
+        emojiPicker.classList.remove('open');
+      });
+    });
+
+    // ============================================================
+    //  设置面板
+    // ============================================================
+    window.toggleSettings = function() {
+      settingsPanel.classList.toggle('open');
+    };
+
+    window.previewSettingsAvatar = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        settingsAvatarPreview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        window._newAvatarData = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.saveSettings = function() {
+      const newName = settingsName.value.trim();
       if (newName) {
         username = newName;
-        localStorage.setItem('hrsi_chat_username_v2', username);
+        localStorage.setItem('hrsi_chat_username_v3', username);
       }
-      if (newAvatar) {
-        avatarText = newAvatar.charAt(0).toUpperCase();
-        localStorage.setItem('hrsi_chat_avatar_v2', avatarText);
+      if (window._newAvatarData) {
+        avatarData = window._newAvatarData;
+        localStorage.setItem('hrsi_chat_avatar_v3', avatarData);
+        window._newAvatarData = null;
       }
-
-      updateAvatarPreview(avatarText);
-
-      // 更新 Ably Presence
+      updateAvatarUI(settingsAvatarPreview, avatarData, username);
+      updateChatAvatar();
+      
+      // 更新 Presence
       if (currentMode === 'ably' && ablyChannel && isConnected) {
-        ablyChannel.presence.update({ name: username, avatar: avatarText });
+        ablyChannel.presence.update({ name: username, avatar: avatarData });
       }
 
-      if (statusBadge) {
-        statusBadge.textContent = '✅ 已更新';
-        statusBadge.style.background = '#22c55e';
-        setTimeout(() => {
-          updateStatus(isConnected);
-        }, 1500);
-      }
+      settingsPanel.classList.remove('open');
+      addSystemMessage('✅ 设置已更新');
+    };
+
+    // ============================================================
+    //  侧边栏切换（移动端）
+    // ============================================================
+    window.toggleSidebar = function(side) {
+      const el = document.getElementById(side === 'left' ? 'chatSidebarLeft' : 'chatSidebarRight');
+      el.classList.toggle('mobile-show');
     };
 
     // ============================================================
@@ -2043,27 +2805,57 @@ title: 首页
     });
 
     // ============================================================
+    //  创建切换按钮
+    // ============================================================
+    function createModeToggle() {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mode-toggle-wrapper';
+      wrapper.style.cssText = 'display:flex;gap:0.3rem;align-items:center;';
+      
+      ['ably', 'itty'].forEach(mode => {
+        const btn = document.createElement('button');
+        btn.id = 'mode-' + mode;
+        btn.textContent = mode === 'ably' ? 'Ably' : 'Itty';
+        btn.style.cssText = `
+          padding: 0.1rem 0.5rem;
+          border-radius: 4px;
+          border: 1px solid ${currentMode === mode ? '#4c6ef5' : '#ccc'};
+          background: ${currentMode === mode ? '#4c6ef5' : '#fff'};
+          color: ${currentMode === mode ? '#fff' : '#333'};
+          font-size: 0.7rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        `;
+        btn.addEventListener('click', () => switchMode(mode));
+        wrapper.appendChild(btn);
+      });
+
+      const header = document.querySelector('.chat-main-header .header-actions');
+      if (header) {
+        header.appendChild(wrapper);
+      }
+    }
+
+    // ============================================================
     //  启动
     // ============================================================
-    // 根据保存的模式启动
+    createModeToggle();
+
     if (currentMode === 'ably') {
       setTimeout(connectAbly, 300);
-    } else if (currentMode === 'pie') {
-      setTimeout(connectPie, 300);
     } else {
       setTimeout(connectItty, 300);
     }
 
-    console.log('💬 三服务聊天室已启动');
+    console.log('💬 完整聊天室已启动');
     console.log('👤 用户:', username);
-    console.log('🔄 当前模式:', currentMode);
-    console.log('🔗 Ably 代理: chat1.haoran54188.ccwu.cc');
-    console.log('🔗 PieSocket 代理: chat2.haoran54188.ccwu.cc');
-    console.log('🔗 itty-sockets 代理: chat3.haoran54188.ccwu.cc');
+    console.log('🔧 模式:', currentMode);
+    console.log('📋 房间:', currentRoom);
 
-    window.reconnectChat = function() {
-      switchMode(currentMode);
-    };
+    // 暴露全局函数
+    window.switchMode = switchMode;
+    window.reconnectChat = reconnectToRoom;
+
   })();
 </script>
 
