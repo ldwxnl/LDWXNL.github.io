@@ -1552,7 +1552,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (纯 Ably，修复重复发送) ===== -->
+<!-- ===== 聊天室脚本 (纯 Ably，最精简) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1571,6 +1571,7 @@ title: 首页
     let isConnected = false;
     let reconnectTimer = null;
 
+    // 用户名
     let username = localStorage.getItem('chat_username') || '访客_' + Math.floor(Math.random() * 10000);
 
     const chatMessages = document.getElementById('chatMessages');
@@ -1767,7 +1768,7 @@ title: 首页
     // ============================================================
     //  发送消息
     // ============================================================
-    function sendMessage() {
+    window.sendChat = function() {
       const text = chatInput.value.trim();
       if (!text) {
         chatInput.focus();
@@ -1785,17 +1786,17 @@ title: 首页
       };
 
       addMessageToUI(msg);
-
       ablyChannel.publish('message', msg).catch(console.error);
 
+      // ✅ 清空输入框
       chatInput.value = '';
       chatInput.focus();
-    }
+    };
 
     // ============================================================
     //  更新资料（改名）
     // ============================================================
-    function updateProfile() {
+    window.updateChatProfile = function() {
       const newName = chatNameInput.value.trim();
       if (!newName) {
         alert('请输入昵称');
@@ -1816,7 +1817,7 @@ title: 首页
       } else {
         applyNameChange(newName);
       }
-    }
+    };
 
     function applyNameChange(newName) {
       const oldName = username;
@@ -1846,24 +1847,23 @@ title: 首页
     }
 
     // ============================================================
-    //  ✅ 修复：只绑定一次 Enter 事件
+    //  键盘事件（只绑定一次，不会重复发送）
     // ============================================================
-    // 方式1：直接在 HTML 中用 onkeydown（推荐）
-    // <input id="chatInput" onkeydown="if(event.key==='Enter'){event.preventDefault();sendMessage();}">
-    
-    // 方式2：用 addEventListener（只绑定一次）
     chatInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        sendMessage();
+        window.sendChat();
       }
     });
 
     // ============================================================
-    //  暴露全局函数（供 HTML onclick 调用）
+    //  启动
     // ============================================================
-    window.sendMessage = sendMessage;
-    window.updateProfile = updateProfile;
+    setTimeout(connectAbly, 300);
+
+    console.log('💬 聊天室已启动');
+    console.log('👤 用户:', username);
+
     window.reconnectChat = function() {
       if (ably) {
         try { ably.close(); } catch (_) {}
@@ -1873,14 +1873,6 @@ title: 首页
       isConnected = false;
       connectAbly();
     };
-
-    // ============================================================
-    //  启动
-    // ============================================================
-    setTimeout(connectAbly, 300);
-
-    console.log('💬 聊天室已启动');
-    console.log('👤 用户:', username);
 
   })();
 </script>
