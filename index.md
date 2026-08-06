@@ -1552,7 +1552,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (纯 Ably，最精简) ===== -->
+<!-- ===== 聊天室脚本 (纯 Ably，修复重复发送) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1571,7 +1571,6 @@ title: 首页
     let isConnected = false;
     let reconnectTimer = null;
 
-    // 用户名
     let username = localStorage.getItem('chat_username') || '访客_' + Math.floor(Math.random() * 10000);
 
     const chatMessages = document.getElementById('chatMessages');
@@ -1699,7 +1698,6 @@ title: 首页
           const empty = chatMessages.querySelector('.empty-chat');
           if (empty) empty.remove();
 
-          // 发送加入消息，但不在自己窗口显示
           ablyChannel.publish('message', {
             type: 'system',
             text: '👋 ' + username + ' 加入了聊天室',
@@ -1724,23 +1722,19 @@ title: 首页
 
         ablyChannel = ably.channels.get(CHANNEL_NAME);
 
-        // 接收消息
         ablyChannel.subscribe('message', (msg) => {
           const data = msg.data;
           
-          // 系统消息直接显示
           if (data.type === 'system') {
             addSystemMessage(data.text);
             return;
           }
           
-          // 自己发的消息不重复显示（已经在发送时显示过了）
           if (data.name === username) return;
           
           addMessageToUI(data);
         });
 
-        // 加载历史消息
         setTimeout(async () => {
           try {
             const history = await ablyChannel.history({ limit: 30, direction: 'backwards' });
@@ -1773,7 +1767,7 @@ title: 首页
     // ============================================================
     //  发送消息
     // ============================================================
-    window.sendChat = function() {
+    function sendMessage() {
       const text = chatInput.value.trim();
       if (!text) {
         chatInput.focus();
@@ -1790,27 +1784,24 @@ title: 首页
         time: Date.now()
       };
 
-      // 自己立即显示
       addMessageToUI(msg);
 
-      // 发送到频道（其他人会收到）
       ablyChannel.publish('message', msg).catch(console.error);
 
       chatInput.value = '';
       chatInput.focus();
-    };
+    }
 
     // ============================================================
     //  更新资料（改名）
     // ============================================================
-    window.updateChatProfile = function() {
+    function updateProfile() {
       const newName = chatNameInput.value.trim();
       if (!newName) {
         alert('请输入昵称');
         return;
       }
 
-      // 检查是否重名（通过 Presence 检查）
       if (ablyChannel && isConnected) {
         ablyChannel.presence.get((err, members) => {
           if (err) return;
@@ -1825,7 +1816,7 @@ title: 首页
       } else {
         applyNameChange(newName);
       }
-    };
+    }
 
     function applyNameChange(newName) {
       const oldName = username;
@@ -1833,11 +1824,9 @@ title: 首页
       localStorage.setItem('chat_username', username);
       chatNameInput.value = username;
 
-      // 更新头像预览
       chatAvatarPreview.textContent = username.charAt(0).toUpperCase();
       chatAvatarPreview.style.background = getAvatarColor(username);
 
-      // 更新 Presence
       if (ablyChannel && isConnected) {
         ablyChannel.presence.update({ name: username });
         ablyChannel.publish('message', {
@@ -1857,23 +1846,24 @@ title: 首页
     }
 
     // ============================================================
-    //  键盘事件
+    //  ✅ 修复：只绑定一次 Enter 事件
     // ============================================================
-    chatInput.addEventListener('keydown', (e) => {
+    // 方式1：直接在 HTML 中用 onkeydown（推荐）
+    // <input id="chatInput" onkeydown="if(event.key==='Enter'){event.preventDefault();sendMessage();}">
+    
+    // 方式2：用 addEventListener（只绑定一次）
+    chatInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        window.sendChat();
+        sendMessage();
       }
     });
 
     // ============================================================
-    //  启动
+    //  暴露全局函数（供 HTML onclick 调用）
     // ============================================================
-    setTimeout(connectAbly, 300);
-
-    console.log('💬 聊天室已启动');
-    console.log('👤 用户:', username);
-
+    window.sendMessage = sendMessage;
+    window.updateProfile = updateProfile;
     window.reconnectChat = function() {
       if (ably) {
         try { ably.close(); } catch (_) {}
@@ -1883,6 +1873,14 @@ title: 首页
       isConnected = false;
       connectAbly();
     };
+
+    // ============================================================
+    //  启动
+    // ============================================================
+    setTimeout(connectAbly, 300);
+
+    console.log('💬 聊天室已启动');
+    console.log('👤 用户:', username);
 
   })();
 </script>
