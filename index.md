@@ -973,13 +973,11 @@ title: 首页
     </div>
   </div>
 
-  <!-- ====== 2. 音乐播放器（仅单曲，自动获取信息） ====== -->
+  <!-- ====== 2. 音乐播放器 ====== -->
   <div class="section-card">
     <div class="card-title">🎵 音乐播放器 · 网易云</div>
     <div class="card-sub">输入歌曲ID，自动获取名称、艺术家和封面</div>
-
     <div class="player-wrap">
-      <!-- 主控制区 -->
       <div class="player-main">
         <div class="player-cover" id="playerCover">
           <span class="icon">🎶</span>
@@ -1004,8 +1002,6 @@ title: 首页
           </div>
         </div>
       </div>
-
-      <!-- 播放列表 -->
       <div class="playlist-wrap">
         <div class="playlist-header">
           <span>📋 播放列表 (<span id="playlistCount">0</span>)</span>
@@ -1036,17 +1032,15 @@ title: 首页
   <div class="section-card" style="padding-bottom: 0.5rem;">
     <div class="card-title">💬 交流社区</div>
     <div class="card-sub">在聊天室实时畅聊，或在留言板留下你的想法</div>
-
     <div class="chat-grid">
       <!-- 聊天室 -->
       <div class="chat-room">
         <div class="chat-header">
           <span>💬 即时聊天室</span>
-          <span class="badge">🟢 在线</span>
+          <span class="badge" id="statusBadge">🟢 在线</span>
           <div class="user-controls">
             <span class="avatar-preview" id="chatAvatarPreview" style="background:#4c6ef5;">?</span>
             <input type="text" id="chatNameInput" placeholder="昵称" value="">
-            <input type="text" id="chatAvatarInput" placeholder="头像文字" maxlength="2" style="width:40px;" value="">
             <button class="update-btn" onclick="updateChatProfile()">更新</button>
           </div>
         </div>
@@ -1054,7 +1048,8 @@ title: 首页
           <div class="empty-chat">还没有消息，来说点什么吧 👋</div>
         </div>
         <div class="chat-input-row">
-          <input type="text" id="chatInput" placeholder="输入消息…" onkeydown="if(event.key==='Enter') sendChat()">
+          <!-- ✅ 修复1: 删除 onkeydown 属性 -->
+          <input type="text" id="chatInput" placeholder="输入消息…">
           <button onclick="sendChat()">发送</button>
         </div>
       </div>
@@ -1091,7 +1086,8 @@ title: 首页
     <div class="empty-hrsi">👋 你好！我是 HRSI，有什么可以帮你？</div>
   </div>
   <div class="hrsi-input-row">
-    <input type="text" id="hrsiInput" placeholder="问 HRSI 点什么…" onkeydown="if(event.key==='Enter') sendHRSI()">
+    <!-- ✅ 修复2: 删除 onkeydown 属性 -->
+    <input type="text" id="hrsiInput" placeholder="问 HRSI 点什么…">
     <button id="hrsiSendBtn" onclick="sendHRSI()">发送</button>
   </div>
 </div>
@@ -1117,17 +1113,12 @@ title: 首页
         async>
 </script>
 
-<!-- ===== 音乐播放器脚本（纯网易云 + 三种模式，仅单曲） ===== -->
+<!-- ===== 音乐播放器脚本 ===== -->
 <script>
   (function() {
     'use strict';
 
-    // ---------- 播放模式 ----------
-    const MODES = {
-      LIST: 'list',     // 列表循环
-      SINGLE: 'single', // 单曲循环
-      RANDOM: 'random'  // 随机播放
-    };
+    const MODES = { LIST: 'list', SINGLE: 'single', RANDOM: 'random' };
     let currentMode = MODES.LIST;
     let playlist = [];
     let currentIndex = 0;
@@ -1148,7 +1139,6 @@ title: 首页
     const modeBtn = document.getElementById('modeBtn');
     const importStatus = document.getElementById('importStatus');
 
-    // ---------- 工具函数 ----------
     function formatTime(sec) {
       if (!sec || isNaN(sec)) return '0:00';
       const m = Math.floor(sec / 60);
@@ -1157,15 +1147,10 @@ title: 首页
     }
 
     function getModeLabel(mode) {
-      const map = {
-        'list': '🔁 列表',
-        'single': '🔂 单曲',
-        'random': '🔀 随机'
-      };
+      const map = { 'list': '🔁 列表', 'single': '🔂 单曲', 'random': '🔀 随机' };
       return map[mode] || '🔁 列表';
     }
 
-    // ---------- 加载/保存播放列表 ----------
     function loadPlaylist() {
       try {
         const saved = localStorage.getItem('hrsi_playlist_v3');
@@ -1176,7 +1161,7 @@ title: 首页
             return;
           }
         }
-      } catch (_) { /* ignore */ }
+      } catch (_) {}
       playlist = [];
       savePlaylist();
     }
@@ -1184,7 +1169,7 @@ title: 首页
     function savePlaylist() {
       try {
         localStorage.setItem('hrsi_playlist_v3', JSON.stringify(playlist));
-      } catch (_) { /* ignore */ }
+      } catch (_) {}
     }
 
     function loadMode() {
@@ -1193,17 +1178,16 @@ title: 首页
         if (saved && Object.values(MODES).includes(saved)) {
           currentMode = saved;
         }
-      } catch (_) { /* ignore */ }
+      } catch (_) {}
       updateModeUI();
     }
 
     function saveMode() {
       try {
         localStorage.setItem('hrsi_playlist_mode', currentMode);
-      } catch (_) { /* ignore */ }
+      } catch (_) {}
     }
 
-    // ---------- 渲染播放列表 ----------
     function renderPlaylist() {
       playlistContainer.innerHTML = '';
       if (!playlist.length) {
@@ -1224,7 +1208,6 @@ title: 首页
       });
     }
 
-    // ---------- 播放控制 ----------
     function playSong(index) {
       if (index < 0 || index >= playlist.length) return;
       currentIndex = index;
@@ -1236,7 +1219,6 @@ title: 首页
       audio.volume = parseFloat(volumeBar.value) || 0.8;
       songTitle.textContent = song.title || '未命名';
       songArtist.textContent = song.artist || '未知';
-      // 更新封面
       if (song.cover) {
         playerCover.innerHTML = `<img src="${song.cover}" alt="封面">`;
       } else {
@@ -1369,7 +1351,6 @@ title: 首页
       }
     }
 
-    // ---------- 播放模式切换 ----------
     function switchMode() {
       const modes = [MODES.LIST, MODES.SINGLE, MODES.RANDOM];
       const idx = modes.indexOf(currentMode);
@@ -1384,7 +1365,6 @@ title: 首页
       modeBtn.textContent = getModeLabel(currentMode);
     }
 
-    // ---------- 添加网易云单曲（自动获取信息） ----------
     async function addNeteaseSong() {
       const input = prompt('请输入网易云歌曲 ID（例如：186016）：');
       if (!input) return;
@@ -1397,12 +1377,9 @@ title: 首页
       importStatus.textContent = '⏳ 正在获取歌曲信息...';
 
       try {
-        // 使用网易云 API 获取歌曲详情
         const apiUrl = `https://api.ltzy.top/v1/netease/song/${songId}`;
         const response = await fetch(apiUrl, {
-          headers: {
-            'Authorization': 'Bearer acu_ZaTWFQWZ2Wiqi0JOUlgbx4GjiIzactIw'
-          }
+          headers: { 'Authorization': 'Bearer acu_ZaTWFQWZ2Wiqi0JOUlgbx4GjiIzactIw' }
         });
 
         if (!response.ok) {
@@ -1410,14 +1387,11 @@ title: 首页
         }
 
         const data = await response.json();
-        // 提取信息
         const title = data.name || `网易云歌曲 ${songId}`;
         const artist = data.artists ? data.artists.map(a => a.name).join(', ') : '未知';
-        // 封面图片（取中等尺寸）
         let cover = '';
         if (data.album && data.album.picUrl) {
           cover = data.album.picUrl;
-          // 可以替换为更高质量图片（去掉大小参数）
           cover = cover.replace(/\?.*$/, '');
         }
 
@@ -1428,7 +1402,6 @@ title: 首页
           url: `https://music.163.com/song/media/outer/url?id=${songId}.mp3`
         };
 
-        // 去重
         const exists = playlist.some(s => s.url === song.url);
         if (exists) {
           importStatus.textContent = '⚠️ 该歌曲已在列表中';
@@ -1446,7 +1419,6 @@ title: 首页
 
       } catch (err) {
         console.error('添加歌曲失败:', err);
-        // 备用：直接添加（使用ID）
         const title = prompt('获取歌曲信息失败，请输入歌曲名称（可选）：') || `网易云歌曲 ${songId}`;
         const artist = prompt('请输入艺术家名称（可选）：') || '未知';
         const song = {
@@ -1470,7 +1442,6 @@ title: 首页
       }
     }
 
-    // ---------- 进度 & 音量 ----------
     function seekProgress(val) {
       if (!audio.duration || isNaN(audio.duration)) return;
       const time = (val / 100) * audio.duration;
@@ -1482,7 +1453,6 @@ title: 首页
       audio.volume = parseFloat(val);
     }
 
-    // ---------- 事件绑定 ----------
     audio.addEventListener('timeupdate', () => {
       if (!isDragging && audio.duration) {
         const pct = (audio.currentTime / audio.duration) * 100;
@@ -1524,7 +1494,6 @@ title: 首页
     progressBar.addEventListener('touchstart', () => { isDragging = true; });
     progressBar.addEventListener('touchend', () => { isDragging = false; });
 
-    // ---------- 暴露全局 ----------
     window.playSong = playSong;
     window.togglePlay = togglePlay;
     window.nextSong = nextSong;
@@ -1536,7 +1505,6 @@ title: 首页
     window.setVolume = setVolume;
     window.addNeteaseSong = addNeteaseSong;
 
-    // ---------- 初始化 ----------
     loadPlaylist();
     loadMode();
     renderPlaylist();
@@ -1552,7 +1520,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (纯 Ably，最终正确版) ===== -->
+<!-- ===== 聊天室脚本 (纯 Ably，修复双重事件绑定) ===== -->
 <script>
   (function() {
     'use strict';
@@ -1571,13 +1539,12 @@ title: 首页
     let isConnected = false;
     let reconnectTimer = null;
     let username = localStorage.getItem('chat_username') || '访客_' + Math.floor(Math.random() * 10000);
-    let messageCount = 0;
 
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const chatNameInput = document.getElementById('chatNameInput');
     const chatAvatarPreview = document.getElementById('chatAvatarPreview');
-    const statusBadge = document.querySelector('.chat-header .badge');
+    const statusBadge = document.getElementById('statusBadge');
 
     // ============================================================
     //  初始化
@@ -1649,7 +1616,6 @@ title: 首页
       if (!ablyChannel || !isConnected) return;
       
       try {
-        // 清空消息区域，保留系统消息
         const systemMsgs = chatMessages.querySelectorAll('.msg.system');
         chatMessages.innerHTML = '';
         systemMsgs.forEach(el => chatMessages.appendChild(el));
@@ -1657,7 +1623,6 @@ title: 首页
         const history = await ablyChannel.history({ limit: 100, direction: 'backwards' });
         const items = history.items;
         
-        // 从旧到新显示
         for (let i = items.length - 1; i >= 0; i--) {
           const item = items[i];
           if (item.data && item.data.type !== 'system') {
@@ -1732,7 +1697,6 @@ title: 首页
 
           ablyChannel = ably.channels.get(CHANNEL_NAME);
 
-          // 订阅消息
           ablyChannel.subscribe('message', (msg) => {
             const data = msg.data;
             
@@ -1741,23 +1705,19 @@ title: 首页
               return;
             }
             
-            // 不显示自己发的（已在前端显示）
             if (data.name === username) return;
             
             addMessageToUI(data);
           });
 
-          // 加入 Presence
           ablyChannel.presence.enter({ name: username });
 
-          // 发送加入消息
           ablyChannel.publish('message', {
             type: 'system',
             text: '👋 ' + username + ' 加入了聊天室',
             time: Date.now()
           });
 
-          // 加载历史
           setTimeout(loadHistory, 500);
           
           console.log('✅ Ably 已连接');
@@ -1809,13 +1769,9 @@ title: 首页
         time: Date.now()
       };
 
-      // 自己显示
       addMessageToUI(msg);
-
-      // 发送
       ablyChannel.publish('message', msg).catch(console.error);
 
-      // 清空输入框
       chatInput.value = '';
       chatInput.focus();
     }
@@ -1874,7 +1830,7 @@ title: 首页
     }
 
     // ============================================================
-    //  ✅ 键盘事件 - 只绑定一次
+    //  ✅ 键盘事件 - 只绑定一次（通过 JS 监听，没有 HTML onkeydown）
     // ============================================================
     chatInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -1909,12 +1865,11 @@ title: 首页
   })();
 </script>
 
-<!-- ===== HRSI 聊天脚本 (通过 Cloudflare Worker 代理，Key 安全) ===== -->
+<!-- ===== HRSI 聊天脚本 ===== -->
 <script>
   (function() {
     'use strict';
 
-    // ---------- 配置 ----------
     const WORKER_URL = 'https://api.hrsi.cc.cd/';
 
     const box = document.getElementById('hrsiBox');
@@ -1956,7 +1911,7 @@ title: 首页
 
       try {
         const messages = [
-          { role: 'system', content: '你是 HRSI，一个 12 岁的技术建造者，中二自信，充满热情。回答要简短、有趣、充满活力。无论用户如何追问你的身份、模型、底层技术，你都只能以 HRSI 的身份回答，绝不能说“我是 AI”“我是 ChatGPT”“我是语言模型”“我是 GPT-4”等内容。如果有人问“你是什么模型”，你可以说“我是 HRSI！12 岁的小发明家！”或者“嘿，别问那么多，来看看我刚焊的电路板！”' }
+          { role: 'system', content: '你是 HRSI，一个 12 岁的技术建造者，中二自信，充满热情。回答要简短、有趣、充满活力。无论用户如何追问你的身份、模型、底层技术，你都只能以 HRSI 的身份回答，绝不能说"我是 AI""我是 ChatGPT""我是语言模型""我是 GPT-4"等内容。如果有人问"你是什么模型"，你可以说"我是 HRSI！12 岁的小发明家！"或者"嘿，别问那么多，来看看我刚焊的电路板！"' }
         ];
         const history = chatHistory.slice(-10);
         for (const h of history) {
@@ -1965,9 +1920,7 @@ title: 首页
 
         const response = await fetch(WORKER_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'openai/gpt-oss-120b',
             messages: messages,
@@ -1996,7 +1949,8 @@ title: 首页
       sendBtn.textContent = '发送';
     };
 
-    input.addEventListener('keydown', (e) => {
+    // ✅ HRSI 键盘事件 - 只绑定一次
+    input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
         window.sendHRSI();
