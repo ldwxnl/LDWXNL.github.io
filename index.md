@@ -1954,7 +1954,7 @@ title: 首页
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'openai/gpt-oss-120b',
+            model: 'Agnes-2.5-Flash',
             messages: messages,
             temperature: 0.8,
             max_tokens: 200,
