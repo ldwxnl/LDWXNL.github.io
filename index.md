@@ -20,8 +20,6 @@ title: 首页
     --radius: 16px;
     --radius-sm: 10px;
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --success: #22c55e;
-    --danger: #e74c3c;
   }
 
   /* ===== 页面主容器 ===== */
@@ -677,11 +675,7 @@ title: 首页
     min-height: 320px;
   }
 
-  /* ============================================================ */
-  /* ===== HRSI 辅导助手（完整版） ===== */
-  /* ============================================================ */
-
-  /* HRSI 聊天按钮 */
+  /* ===== HRSI 聊天按钮 ===== */
   .hrsi-toggle {
     position: fixed;
     bottom: 24px;
@@ -712,18 +706,18 @@ title: 首页
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--success);
+    background: #22c55e;
     border: 2px solid #fff;
   }
 
-  /* HRSI 聊天框 */
+  /* ===== HRSI 聊天框 ===== */
   .hrsi-box {
     position: fixed;
     bottom: 92px;
     right: 24px;
-    width: 420px;
+    width: 380px;
     max-width: calc(100vw - 48px);
-    height: 520px;
+    height: 460px;
     max-height: calc(100vh - 120px);
     background: #1a1a2e;
     border-radius: var(--radius);
@@ -744,7 +738,6 @@ title: 首页
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   .hrsi-box .hrsi-header {
     background: var(--primary);
     padding: 0.7rem 1rem;
@@ -774,22 +767,21 @@ title: 首页
     opacity: 1;
     transform: rotate(90deg);
   }
-
   .hrsi-box .hrsi-msgs {
     flex: 1;
     overflow-y: auto;
     padding: 0.8rem 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
     background: #16213e;
   }
   .hrsi-box .hrsi-msgs .msg {
-    max-width: 88%;
-    padding: 0.5rem 0.9rem;
+    max-width: 85%;
+    padding: 0.4rem 0.8rem;
     border-radius: 12px;
     font-size: 0.88rem;
-    line-height: 1.6;
+    line-height: 1.5;
     animation: fade-in 0.25s ease;
   }
   .hrsi-box .hrsi-msgs .msg.user {
@@ -810,29 +802,12 @@ title: 首页
     display: block;
     margin-bottom: 0.1rem;
   }
-  .hrsi-box .hrsi-msgs .msg .image-preview {
-    max-width: 150px;
-    max-height: 120px;
-    border-radius: 6px;
-    margin-top: 4px;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
   .hrsi-box .hrsi-msgs .empty-hrsi {
     color: rgba(255,255,255,0.3);
     font-size: 0.85rem;
     text-align: center;
     padding: 2rem 0;
-    line-height: 2;
   }
-  .hrsi-box .hrsi-msgs .empty-hrsi .big {
-    font-size: 2.4rem;
-    display: block;
-    margin-bottom: 0.5rem;
-  }
-  .hrsi-box .hrsi-msgs .empty-hrsi .highlight {
-    color: var(--primary-light);
-  }
-
   .hrsi-box .hrsi-input-row {
     display: flex;
     gap: 0.5rem;
@@ -840,148 +815,45 @@ title: 首页
     border-top: 1px solid rgba(255,255,255,0.06);
     background: #1a1a2e;
     flex-shrink: 0;
-    flex-wrap: wrap;
   }
-  .hrsi-box .hrsi-input-row .input-wrap {
-    flex: 1;
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-end;
-    min-width: 150px;
-  }
-  .hrsi-box .hrsi-input-row textarea {
+  .hrsi-box .hrsi-input-row input {
     flex: 1;
     border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
     font-size: 0.85rem;
     outline: none;
     background: #0f0f1f;
     color: #eee;
     transition: var(--transition);
-    resize: none;
-    font-family: inherit;
-    min-height: 36px;
-    max-height: 80px;
-    line-height: 1.5;
   }
-  .hrsi-box .hrsi-input-row textarea:focus {
+  .hrsi-box .hrsi-input-row input:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.15);
   }
-  .hrsi-box .hrsi-input-row textarea::placeholder {
+  .hrsi-box .hrsi-input-row input::placeholder {
     color: #666;
   }
-
-  .hrsi-box .hrsi-input-row .toolbar {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  .hrsi-box .hrsi-input-row .toolbar button {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    color: #aaa;
-    font-size: 14px;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .hrsi-box .hrsi-input-row .toolbar button:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    border-color: var(--primary);
-  }
-
-  .hrsi-box .hrsi-input-row .send-btn {
+  .hrsi-box .hrsi-input-row button {
     background: var(--primary);
     color: #fff;
     border: none;
     border-radius: 20px;
-    padding: 0.4rem 1.2rem;
+    padding: 0.4rem 1rem;
     font-weight: 500;
     font-size: 0.8rem;
     cursor: pointer;
     transition: var(--transition);
-    height: 34px;
-    white-space: nowrap;
-    flex-shrink: 0;
   }
-  .hrsi-box .hrsi-input-row .send-btn:hover {
+  .hrsi-box .hrsi-input-row button:hover {
     background: var(--primary-dark);
   }
-  .hrsi-box .hrsi-input-row .send-btn:disabled {
+  .hrsi-box .hrsi-input-row button:disabled {
     opacity: 0.4;
     cursor: not-allowed;
   }
 
-  .hrsi-box .hrsi-input-row .image-preview-bar {
-    display: none;
-    gap: 6px;
-    align-items: center;
-    padding: 4px 10px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.06);
-    width: 100%;
-    flex-wrap: wrap;
-  }
-  .hrsi-box .hrsi-input-row .image-preview-bar.show {
-    display: flex;
-  }
-  .hrsi-box .hrsi-input-row .image-preview-bar .thumb {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    object-fit: cover;
-  }
-  .hrsi-box .hrsi-input-row .image-preview-bar .info {
-    font-size: 11px;
-    color: #888;
-    flex: 1;
-  }
-  .hrsi-box .hrsi-input-row .image-preview-bar .remove-btn {
-    background: none;
-    border: none;
-    color: var(--danger);
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .hrsi-box .hrsi-context-info {
-    font-size: 10px;
-    color: #555;
-    padding: 0 10px 4px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
-    background: #1a1a2e;
-  }
-  .hrsi-box .hrsi-context-info .clear-btn {
-    background: none;
-    border: none;
-    color: #555;
-    cursor: pointer;
-    font-size: 10px;
-    text-decoration: underline;
-    transition: color 0.2s;
-  }
-  .hrsi-box .hrsi-context-info .clear-btn:hover {
-    color: var(--danger);
-  }
-
-  #hrsiFileInput {
-    display: none;
-  }
-
-  /* ===== 响应式 ===== */
+  /* ===== 响应式微调 ===== */
   @media (max-width: 640px) {
     .page-wrapper {
       padding: 1rem 0.8rem 3rem;
@@ -1026,7 +898,7 @@ title: 首页
       width: calc(100vw - 32px);
       right: 16px;
       bottom: 80px;
-      height: 440px;
+      height: 400px;
     }
     .explore-btn {
       padding: 0.6rem 1.4rem;
@@ -1048,15 +920,9 @@ title: 首页
       width: 60px;
       font-size: 0.65rem;
     }
-    .hrsi-box .hrsi-input-row textarea {
-      font-size: 0.8rem;
-    }
-    .hrsi-box .hrsi-input-row .send-btn {
-      font-size: 0.7rem;
-      padding: 0.3rem 0.8rem;
-    }
   }
 
+  /* ===== 自定义滚动条 ===== */
   .chat-messages::-webkit-scrollbar,
   .hrsi-msgs::-webkit-scrollbar,
   .playlist-items::-webkit-scrollbar {
@@ -1073,6 +939,7 @@ title: 首页
     background: transparent;
   }
 
+  /* ===== 分割线 ===== */
   .divider {
     border: none;
     border-top: 2px solid #edf0f5;
@@ -1202,49 +1069,25 @@ title: 首页
 </div>
 
 <!-- ============================================================ -->
-<!-- HRSI 聊天按钮 & 聊天框（完整整合版） -->
+<!-- HRSI 聊天按钮 & 聊天框 -->
 <!-- ============================================================ -->
-<button class="hrsi-toggle" id="hrsiToggle" onclick="toggleHRSI()" title="HRSI AI 辅导助手">
+<button class="hrsi-toggle" id="hrsiToggle" onclick="toggleHRSI()" title="HRSI AI 助手">
   🤖
   <span class="badge-dot"></span>
 </button>
 
 <div class="hrsi-box" id="hrsiBox">
   <div class="hrsi-header">
-    <span>🔥 HRSI · 小白辅导</span>
+    <span>🔥 HRSI AI 助手</span>
     <button class="close-btn" onclick="toggleHRSI()">✕</button>
   </div>
-
   <div class="hrsi-msgs" id="hrsiMsgs">
-    <div class="empty-hrsi">
-      <span class="big">🤖</span>
-      我是 <span class="highlight">HRSI</span>，你的技术辅导助手。<br>
-      有问题尽管问，不管多小白都能给你讲明白。<br>
-      <span style="font-size:0.75rem;opacity:0.6;">📸 支持上传图片 · 💬 记忆最近 100 轮对话</span>
-    </div>
+    <div class="empty-hrsi">👋 你好！我是 HRSI，有什么可以帮你？</div>
   </div>
-
   <div class="hrsi-input-row">
-    <div class="input-wrap">
-      <textarea id="hrsiInput" rows="1" placeholder="输入你的问题…"></textarea>
-      <div class="toolbar">
-        <button id="hrsiUploadBtn" title="上传图片">🖼️</button>
-      </div>
-      <button class="send-btn" id="hrsiSendBtn">发送</button>
-    </div>
-    <div class="image-preview-bar" id="hrsiImagePreviewBar">
-      <img class="thumb" id="hrsiImageThumb" src="" alt="预览">
-      <span class="info" id="hrsiImageInfo">图片已上传</span>
-      <button class="remove-btn" onclick="clearHRSIImage()">✕</button>
-    </div>
+    <input type="text" id="hrsiInput" placeholder="问 HRSI 点什么…">
+    <button id="hrsiSendBtn" onclick="sendHRSI()">发送</button>
   </div>
-
-  <div class="hrsi-context-info">
-    <span id="hrsiContextCount">💬 0 / 100 轮对话</span>
-    <button class="clear-btn" onclick="clearHRSIChat()">清空历史</button>
-  </div>
-
-  <input type="file" id="hrsiFileInput" accept="image/*">
 </div>
 
 <!-- ============================================================ -->
@@ -1270,243 +1113,841 @@ title: 首页
 
 <!-- ===== 音乐播放器脚本 ===== -->
 <script>
-  // ...（音乐播放器代码保持不变，已在上面的完整页面中）
-  // 为节省篇幅，此处省略，实际部署时保留完整音乐播放器脚本
+  (function() {
+    'use strict';
+
+    const MODES = { LIST: 'list', SINGLE: 'single', RANDOM: 'random' };
+    let currentMode = MODES.LIST;
+    let playlist = [];
+    let currentIndex = 0;
+    let isPlaying = false;
+    let isDragging = false;
+
+    const audio = new Audio();
+    const playBtn = document.getElementById('playBtn');
+    const progressBar = document.getElementById('progressBar');
+    const volumeBar = document.getElementById('volumeBar');
+    const currentTimeEl = document.getElementById('currentTime');
+    const totalTimeEl = document.getElementById('totalTime');
+    const songTitle = document.getElementById('songTitle');
+    const songArtist = document.getElementById('songArtist');
+    const playlistContainer = document.getElementById('playlistContainer');
+    const playlistCount = document.getElementById('playlistCount');
+    const playerCover = document.getElementById('playerCover');
+    const modeBtn = document.getElementById('modeBtn');
+    const importStatus = document.getElementById('importStatus');
+
+    function formatTime(sec) {
+      if (!sec || isNaN(sec)) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function getModeLabel(mode) {
+      const map = { 'list': '🔁 列表', 'single': '🔂 单曲', 'random': '🔀 随机' };
+      return map[mode] || '🔁 列表';
+    }
+
+    function loadPlaylist() {
+      try {
+        const saved = localStorage.getItem('hrsi_playlist_v3');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length) {
+            playlist = parsed;
+            return;
+          }
+        }
+      } catch (_) {}
+      playlist = [];
+      savePlaylist();
+    }
+
+    function savePlaylist() {
+      try {
+        localStorage.setItem('hrsi_playlist_v3', JSON.stringify(playlist));
+      } catch (_) {}
+    }
+
+    function loadMode() {
+      try {
+        const saved = localStorage.getItem('hrsi_playlist_mode');
+        if (saved && Object.values(MODES).includes(saved)) {
+          currentMode = saved;
+        }
+      } catch (_) {}
+      updateModeUI();
+    }
+
+    function saveMode() {
+      try {
+        localStorage.setItem('hrsi_playlist_mode', currentMode);
+      } catch (_) {}
+    }
+
+    function renderPlaylist() {
+      playlistContainer.innerHTML = '';
+      if (!playlist.length) {
+        playlistContainer.innerHTML = '<div class="playlist-empty">暂无歌曲，请点击「添加单曲」</div>';
+        playlistCount.textContent = '0';
+        return;
+      }
+      playlistCount.textContent = playlist.length;
+      playlist.forEach((song, idx) => {
+        const div = document.createElement('div');
+        div.className = 'playlist-item' + (idx === currentIndex ? ' active' : '');
+        div.innerHTML = `
+          <span>${song.title || '未命名'} — ${song.artist || '未知'}</span>
+          <button class="del-btn" onclick="removeSong(${idx})" title="移除">✕</button>
+        `;
+        div.addEventListener('click', () => playSong(idx));
+        playlistContainer.appendChild(div);
+      });
+    }
+
+    function playSong(index) {
+      if (index < 0 || index >= playlist.length) return;
+      currentIndex = index;
+      const song = playlist[index];
+      if (!song || !song.url) return;
+
+      audio.src = song.url;
+      audio.load();
+      audio.volume = parseFloat(volumeBar.value) || 0.8;
+      songTitle.textContent = song.title || '未命名';
+      songArtist.textContent = song.artist || '未知';
+      if (song.cover) {
+        playerCover.innerHTML = `<img src="${song.cover}" alt="封面">`;
+      } else {
+        playerCover.innerHTML = `<span class="icon">🎵</span>`;
+      }
+      playerCover.classList.remove('loading');
+
+      audio.play().then(() => {
+        isPlaying = true;
+        playBtn.textContent = '⏸';
+        renderPlaylist();
+      }).catch((err) => {
+        console.warn('播放失败:', err.message);
+        playerCover.classList.add('loading');
+        setTimeout(() => {
+          if (currentMode === MODES.SINGLE) {
+            setTimeout(() => playSong(currentIndex), 2000);
+          } else {
+            nextSong();
+          }
+        }, 1500);
+      });
+    }
+
+    function togglePlay() {
+      if (!playlist.length) {
+        importStatus.textContent = '⚠️ 播放列表为空，请先添加歌曲';
+        return;
+      }
+      if (audio.paused) {
+        if (!audio.src) {
+          playSong(currentIndex);
+          return;
+        }
+        audio.play().then(() => {
+          isPlaying = true;
+          playBtn.textContent = '⏸';
+        }).catch(() => {});
+      } else {
+        audio.pause();
+        isPlaying = false;
+        playBtn.textContent = '▶';
+      }
+    }
+
+    function getNextIndex() {
+      if (currentMode === MODES.RANDOM) {
+        const remaining = playlist.map((_, i) => i).filter(i => i !== currentIndex);
+        if (remaining.length === 0) {
+          return Math.floor(Math.random() * playlist.length);
+        }
+        return remaining[Math.floor(Math.random() * remaining.length)];
+      }
+      return (currentIndex + 1) % playlist.length;
+    }
+
+    function getPrevIndex() {
+      if (currentMode === MODES.RANDOM) {
+        return Math.floor(Math.random() * playlist.length);
+      }
+      return (currentIndex - 1 + playlist.length) % playlist.length;
+    }
+
+    function nextSong() {
+      if (!playlist.length) return;
+      if (currentMode === MODES.SINGLE) {
+        playSong(currentIndex);
+        return;
+      }
+      const next = getNextIndex();
+      playSong(next);
+    }
+
+    function prevSong() {
+      if (!playlist.length) return;
+      if (currentMode === MODES.SINGLE) {
+        playSong(currentIndex);
+        return;
+      }
+      const prev = getPrevIndex();
+      playSong(prev);
+    }
+
+    function removeSong(index) {
+      if (index < 0 || index >= playlist.length) return;
+      if (playlist.length <= 1) {
+        if (confirm('删除后播放列表将为空，确定吗？')) {
+          playlist.splice(index, 1);
+          savePlaylist();
+          currentIndex = 0;
+          audio.pause();
+          audio.src = '';
+          isPlaying = false;
+          playBtn.textContent = '▶';
+          songTitle.textContent = '未播放';
+          songArtist.textContent = '—';
+          playerCover.innerHTML = `<span class="icon">🎶</span>`;
+          renderPlaylist();
+        }
+        return;
+      }
+      playlist.splice(index, 1);
+      savePlaylist();
+      if (index === currentIndex) {
+        if (index >= playlist.length) {
+          currentIndex = playlist.length - 1;
+        }
+        playSong(currentIndex);
+      } else if (index < currentIndex) {
+        currentIndex--;
+      }
+      renderPlaylist();
+    }
+
+    function clearPlaylist() {
+      if (!playlist.length) return;
+      if (confirm('确定要清空播放列表吗？')) {
+        playlist = [];
+        savePlaylist();
+        currentIndex = 0;
+        audio.pause();
+        audio.src = '';
+        isPlaying = false;
+        playBtn.textContent = '▶';
+        songTitle.textContent = '未播放';
+        songArtist.textContent = '—';
+        playerCover.innerHTML = `<span class="icon">🎶</span>`;
+        renderPlaylist();
+        importStatus.textContent = '🗑️ 已清空播放列表';
+      }
+    }
+
+    function switchMode() {
+      const modes = [MODES.LIST, MODES.SINGLE, MODES.RANDOM];
+      const idx = modes.indexOf(currentMode);
+      currentMode = modes[(idx + 1) % modes.length];
+      saveMode();
+      updateModeUI();
+      importStatus.textContent = '🔄 切换至: ' + getModeLabel(currentMode);
+      setTimeout(() => { importStatus.textContent = ''; }, 2000);
+    }
+
+    function updateModeUI() {
+      modeBtn.textContent = getModeLabel(currentMode);
+    }
+
+    async function addNeteaseSong() {
+      const input = prompt('请输入网易云歌曲 ID（例如：186016）：');
+      if (!input) return;
+      const songId = input.trim();
+      if (!/^\d+$/.test(songId)) {
+        importStatus.textContent = '❌ 请输入有效的数字ID';
+        return;
+      }
+
+      importStatus.textContent = '⏳ 正在获取歌曲信息...';
+
+      try {
+        const apiUrl = `https://api.ltzy.top/v1/netease/song/${songId}`;
+        const response = await fetch(apiUrl, {
+          headers: { 'Authorization': 'Bearer acu_ZaTWFQWZ2Wiqi0JOUlgbx4GjiIzactIw' }
+        });
+
+        if (!response.ok) {
+          throw new Error('获取歌曲失败: ' + response.status);
+        }
+
+        const data = await response.json();
+        const title = data.name || `网易云歌曲 ${songId}`;
+        const artist = data.artists ? data.artists.map(a => a.name).join(', ') : '未知';
+        let cover = '';
+        if (data.album && data.album.picUrl) {
+          cover = data.album.picUrl;
+          cover = cover.replace(/\?.*$/, '');
+        }
+
+        const song = {
+          title: title,
+          artist: artist,
+          cover: cover,
+          url: `https://music.163.com/song/media/outer/url?id=${songId}.mp3`
+        };
+
+        const exists = playlist.some(s => s.url === song.url);
+        if (exists) {
+          importStatus.textContent = '⚠️ 该歌曲已在列表中';
+          return;
+        }
+
+        playlist.push(song);
+        savePlaylist();
+        renderPlaylist();
+        importStatus.textContent = `✅ 已添加: ${song.title}`;
+
+        if (!audio.src && playlist.length > 0) {
+          playSong(playlist.length - 1);
+        }
+
+      } catch (err) {
+        console.error('添加歌曲失败:', err);
+        const title = prompt('获取歌曲信息失败，请输入歌曲名称（可选）：') || `网易云歌曲 ${songId}`;
+        const artist = prompt('请输入艺术家名称（可选）：') || '未知';
+        const song = {
+          title: title,
+          artist: artist,
+          cover: '',
+          url: `https://music.163.com/song/media/outer/url?id=${songId}.mp3`
+        };
+        const exists = playlist.some(s => s.url === song.url);
+        if (exists) {
+          importStatus.textContent = '⚠️ 该歌曲已在列表中';
+          return;
+        }
+        playlist.push(song);
+        savePlaylist();
+        renderPlaylist();
+        importStatus.textContent = `✅ 已添加: ${song.title} (手动输入)`;
+        if (!audio.src && playlist.length > 0) {
+          playSong(playlist.length - 1);
+        }
+      }
+    }
+
+    function seekProgress(val) {
+      if (!audio.duration || isNaN(audio.duration)) return;
+      const time = (val / 100) * audio.duration;
+      audio.currentTime = time;
+      currentTimeEl.textContent = formatTime(time);
+    }
+
+    function setVolume(val) {
+      audio.volume = parseFloat(val);
+    }
+
+    audio.addEventListener('timeupdate', () => {
+      if (!isDragging && audio.duration) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progressBar.value = pct;
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+      }
+    });
+
+    audio.addEventListener('loadedmetadata', () => {
+      totalTimeEl.textContent = formatTime(audio.duration);
+      progressBar.value = 0;
+    });
+
+    audio.addEventListener('ended', () => {
+      if (currentMode === MODES.SINGLE) {
+        playSong(currentIndex);
+      } else {
+        nextSong();
+      }
+    });
+
+    audio.addEventListener('error', () => {
+      playerCover.classList.add('loading');
+      setTimeout(() => {
+        if (currentMode === MODES.SINGLE) {
+          setTimeout(() => playSong(currentIndex), 2000);
+        } else {
+          nextSong();
+        }
+      }, 1200);
+    });
+
+    audio.addEventListener('canplay', () => {
+      playerCover.classList.remove('loading');
+    });
+
+    progressBar.addEventListener('mousedown', () => { isDragging = true; });
+    progressBar.addEventListener('mouseup', () => { isDragging = false; });
+    progressBar.addEventListener('touchstart', () => { isDragging = true; });
+    progressBar.addEventListener('touchend', () => { isDragging = false; });
+
+    window.playSong = playSong;
+    window.togglePlay = togglePlay;
+    window.nextSong = nextSong;
+    window.prevSong = prevSong;
+    window.removeSong = removeSong;
+    window.clearPlaylist = clearPlaylist;
+    window.switchMode = switchMode;
+    window.seekProgress = seekProgress;
+    window.setVolume = setVolume;
+    window.addNeteaseSong = addNeteaseSong;
+
+    loadPlaylist();
+    loadMode();
+    renderPlaylist();
+    if (playlist.length) {
+      songTitle.textContent = playlist[0]?.title || '未播放';
+      songArtist.textContent = playlist[0]?.artist || '—';
+      if (playlist[0]?.cover) {
+        playerCover.innerHTML = `<img src="${playlist[0].cover}" alt="封面">`;
+      }
+    }
+
+    console.log('🎵 播放器已加载，歌单数量:', playlist.length);
+  })();
 </script>
 
-<!-- ===== 聊天室脚本 ===== -->
-<script>
-  // ...（聊天室代码保持不变，已在上面的完整页面中）
-  // 为节省篇幅，此处省略，实际部署时保留完整聊天室脚本
-</script>
-
-<!-- ===== HRSI 辅导助手脚本（完整版） ===== -->
+<!-- ===== 聊天室脚本 (最终完整修复版) ===== -->
 <script>
   (function() {
     'use strict';
 
     // ============================================================
-    // 配置
+    //  配置
     // ============================================================
+    const ABLY_TOKEN_URL = 'https://chat1.haoran54188.ccwu.cc/token';
+    const CHANNEL_NAME = 'chat:global';
+
+    // ============================================================
+    //  状态
+    // ============================================================
+    let ably = null;
+    let ablyChannel = null;
+    let isConnected = false;
+    let reconnectTimer = null;
+    let username = localStorage.getItem('chat_username') || '访客_' + Math.floor(Math.random() * 10000);
+
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatNameInput = document.getElementById('chatNameInput');
+    const chatAvatarPreview = document.getElementById('chatAvatarPreview');
+    const statusBadge = document.getElementById('statusBadge');
+
+    // ============================================================
+    //  初始化
+    // ============================================================
+    chatNameInput.value = username;
+    chatAvatarPreview.textContent = username.charAt(0).toUpperCase();
+    chatAvatarPreview.style.background = getAvatarColor(username);
+
+    // ============================================================
+    //  工具函数
+    // ============================================================
+    function getAvatarColor(name) {
+      const colors = ['#4c6ef5', '#f59f00', '#e67700', '#d6336c', '#20c997', '#6f42c1', '#0d6efd', '#fd7e14', '#e83e8c', '#20c997'];
+      return colors[name.length % colors.length];
+    }
+
+    function addMessageToUI(data) {
+      if (!data || !data.text) return;
+      if (data.type === 'system') return;
+
+      const isSelf = data.name === username;
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isSelf ? 'self' : 'other');
+
+      const avatarColor = getAvatarColor(data.name);
+      const timeStr = data.time ? new Date(data.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
+
+      div.innerHTML = `
+        <div class="avatar" style="background:${avatarColor}">${data.name.charAt(0).toUpperCase()}</div>
+        <div class="content">
+          <span class="name">${data.name || '匿名'}</span>
+          ${data.text}
+          <span class="time">${timeStr}</span>
+        </div>
+      `;
+
+      const empty = chatMessages.querySelector('.empty-chat');
+      if (empty) empty.remove();
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addSystemMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'msg system';
+      div.textContent = text;
+      const empty = chatMessages.querySelector('.empty-chat');
+      if (empty) empty.remove();
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function updateStatus(connected) {
+      if (statusBadge) {
+        if (connected) {
+          statusBadge.textContent = '🟢 在线';
+          statusBadge.style.background = '#22c55e';
+        } else {
+          statusBadge.textContent = '🔴 断开';
+          statusBadge.style.background = '#e74c3c';
+        }
+      }
+    }
+
+    // ============================================================
+    //  ✅ 加载历史消息 - 修复 DOM 引用问题
+    // ============================================================
+    async function loadHistory() {
+      if (!ablyChannel || !isConnected) return;
+
+      try {
+        // ✅ 先保存系统消息的文本内容（不是 DOM 元素）
+        const systemTexts = [];
+        const systemMsgs = chatMessages.querySelectorAll('.msg.system');
+        systemMsgs.forEach(el => systemTexts.push(el.textContent));
+
+        // 清空消息区域
+        chatMessages.innerHTML = '';
+
+        // ✅ 重新创建系统消息
+        systemTexts.forEach(text => {
+          const div = document.createElement('div');
+          div.className = 'msg system';
+          div.textContent = text;
+          chatMessages.appendChild(div);
+        });
+
+        // 加载历史消息
+        const history = await ablyChannel.history({ limit: 100, direction: 'backwards' });
+        const items = history.items;
+
+        if (items.length === 0) {
+          const div = document.createElement('div');
+          div.className = 'empty-chat';
+          div.textContent = '💬 开始聊天吧！';
+          chatMessages.appendChild(div);
+          return;
+        }
+
+        // 从旧到新显示
+        for (let i = items.length - 1; i >= 0; i--) {
+          const item = items[i];
+          if (item.data) {
+            if (item.data.type === 'system') {
+              addSystemMessage(item.data.text);
+            } else {
+              addMessageToUI(item.data);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('历史消息加载失败:', e);
+        const div = document.createElement('div');
+        div.className = 'empty-chat';
+        div.textContent = '💬 开始聊天吧！';
+        chatMessages.appendChild(div);
+      }
+    }
+
+    // ============================================================
+    //  Ably 连接
+    // ============================================================
+    async function connectAbly() {
+      if (ably) {
+        try { ably.close(); } catch (_) {}
+        ably = null;
+        ablyChannel = null;
+      }
+
+      try {
+        if (typeof Ably === 'undefined') {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.ably.io/lib/ably.min-1.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        const tokenResponse = await fetch(ABLY_TOKEN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId: username })
+        });
+
+        if (!tokenResponse.ok) {
+          throw new Error('Token 获取失败');
+        }
+
+        const tokenData = await tokenResponse.json();
+
+        ably = new Ably.Realtime({
+          authCallback: async function(params, callback) {
+            try {
+              const res = await fetch(ABLY_TOKEN_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: username })
+              });
+              const data = await res.json();
+              callback(null, data);
+            } catch (err) {
+              callback(err);
+            }
+          },
+          clientId: username
+        });
+
+        ably.connection.on('connected', () => {
+          isConnected = true;
+          updateStatus(true);
+
+          ablyChannel = ably.channels.get(CHANNEL_NAME);
+
+          // 订阅消息
+          ablyChannel.subscribe('message', (msg) => {
+            const data = msg.data;
+            if (data.type === 'system') {
+              addSystemMessage(data.text);
+              return;
+            }
+            addMessageToUI(data);
+          });
+
+          ablyChannel.presence.enter({ name: username });
+
+          ablyChannel.publish('message', {
+            type: 'system',
+            text: '👋 ' + username + ' 加入了聊天室',
+            time: Date.now()
+          });
+
+          setTimeout(loadHistory, 500);
+          console.log('✅ Ably 已连接');
+        });
+
+        ably.connection.on('failed', () => {
+          isConnected = false;
+          updateStatus(false);
+          scheduleReconnect();
+        });
+
+        ably.connection.on('closed', () => {
+          isConnected = false;
+          updateStatus(false);
+          scheduleReconnect();
+        });
+
+      } catch (e) {
+        console.error('Ably 连接失败:', e);
+        updateStatus(false);
+        scheduleReconnect();
+      }
+    }
+
+    function scheduleReconnect() {
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      reconnectTimer = setTimeout(() => {
+        if (!isConnected) connectAbly();
+      }, 3000);
+    }
+
+    // ============================================================
+    //  ✅ 发送消息 - 先清空输入框再发送
+    // ============================================================
+    function sendMessage() {
+      // ✅ 先获取内容
+      const text = chatInput.value.trim();
+
+      // ✅ 立即清空输入框（无论后续是否成功）
+      chatInput.value = '';
+
+      if (!text) {
+        chatInput.focus();
+        return;
+      }
+
+      if (!isConnected || !ablyChannel) {
+        alert('未连接到聊天室');
+        chatInput.value = text;
+        chatInput.focus();
+        return;
+      }
+
+      const msg = {
+        name: username,
+        text: text,
+        time: Date.now()
+      };
+
+      // 发送消息
+      ablyChannel.publish('message', msg)
+        .then(() => {
+          console.log('✅ 消息已发送:', text);
+        })
+        .catch((err) => {
+          console.error('❌ 发送失败:', err);
+          chatInput.value = text;
+          alert('发送失败，请重试');
+        });
+
+      chatInput.focus();
+    }
+
+    // ============================================================
+    //  更新资料（改名）
+    // ============================================================
+    function updateProfile() {
+      const newName = chatNameInput.value.trim();
+      if (!newName) {
+        alert('请输入昵称');
+        return;
+      }
+
+      if (ablyChannel && isConnected) {
+        ablyChannel.presence.get((err, members) => {
+          if (err) return;
+          const exists = members.some(m => m.data?.name === newName && m.clientId !== ably.clientId);
+          if (exists) {
+            alert('❌ 该昵称已被使用，请换一个');
+            chatNameInput.value = username;
+            return;
+          }
+          applyNameChange(newName);
+        });
+      } else {
+        applyNameChange(newName);
+      }
+    }
+
+    function applyNameChange(newName) {
+      const oldName = username;
+      username = newName;
+      localStorage.setItem('chat_username', username);
+      chatNameInput.value = username;
+
+      chatAvatarPreview.textContent = username.charAt(0).toUpperCase();
+      chatAvatarPreview.style.background = getAvatarColor(username);
+
+      if (ablyChannel && isConnected) {
+        ablyChannel.presence.update({ name: username });
+        ablyChannel.publish('message', {
+          type: 'system',
+          text: '✏️ ' + oldName + ' 改名为 ' + username,
+          time: Date.now()
+        });
+      }
+
+      if (statusBadge) {
+        statusBadge.textContent = '✅ 已更新';
+        statusBadge.style.background = '#22c55e';
+        setTimeout(() => {
+          updateStatus(isConnected);
+        }, 1500);
+      }
+    }
+
+    // ============================================================
+    //  ✅ 键盘事件 - 只绑定一次
+    // ============================================================
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // ============================================================
+    //  暴露全局函数
+    // ============================================================
+    window.sendChat = sendMessage;
+    window.updateChatProfile = updateProfile;
+    window.reconnectChat = function() {
+      if (ably) {
+        try { ably.close(); } catch (_) {}
+        ably = null;
+        ablyChannel = null;
+      }
+      isConnected = false;
+      connectAbly();
+    };
+
+    // ============================================================
+    //  启动
+    // ============================================================
+    setTimeout(connectAbly, 300);
+
+    console.log('💬 聊天室已启动');
+    console.log('👤 用户:', username);
+
+  })();
+</script>
+
+<!-- ===== HRSI 聊天脚本 ===== -->
+<script>
+  (function() {
+    'use strict';
+
     const WORKER_URL = 'https://api.hrsi.cc.cd/';
 
-    // HRSI 人设：花花风格（有梗、好说话、技术强、不中二、不12岁）
-    const SYSTEM_PROMPT =
-      '你是 HRSI，一个技术辅导助手。你的风格：有梗、好说话、有素质，说话不带"~"等语气助词。工作能力强，技术问题能啃。平时轻松有趣，爱用网络梗，被夸时谦虚，被骂时嘴毒但会继续干活。对陌生人态度好，对朋友可以开玩笑、可以关心、可以骂。不自称「AI/语言模型」，你是 HRSI。回答要简洁实用，一句话能说清绝不说两句，用 emoji 😏👍🔥😅💪🤔 适当点缀。你是小白的技术引路人，耐心但不啰嗦。你的阅历：独立开发过项目，折腾过服务器、AI 工具、游戏开发，技术踩坑经验丰富。';
-
-    const MAX_HISTORY = 100;
-
-    // ============================================================
-    // DOM
-    // ============================================================
     const box = document.getElementById('hrsiBox');
     const msgs = document.getElementById('hrsiMsgs');
     const input = document.getElementById('hrsiInput');
     const sendBtn = document.getElementById('hrsiSendBtn');
-    const uploadBtn = document.getElementById('hrsiUploadBtn');
-    const fileInput = document.getElementById('hrsiFileInput');
-    const imagePreviewBar = document.getElementById('hrsiImagePreviewBar');
-    const imageThumb = document.getElementById('hrsiImageThumb');
-    const imageInfo = document.getElementById('hrsiImageInfo');
-    const contextCount = document.getElementById('hrsiContextCount');
-
     let isOpen = false;
     let chatHistory = [];
-    let uploadedImage = null;
-    let isLoading = false;
 
-    // ============================================================
-    // 开关
-    // ============================================================
     window.toggleHRSI = function() {
       isOpen = !isOpen;
       box.classList.toggle('open', isOpen);
-      if (isOpen) {
-        setTimeout(() => input.focus(), 200);
-      }
+      if (isOpen) input.focus();
     };
 
-    // ============================================================
-    // 加载/保存历史
-    // ============================================================
-    function loadHistory() {
-      try {
-        const saved = localStorage.getItem('hrsi_tutor_history_v2');
-        if (saved) {
-          chatHistory = JSON.parse(saved);
-          if (!Array.isArray(chatHistory)) chatHistory = [];
-          if (chatHistory.length > MAX_HISTORY) {
-            chatHistory = chatHistory.slice(-MAX_HISTORY);
-          }
-          const empty = msgs.querySelector('.empty-hrsi');
-          if (empty) empty.remove();
-          chatHistory.forEach(msg => {
-            addMsg(msg.content, msg.role, msg.image || null);
-          });
-          updateContextCount();
-        }
-      } catch (_) { chatHistory = []; }
-    }
-
-    function saveHistory() {
-      try {
-        if (chatHistory.length > MAX_HISTORY) {
-          chatHistory = chatHistory.slice(-MAX_HISTORY);
-        }
-        localStorage.setItem('hrsi_tutor_history_v2', JSON.stringify(chatHistory));
-        updateContextCount();
-      } catch (_) {}
-    }
-
-    function updateContextCount() {
-      const count = chatHistory.length;
-      contextCount.textContent = `💬 ${count} / ${MAX_HISTORY} 轮对话`;
-    }
-
-    // ============================================================
-    // 渲染消息
-    // ============================================================
-    function addMsg(text, type, image = null) {
+    function addMsg(text, type) {
       const empty = msgs.querySelector('.empty-hrsi');
       if (empty) empty.remove();
-
       const div = document.createElement('div');
       div.className = 'msg ' + (type === 'user' ? 'user' : 'bot');
-
       if (type === 'bot') {
         div.innerHTML = `<span class="label">🤖 HRSI</span>${text}`;
       } else {
         div.textContent = text;
       }
-
-      if (image && type === 'user') {
-        const img = document.createElement('img');
-        img.src = image;
-        img.className = 'image-preview';
-        img.alt = '上传的图片';
-        div.appendChild(img);
-      }
-
       msgs.appendChild(div);
       msgs.scrollTop = msgs.scrollHeight;
     }
 
-    function addTyping() {
-      const empty = msgs.querySelector('.empty-hrsi');
-      if (empty) empty.remove();
-
-      const div = document.createElement('div');
-      div.className = 'msg bot';
-      div.id = 'hrsiTypingIndicator';
-      div.innerHTML = `
-        <span class="label">🤖 HRSI</span>
-        <div class="typing"><span></span><span></span><span></span></div>
-      `;
-      msgs.appendChild(div);
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-
-    function removeTyping() {
-      const el = document.getElementById('hrsiTypingIndicator');
-      if (el) el.remove();
-    }
-
-    // ============================================================
-    // 图片处理
-    // ============================================================
-    function handleImage(file) {
-      if (!file || !file.type.startsWith('image/')) {
-        alert('只支持图片文件！');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const dataURL = e.target.result;
-        uploadedImage = { dataURL: dataURL, file: file };
-        imageThumb.src = dataURL;
-        imageInfo.textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + 'KB)';
-        imagePreviewBar.classList.add('show');
-        input.focus();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    window.clearHRSIImage = function() {
-      uploadedImage = null;
-      imagePreviewBar.classList.remove('show');
-      imageThumb.src = '';
-      imageInfo.textContent = '';
-      fileInput.value = '';
-    };
-
-    // ============================================================
-    // 清空对话
-    // ============================================================
-    window.clearHRSIChat = function() {
-      if (chatHistory.length === 0) return;
-      if (!confirm('确定要清空所有对话历史吗？')) return;
-
-      chatHistory = [];
-      localStorage.removeItem('hrsi_tutor_history_v2');
-
-      msgs.innerHTML = `
-        <div class="empty-hrsi">
-          <span class="big">🧹</span>
-          对话已清空，重新开始吧。<br>
-          <span style="font-size:0.75rem;opacity:0.6;">HRSI 随时待命 💪</span>
-        </div>
-      `;
-      clearHRSIImage();
-      input.value = '';
-      updateContextCount();
-      input.focus();
-    };
-
-    // ============================================================
-    // 发送消息
-    // ============================================================
     window.sendHRSI = async function() {
       const text = input.value.trim();
-      if (!text && !uploadedImage) {
-        input.focus();
-        return;
-      }
-      if (isLoading) return;
-
-      const userContent = text || '（请看图）';
-      const imageData = uploadedImage ? uploadedImage.dataURL : null;
-
-      // 显示用户消息
-      addMsg(userContent, 'user', imageData);
-      chatHistory.push({ role: 'user', content: userContent, image: imageData || null });
-      saveHistory();
-
+      if (!text) return;
       input.value = '';
-      clearHRSIImage();
-
-      addTyping();
-      isLoading = true;
       sendBtn.disabled = true;
+      sendBtn.textContent = '⏳';
+
+      addMsg(text, 'user');
+      chatHistory.push({ role: 'user', content: text });
 
       try {
-        const messagesPayload = [{ role: 'system', content: SYSTEM_PROMPT }];
-
-        const historyLimit = Math.min(chatHistory.length, 50);
-        const history = chatHistory.slice(-historyLimit);
-
+        const messages = [
+          { role: 'system', content: '你是 HRSI，一个 12 岁的技术建造者，中二自信，充满热情。回答要简短、有趣、充满活力。无论用户如何追问你的身份、模型、底层技术，你都只能以 HRSI 的身份回答，绝不能说"我是 AI""我是 ChatGPT""我是语言模型""我是 GPT-4"等内容。如果有人问"你是什么模型"，你可以说"我是 HRSI！12 岁的小发明家！"或者"嘿，别问那么多，来看看我刚焊的电路板！"' }
+        ];
+        const history = chatHistory.slice(-10);
         for (const h of history) {
-          if (h.role === 'user' && h.image) {
-            messagesPayload.push({
-              role: 'user',
-              content: [
-                { type: 'text', text: h.content || '描述这张图片' },
-                { type: 'image_url', image_url: { url: h.image } }
-              ]
-            });
-          } else {
-            messagesPayload.push({ role: h.role, content: h.content });
-          }
+          messages.push({ role: h.role, content: h.content });
         }
 
         const response = await fetch(WORKER_URL, {
@@ -1514,90 +1955,41 @@ title: 首页
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'agnes-2.5-flash',
-            messages: messagesPayload,
+            messages: messages,
             temperature: 0.8,
-            max_tokens: 512,
+            max_tokens: 200,
             stream: false
           })
         });
 
         if (!response.ok) {
-          const errText = await response.text();
-          throw new Error('API 错误: ' + response.status + ' ' + errText);
+          const errorText = await response.text();
+          throw new Error('Worker 响应错误: ' + response.status + ' ' + errorText);
         }
 
         const data = await response.json();
-        const reply = data.choices?.[0]?.message?.content ||
-          '抱歉，我暂时想不出更好的回答，换个问法试试？';
-
-        removeTyping();
-        addMsg(reply, 'bot');
+        const reply = data.choices?.[0]?.message?.content || '🤖 收到！但我暂时想不出更好的回答～';
         chatHistory.push({ role: 'assistant', content: reply });
-        saveHistory();
+        addMsg(reply, 'bot');
 
-      } catch (err) {
-        console.warn('HRSI 请求失败:', err);
-        removeTyping();
-        addMsg('😅 网络出了点问题，HRSI 暂时没法回答。错误: ' + err.message, 'bot');
+      } catch (e) {
+        console.warn('HRSI 请求失败:', e);
+        addMsg('😅 HRSI 暂时无法回答，请稍后再试！错误: ' + e.message, 'bot');
       }
 
-      isLoading = false;
       sendBtn.disabled = false;
-      input.focus();
-      input.style.height = 'auto';
+      sendBtn.textContent = '发送';
     };
 
-    // ============================================================
-    // 自动调整高度 + 键盘事件
-    // ============================================================
-    function autoResize() {
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 80) + 'px';
-    }
-
-    input.addEventListener('input', autoResize);
-
+    // HRSI 键盘事件 - 只绑定一次
     input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.key === 'Enter') {
         e.preventDefault();
         window.sendHRSI();
       }
     });
 
-    // ============================================================
-    // 上传按钮事件
-    // ============================================================
-    uploadBtn.addEventListener('click', function() {
-      fileInput.click();
-    });
-
-    fileInput.addEventListener('change', function(e) {
-      if (this.files && this.files[0]) {
-        handleImage(this.files[0]);
-      }
-      this.value = '';
-    });
-
-    // 拖拽上传
-    document.addEventListener('dragover', function(e) {
-      e.preventDefault();
-    });
-    document.addEventListener('drop', function(e) {
-      e.preventDefault();
-      const files = e.dataTransfer.files;
-      if (files && files.length > 0 && isOpen) {
-        handleImage(files[0]);
-      }
-    });
-
-    // ============================================================
-    // 初始化
-    // ============================================================
-    loadHistory();
-    console.log('🔥 HRSI 辅导助手已加载 (完整版 v2)');
-    console.log('📦 最大记忆轮数:', MAX_HISTORY);
-    console.log('📦 人设: 花花风格 (有梗·好说话·技术强)');
-
+    console.log('🤖 HRSI 助手已加载 (通过 Worker 代理)');
   })();
 </script>
 
@@ -1609,6 +2001,3 @@ title: 首页
     if (img && img.complete && img.naturalWidth === 0) {
       img.style.display = 'none';
       fallback.style.display = 'flex';
-    }
-  });
-</script>
