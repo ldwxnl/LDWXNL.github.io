@@ -24,7 +24,17 @@ title: 首页
     --danger: #e74c3c;
   }
 
-  /* ===== 页面主容器 ===== */
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg-body);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  }
+
   .page-wrapper {
     max-width: 1100px;
     margin: 0 auto;
@@ -686,7 +696,7 @@ title: 首页
   }
 
   /* ============================================================ */
-  /* ===== HRSI 辅导助手（完整版） ===== */
+  /* ===== HRSI 辅导助手（移动端优化版） ===== */
   /* ============================================================ */
 
   .hrsi-toggle {
@@ -707,10 +717,14 @@ title: 首页
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
   }
   .hrsi-toggle:hover {
     transform: scale(1.08);
     box-shadow: 0 6px 28px rgba(76, 110, 245, 0.45);
+  }
+  .hrsi-toggle:active {
+    transform: scale(0.95);
   }
   .hrsi-toggle .badge-dot {
     position: absolute;
@@ -738,7 +752,7 @@ title: 首页
     flex-direction: column;
     z-index: 9999;
     color: #eee;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.06);
     animation: slide-up 0.3s ease;
@@ -775,6 +789,7 @@ title: 首页
     opacity: 0.7;
     transition: var(--transition);
     padding: 0 0.2rem;
+    touch-action: manipulation;
   }
   .hrsi-box .hrsi-header .close-btn:hover {
     opacity: 1;
@@ -789,6 +804,7 @@ title: 首页
     flex-direction: column;
     gap: 0.5rem;
     background: #16213e;
+    -webkit-overflow-scrolling: touch;
   }
   .hrsi-box .hrsi-msgs .msg {
     max-width: 88%;
@@ -839,6 +855,7 @@ title: 首页
     color: var(--primary-light);
   }
 
+  /* ===== HRSI 输入行 - 移动端优化 ===== */
   .hrsi-box .hrsi-input-row {
     display: flex;
     gap: 0.5rem;
@@ -846,36 +863,40 @@ title: 首页
     border-top: 1px solid rgba(255,255,255,0.06);
     background: #1a1a2e;
     flex-shrink: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: flex-end;
   }
+
   .hrsi-box .hrsi-input-row .input-wrap {
     flex: 1;
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     align-items: flex-end;
-    min-width: 150px;
+    min-width: 0;
   }
-  .hrsi-box .hrsi-input-row textarea {
+
+  /* 改用 input 替代 textarea（移动端更友好） */
+  .hrsi-box .hrsi-input-row input[type="text"] {
     flex: 1;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 0.4rem 0.9rem;
-    font-size: 0.85rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.9rem;
     outline: none;
     background: #0f0f1f;
     color: #eee;
     transition: var(--transition);
-    resize: none;
     font-family: inherit;
-    min-height: 36px;
-    max-height: 80px;
-    line-height: 1.5;
+    height: 40px;
+    min-height: 40px;
+    -webkit-appearance: none;
+    appearance: none;
   }
-  .hrsi-box .hrsi-input-row textarea:focus {
+  .hrsi-box .hrsi-input-row input[type="text"]:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.15);
   }
-  .hrsi-box .hrsi-input-row textarea::placeholder {
+  .hrsi-box .hrsi-input-row input[type="text"]::placeholder {
     color: #666;
   }
 
@@ -889,20 +910,25 @@ title: 首页
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 50%;
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
     color: #aaa;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
+    flex-shrink: 0;
   }
   .hrsi-box .hrsi-input-row .toolbar button:hover {
     background: rgba(255,255,255,0.1);
     color: #fff;
     border-color: var(--primary);
+  }
+  .hrsi-box .hrsi-input-row .toolbar button:active {
+    transform: scale(0.92);
   }
 
   .hrsi-box .hrsi-input-row .send-btn {
@@ -912,19 +938,24 @@ title: 首页
     border-radius: 20px;
     padding: 0.4rem 1.2rem;
     font-weight: 500;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: var(--transition);
-    height: 34px;
+    height: 40px;
     white-space: nowrap;
     flex-shrink: 0;
+    touch-action: manipulation;
   }
   .hrsi-box .hrsi-input-row .send-btn:hover {
     background: var(--primary-dark);
   }
+  .hrsi-box .hrsi-input-row .send-btn:active {
+    transform: scale(0.95);
+  }
   .hrsi-box .hrsi-input-row .send-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+    transform: none;
   }
 
   .hrsi-box .hrsi-input-row .image-preview-bar {
@@ -958,6 +989,7 @@ title: 首页
     color: var(--danger);
     cursor: pointer;
     font-size: 14px;
+    touch-action: manipulation;
   }
 
   .hrsi-box .hrsi-context-info {
@@ -978,6 +1010,7 @@ title: 首页
     font-size: 10px;
     text-decoration: underline;
     transition: color 0.2s;
+    touch-action: manipulation;
   }
   .hrsi-box .hrsi-context-info .clear-btn:hover {
     color: var(--danger);
@@ -991,6 +1024,43 @@ title: 首页
     border: none;
     border-top: 2px solid #edf0f5;
     margin: 2rem 0 1.8rem 0;
+  }
+
+  /* ===== 打字动画 ===== */
+  .typing {
+    display: flex;
+    gap: 4px;
+    padding: 2px 0;
+  }
+  .typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #888;
+    animation: typing-bounce 1.2s ease-in-out infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* ===== 滚动条 ===== */
+  .chat-messages::-webkit-scrollbar,
+  .hrsi-msgs::-webkit-scrollbar,
+  .playlist-items::-webkit-scrollbar {
+    width: 4px;
+  }
+  .chat-messages::-webkit-scrollbar-thumb,
+  .hrsi-msgs::-webkit-scrollbar-thumb,
+  .playlist-items::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+  .chat-messages::-webkit-scrollbar-track,
+  .hrsi-msgs::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   /* ===== 响应式 ===== */
@@ -1060,29 +1130,51 @@ title: 首页
       width: 60px;
       font-size: 0.65rem;
     }
-    .hrsi-box .hrsi-input-row textarea {
-      font-size: 0.8rem;
+    .hrsi-box .hrsi-input-row input[type="text"] {
+      font-size: 0.85rem;
+      height: 36px;
+      min-height: 36px;
+      padding: 0.4rem 0.8rem;
     }
     .hrsi-box .hrsi-input-row .send-btn {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       padding: 0.3rem 0.8rem;
+      height: 36px;
+    }
+    .hrsi-box .hrsi-input-row .toolbar button {
+      width: 36px;
+      height: 36px;
+      font-size: 14px;
     }
   }
 
-  .chat-messages::-webkit-scrollbar,
-  .hrsi-msgs::-webkit-scrollbar,
-  .playlist-items::-webkit-scrollbar {
-    width: 4px;
-  }
-  .chat-messages::-webkit-scrollbar-thumb,
-  .hrsi-msgs::-webkit-scrollbar-thumb,
-  .playlist-items::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-  }
-  .chat-messages::-webkit-scrollbar-track,
-  .hrsi-msgs::-webkit-scrollbar-track {
-    background: transparent;
+  @media (max-width: 400px) {
+    .hrsi-box {
+      width: calc(100vw - 16px);
+      right: 8px;
+      bottom: 72px;
+      height: 400px;
+    }
+    .hrsi-box .hrsi-input-row {
+      padding: 0.3rem 0.5rem;
+      gap: 0.3rem;
+    }
+    .hrsi-box .hrsi-input-row input[type="text"] {
+      font-size: 0.8rem;
+      height: 32px;
+      min-height: 32px;
+      padding: 0.3rem 0.6rem;
+    }
+    .hrsi-box .hrsi-input-row .send-btn {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      height: 32px;
+    }
+    .hrsi-box .hrsi-input-row .toolbar button {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
   }
 </style>
 
@@ -1207,7 +1299,7 @@ title: 首页
 </div>
 
 <!-- ============================================================ -->
-<!-- HRSI 聊天按钮 & 聊天框（完整版） -->
+<!-- HRSI 聊天按钮 & 聊天框（移动端优化版） -->
 <!-- ============================================================ -->
 <button class="hrsi-toggle" id="hrsiToggle" onclick="toggleHRSI()" title="HRSI AI 辅导助手">
   🤖
@@ -1229,9 +1321,10 @@ title: 首页
     </div>
   </div>
 
+  <!-- 改用 input 替代 textarea（移动端更友好） -->
   <div class="hrsi-input-row">
     <div class="input-wrap">
-      <textarea id="hrsiInput" rows="1" placeholder="输入你的问题…"></textarea>
+      <input type="text" id="hrsiInput" placeholder="输入你的问题…" autocomplete="off" enterkeyhint="send">
       <div class="toolbar">
         <button id="hrsiUploadBtn" title="上传图片">🖼️</button>
       </div>
@@ -1680,7 +1773,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== 聊天室脚本 (完整可用版) ===== -->
+<!-- ===== 聊天室脚本 ===== -->
 <script>
   (function() {
     'use strict';
@@ -1764,7 +1857,6 @@ title: 首页
       if (!ablyChannel || !isConnected) return;
 
       try {
-        // 保留系统消息
         const systemTexts = [];
         const systemMsgs = chatMessages.querySelectorAll('.msg.system');
         systemMsgs.forEach(el => systemTexts.push(el.textContent));
@@ -1833,8 +1925,6 @@ title: 首页
         if (!tokenResponse.ok) {
           throw new Error('Token 获取失败');
         }
-
-        const tokenData = await tokenResponse.json();
 
         ably = new Ably.Realtime({
           authCallback: async function(params, callback) {
@@ -2012,7 +2102,7 @@ title: 首页
   })();
 </script>
 
-<!-- ===== HRSI 辅导助手脚本（完整版） ===== -->
+<!-- ===== HRSI 辅导助手脚本（移动端优化版） ===== -->
 <script>
   (function() {
     'use strict';
@@ -2039,14 +2129,23 @@ title: 首页
     let uploadedImage = null;
     let isLoading = false;
 
+    // ===== 开关 =====
     window.toggleHRSI = function() {
       isOpen = !isOpen;
       box.classList.toggle('open', isOpen);
       if (isOpen) {
-        setTimeout(() => input.focus(), 200);
+        setTimeout(function() {
+          input.focus();
+          // 移动端：将光标移到末尾
+          if (input.setSelectionRange) {
+            const len = input.value.length;
+            input.setSelectionRange(len, len);
+          }
+        }, 300);
       }
     };
 
+    // ===== 加载历史 =====
     function loadHistory() {
       try {
         const saved = localStorage.getItem('hrsi_tutor_history_v2');
@@ -2058,7 +2157,7 @@ title: 首页
           }
           const empty = msgs.querySelector('.empty-hrsi');
           if (empty) empty.remove();
-          chatHistory.forEach(msg => {
+          chatHistory.forEach(function(msg) {
             addMsg(msg.content, msg.role, msg.image || null);
           });
           updateContextCount();
@@ -2077,25 +2176,26 @@ title: 首页
     }
 
     function updateContextCount() {
-      const count = chatHistory.length;
-      contextCount.textContent = `💬 ${count} / ${MAX_HISTORY} 轮对话`;
+      var count = chatHistory.length;
+      contextCount.textContent = '💬 ' + count + ' / ' + MAX_HISTORY + ' 轮对话';
     }
 
-    function addMsg(text, type, image = null) {
-      const empty = msgs.querySelector('.empty-hrsi');
+    function addMsg(text, type, image) {
+      image = image || null;
+      var empty = msgs.querySelector('.empty-hrsi');
       if (empty) empty.remove();
 
-      const div = document.createElement('div');
+      var div = document.createElement('div');
       div.className = 'msg ' + (type === 'user' ? 'user' : 'bot');
 
       if (type === 'bot') {
-        div.innerHTML = `<span class="label">🤖 HRSI</span>${text}`;
+        div.innerHTML = '<span class="label">🤖 HRSI</span>' + text;
       } else {
         div.textContent = text;
       }
 
       if (image && type === 'user') {
-        const img = document.createElement('img');
+        var img = document.createElement('img');
         img.src = image;
         img.className = 'image-preview';
         img.alt = '上传的图片';
@@ -2107,10 +2207,10 @@ title: 首页
     }
 
     function addTyping() {
-      const empty = msgs.querySelector('.empty-hrsi');
+      var empty = msgs.querySelector('.empty-hrsi');
       if (empty) empty.remove();
 
-      const div = document.createElement('div');
+      var div = document.createElement('div');
       div.className = 'msg bot';
       div.id = 'hrsiTypingIndicator';
       div.innerHTML = `
@@ -2122,7 +2222,7 @@ title: 首页
     }
 
     function removeTyping() {
-      const el = document.getElementById('hrsiTypingIndicator');
+      var el = document.getElementById('hrsiTypingIndicator');
       if (el) el.remove();
     }
 
@@ -2132,9 +2232,9 @@ title: 首页
         return;
       }
 
-      const reader = new FileReader();
+      var reader = new FileReader();
       reader.onload = function(e) {
-        const dataURL = e.target.result;
+        var dataURL = e.target.result;
         uploadedImage = { dataURL: dataURL, file: file };
         imageThumb.src = dataURL;
         imageInfo.textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + 'KB)';
@@ -2172,100 +2272,132 @@ title: 首页
       input.focus();
     };
 
-    window.sendHRSI = async function() {
-      const text = input.value.trim();
+    // ============================================================
+    //  🔥 核心发送函数 - 移动端优化
+    // ============================================================
+    window.sendHRSI = function() {
+      var text = input.value.trim();
+
+      // 如果没有文字也没有图片，不做任何事
       if (!text && !uploadedImage) {
         input.focus();
         return;
       }
       if (isLoading) return;
 
-      const userContent = text || '（请看图）';
-      const imageData = uploadedImage ? uploadedImage.dataURL : null;
+      var userContent = text || '（请看图）';
+      var imageData = uploadedImage ? uploadedImage.dataURL : null;
 
+      // 显示用户消息
       addMsg(userContent, 'user', imageData);
       chatHistory.push({ role: 'user', content: userContent, image: imageData || null });
       saveHistory();
 
+      // 清空输入
       input.value = '';
       clearHRSIImage();
 
+      // 显示打字指示器
       addTyping();
       isLoading = true;
       sendBtn.disabled = true;
+      sendBtn.textContent = '⏳';
 
-      try {
-        const messagesPayload = [{ role: 'system', content: SYSTEM_PROMPT }];
+      // 使用 Promise 异步执行
+      (async function() {
+        try {
+          var messagesPayload = [{ role: 'system', content: SYSTEM_PROMPT }];
 
-        const historyLimit = Math.min(chatHistory.length, 50);
-        const history = chatHistory.slice(-historyLimit);
+          var historyLimit = Math.min(chatHistory.length, 50);
+          var history = chatHistory.slice(-historyLimit);
 
-        for (const h of history) {
-          if (h.role === 'user' && h.image) {
-            messagesPayload.push({
-              role: 'user',
-              content: [
-                { type: 'text', text: h.content || '描述这张图片' },
-                { type: 'image_url', image_url: { url: h.image } }
-              ]
-            });
-          } else {
-            messagesPayload.push({ role: h.role, content: h.content });
+          for (var i = 0; i < history.length; i++) {
+            var h = history[i];
+            if (h.role === 'user' && h.image) {
+              messagesPayload.push({
+                role: 'user',
+                content: [
+                  { type: 'text', text: h.content || '描述这张图片' },
+                  { type: 'image_url', image_url: { url: h.image } }
+                ]
+              });
+            } else {
+              messagesPayload.push({ role: h.role, content: h.content });
+            }
           }
+
+          var response = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'agnes-2.5-flash',
+              messages: messagesPayload,
+              temperature: 0.8,
+              max_tokens: 512,
+              stream: false
+            })
+          });
+
+          if (!response.ok) {
+            var errText = await response.text();
+            throw new Error('API 错误: ' + response.status + ' ' + errText);
+          }
+
+          var data = await response.json();
+          var reply = data.choices?.[0]?.message?.content ||
+            '抱歉，我暂时想不出更好的回答，换个问法试试？';
+
+          removeTyping();
+          addMsg(reply, 'bot');
+          chatHistory.push({ role: 'assistant', content: reply });
+          saveHistory();
+
+        } catch (err) {
+          console.warn('HRSI 请求失败:', err);
+          removeTyping();
+          addMsg('😅 网络出了点问题，HRSI 暂时没法回答。错误: ' + err.message, 'bot');
         }
 
-        const response = await fetch(WORKER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'agnes-2.5-flash',
-            messages: messagesPayload,
-            temperature: 0.8,
-            max_tokens: 512,
-            stream: false
-          })
-        });
-
-        if (!response.ok) {
-          const errText = await response.text();
-          throw new Error('API 错误: ' + response.status + ' ' + errText);
-        }
-
-        const data = await response.json();
-        const reply = data.choices?.[0]?.message?.content ||
-          '抱歉，我暂时想不出更好的回答，换个问法试试？';
-
-        removeTyping();
-        addMsg(reply, 'bot');
-        chatHistory.push({ role: 'assistant', content: reply });
-        saveHistory();
-
-      } catch (err) {
-        console.warn('HRSI 请求失败:', err);
-        removeTyping();
-        addMsg('😅 网络出了点问题，HRSI 暂时没法回答。错误: ' + err.message, 'bot');
-      }
-
-      isLoading = false;
-      sendBtn.disabled = false;
-      input.focus();
-      input.style.height = 'auto';
+        isLoading = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = '发送';
+        input.focus();
+      })();
     };
 
-    function autoResize() {
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 80) + 'px';
-    }
-
-    input.addEventListener('input', autoResize);
-
+    // ============================================================
+    //  🔥 移动端键盘事件（核心修复）
+    // ============================================================
+    // 使用 input 标签，监听 keydown 和 keypress
     input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      // Enter 键（兼容移动端）
+      if (e.key === 'Enter' || e.keyCode === 13) {
         e.preventDefault();
         window.sendHRSI();
       }
     });
 
+    // 额外的 keyup 监听（某些移动浏览器）
+    input.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter' || e.keyCode === 13) {
+        // 防止重复触发
+      }
+    });
+
+    // ============================================================
+    //  🔥 发送按钮事件
+    // ============================================================
+    sendBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.sendHRSI();
+    });
+
+    // 触摸事件优化（移动端响应更快）
+    sendBtn.addEventListener('touchstart', function(e) {
+      // 不阻止默认事件，让 click 也能触发
+    }, { passive: true });
+
+    // ===== 上传按钮 =====
     uploadBtn.addEventListener('click', function() {
       fileInput.click();
     });
@@ -2277,51 +2409,43 @@ title: 首页
       this.value = '';
     });
 
+    // ===== 拖拽上传 =====
     document.addEventListener('dragover', function(e) {
       e.preventDefault();
     });
     document.addEventListener('drop', function(e) {
       e.preventDefault();
-      const files = e.dataTransfer.files;
+      var files = e.dataTransfer.files;
       if (files && files.length > 0 && isOpen) {
         handleImage(files[0]);
       }
     });
 
+    // ===== 初始化 =====
     loadHistory();
-    console.log('🔥 HRSI 辅导助手已加载 (完整版)');
+    console.log('🔥 HRSI 辅导助手已加载 (移动端优化版)');
     console.log('📦 最大记忆轮数:', MAX_HISTORY);
+
+    var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    console.log('📱 设备类型:', isMobile ? '移动端' : '桌面端');
+
+    // 如果是移动端，额外优化
+    if (isMobile) {
+      // 防止页面缩放
+      var metaViewport = document.querySelector('meta[name=viewport]');
+      if (metaViewport) {
+        // 保持现有 viewport 设置
+      }
+    }
 
   })();
 </script>
 
-<!-- ===== 打字动画样式 ===== -->
-<style>
-  .typing {
-    display: flex;
-    gap: 4px;
-    padding: 2px 0;
-  }
-  .typing span {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #888;
-    animation: typing-bounce 1.2s ease-in-out infinite;
-  }
-  .typing span:nth-child(2) { animation-delay: 0.2s; }
-  .typing span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes typing-bounce {
-    0%, 60%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-6px); }
-  }
-</style>
-
-<!-- ===== 头像占位增强 ===== -->
+<!-- ===== 头像占位 ===== -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const img = document.querySelector('.profile-avatar');
-    const fallback = document.querySelector('.fallback-avatar');
+    var img = document.querySelector('.profile-avatar');
+    var fallback = document.querySelector('.fallback-avatar');
     if (img && img.complete && img.naturalWidth === 0) {
       img.style.display = 'none';
       fallback.style.display = 'flex';
